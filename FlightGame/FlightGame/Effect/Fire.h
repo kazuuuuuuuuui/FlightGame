@@ -2,10 +2,10 @@
 #define FIRE_H_
 
 #include<list>
-#include"../MyLibrary/GameObject/GameObject.h"
+#include"Effect.h"
 #include"Particle.h"
 
-class Fire :public oka::GameObject
+class Fire :public oka::Effect
 {
 public:
 	static const int m_particleNum;

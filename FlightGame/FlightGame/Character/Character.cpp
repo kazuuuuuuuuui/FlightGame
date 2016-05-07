@@ -56,7 +56,7 @@ void Character::Update()
 	if (m_isHitAttack)
 	{
 		//書き換え
-		//m_hp -= 1;
+		m_hp -= 5;
 	}
 
 	m_isHitAttack = false;
@@ -89,8 +89,8 @@ void Character::Update()
 		m_isActive = false;
 
 		//爆発エフェクト
-		oka::GameManager::GetInstance()->AddGameObject("Smoke", Smoke::Create(m_transform.GetPosition()));
-		oka::GameManager::GetInstance()->AddGameObject("Fire", Fire::Create(m_transform.GetPosition()));
+		/*oka::GameManager::GetInstance()->AddGameObject("Smoke", Smoke::Create(m_transform.GetPosition()));
+		oka::GameManager::GetInstance()->AddGameObject("Fire", Fire::Create(m_transform.GetPosition()));*/
 	}
 
 

@@ -4,6 +4,7 @@
 #include"ImageManager.h"
 #include"../Sound/Sound.h"
 #include"SoundManager.h"
+#include"EffectManager.h"
 #include"../../Scene/GameMainScene.h"
 
 //debug
@@ -162,6 +163,13 @@ namespace oka
 			oka::CharacterManager::GetInstance()->AddCharacter(new Enemy(glm::vec3(0.0f, 5.0f, -100.0f)));
 			oka::GameManager::GetInstance()->AddGameObject("Character", oka::CharacterManager::GetInstance()->m_characters[0]);
 			oka::GameManager::GetInstance()->AddGameObject("Enemy", oka::CharacterManager::GetInstance()->m_characters[1]);
+
+			//debug
+			glm::vec3 pos = glm::vec3(0.0f, 0.0f, -50.0f);
+			int particleNum = 35;
+			oka::EffectManager::GetInstance()->AddEffects(Smoke::Create(pos, particleNum));
+			oka::EffectManager::GetInstance()->AddEffects(Fire::Create(glm::vec3(pos)));
+
 
 			//oka::SoundManager::GetInstance()->AddSound("Shot", oka::Sound::LoadWavFile());
 

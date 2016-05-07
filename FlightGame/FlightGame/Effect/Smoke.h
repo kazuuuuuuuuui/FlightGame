@@ -2,16 +2,14 @@
 #define SMOKE_H_
 
 #include<list>
-#include"../MyLibrary/GameObject/GameObject.h"
+#include"Effect.h"
 #include"Particle.h"
 
-class Smoke :public oka::GameObject
+class Smoke :public oka::Effect
 {
 public:
-	static const int m_particleNum;
 	std::list<Particle*>m_particles;
-
-	static Smoke* Create(glm::vec3 _pos);
+	static Smoke* Create(glm::vec3 _pos,const int _particleNum);
 
 	void Draw();
 	void Update();

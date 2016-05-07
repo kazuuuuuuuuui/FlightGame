@@ -1,7 +1,7 @@
 #include"Fire.h"
 #include"../glut.h"
 
-const int Fire::m_particleNum = 20;
+const int Fire::m_particleNum = 30;
 
 Fire::Fire(glm::vec3 _pos)
 {
@@ -11,9 +11,9 @@ Fire::Fire(glm::vec3 _pos)
 	{
 		Particle *particle = new Particle(glm::vec3(1.0f,0.5f,0.25f));
 
-		particle->m_speed.x = ((float)rand() / RAND_MAX - 0.5f)*0.01f;
-		particle->m_speed.y = (0.5f + ((float)rand() / RAND_MAX)) *0.001f;
-		particle->m_speed.z = ((float)rand() / RAND_MAX - 0.5f)*0.01f;
+		particle->m_speed.x = ((float)rand() / RAND_MAX - 0.5f)*0.05f;
+		particle->m_speed.y = (((float)rand() / RAND_MAX)) *0.1f;
+		particle->m_speed.z = ((float)rand() / RAND_MAX - 0.5f)*0.05f;
 		particle->m_alpha = ((float)rand() / RAND_MAX);
 
 		m_particles.push_back(particle);
@@ -63,7 +63,7 @@ void Fire::Update()
 	glm::mat4 rotate = rotateX*rotateY*rotateZ;
 
 	glm::mat4 scale = glm::mat4(1.0);
-	scale = glm::scale(scale,m_transform.GetScale());
+	scale = glm::scale(scale, m_transform.GetScale())*glm::scale(scale, glm::vec3(0.8f, 1, 0.8f));
 
 	m_matrix = translate *rotate *scale;
 
@@ -71,7 +71,7 @@ void Fire::Update()
 	for (auto itr = m_particles.begin(); itr != m_particles.end(); itr++)
 	{
 		(*itr)->m_alpha -= 0.01f;
-		(*itr)->m_transform.SetScale(m_transform.GetScale() + 0.4f);
+		(*itr)->m_transform.SetScale(m_transform.GetScale() + 3.0f);
 		(*itr)->m_transform.SetPosition((*itr)->m_transform.GetPosition() + (*itr)->m_speed*(*itr)->m_alpha);
 	}
 }

@@ -3,6 +3,7 @@
 #include"../MyLibrary/Manager/GameManager.h"
 #include"../MyLibrary/Manager/JoysticManager.h"
 #include"../MyLibrary/Manager/CharacterManager.h"
+#include"../MyLibrary/Manager/EffectManager.h"
 #include"../glut.h"
 
 void GameMainScene::Update()
@@ -27,15 +28,22 @@ void GameMainScene::Update()
 	}
 
 	//全オブジェクトの更新
-
 	for (auto itr = oka::GameManager::GetInstance()->m_gameObject.begin(); itr != oka::GameManager::GetInstance()->m_gameObject.end(); itr++)
 	{
 		itr->second->Update();
 	}
 
+	//エフェクト
+	for (auto itr = oka::EffectManager::GetInstance()->m_effects.begin(); itr != oka::EffectManager::GetInstance()->m_effects.end(); itr++)
+	{
+		(*itr)->Update();
+	}
+
+	oka::EffectManager::GetInstance()->EraseEffect();
+
 	/*
 	
-	弾変更
+	弾変更予定
 	
 	*/
 
@@ -65,9 +73,15 @@ void GameMainScene::Render()
 	g_camera->SetViewMatrix(pos, target, up);
 	g_camera->MultViewMatrix();
 
+	//全オブジェクトの描画
 	for (auto itr = oka::GameManager::GetInstance()->m_gameObject.begin(); itr != oka::GameManager::GetInstance()->m_gameObject.end(); itr++)
 	{
 		itr->second->Draw();
+	}
+
+	for (auto itr = oka::EffectManager::GetInstance()->m_effects.begin(); itr != oka::EffectManager::GetInstance()->m_effects.end(); itr++)
+	{
+		(*itr)->Draw();
 	}
 
 

@@ -4,6 +4,8 @@
 #include"../MyLibrary/Input/Keyboard.h"
 #include"../MyLibrary/Input/Controller.h"
 #include"../MyLibrary/Manager/ImageManager.h"
+#include"../Effect/Smoke.h"
+#include"../MyLibrary/Manager/EffectManager.h"
 #include"../MyLibrary/Camera/Camera.h"
 
 #include"../glm/glm.hpp"
@@ -106,6 +108,17 @@ void Player::Accel(unsigned short _pressedKey)
 		accel.z = value*cos(m_transform.GetRotation().y);
 
 		m_accel = accel;
+
+		//‘OiŽž‚Ì‰Œ•¬o
+		/*glm::vec3 myPos = m_transform.GetPosition();
+		glm::vec3 pos;
+		pos.x = myPos.x - sin(m_transform.GetRotation().y);
+		pos.y = myPos.y + sin(m_transform.GetRotation().x);
+		pos.z = myPos.z - cos(m_transform.GetRotation().y);
+
+		int particleNum = 1;
+		oka::EffectManager::GetInstance()->AddEffects(Smoke::Create(pos, particleNum));*/
+
 	}
 	else
 	{

@@ -1,9 +1,9 @@
 #ifndef PARTICLE_H_
 #define PARTICLE_H_
 
-#include"../MyLibrary/GameObject/GameObject.h"
+#include"Effect.h"
 
-class Particle :public oka::GameObject
+class Particle :public oka::Effect
 {
 public:
 	float m_alpha;

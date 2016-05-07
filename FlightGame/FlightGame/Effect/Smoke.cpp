@@ -1,34 +1,50 @@
 #include"Smoke.h"
 #include"../glut.h"
 
-const int Smoke::m_particleNum = 20;
+//-------------------------------------
+//コンストラクタ
+//煙自体の発生位置を引数として指定する
 
 Smoke::Smoke(glm::vec3 _pos)
 {
 	m_transform.SetPosition(_pos);
 
-	for (int i = 0; i < m_particleNum; i++)
+}
+
+//-------------------------------------
+//煙エフェクトの生成
+//引数として煙自体の座標と煙を形成する
+//パーティクルの枚数を指定する
+//戻り値として生成した煙を返す
+
+Smoke* Smoke::Create(glm::vec3 _pos,const int _particleNum)
+{
+	Smoke *smoke = new Smoke(_pos);
+
+	for (int i = 0; i < _particleNum; i++)
 	{
 		glm::vec3 color;
-		color.x = 160.0f / 255.0f;
-		color.y = 160.0f / 255.0f;
-		color.z = 160.0f / 255.0f;
+		color.x = 30.0f / 255.0f;
+		color.y = 30.0f / 255.0f;
+		color.z = 30.0f / 255.0f;
 
 		Particle *particle = new Particle(color);
 
-		particle->m_speed.x = ((float)rand() / RAND_MAX - 0.5f)*0.02f;
-		particle->m_speed.y = (0.05f + ((float)rand() / RAND_MAX)*0.5f) *0.05f;
-		particle->m_speed.z = ((float)rand() / RAND_MAX - 0.5f)*0.015f;
+		glm::vec3 speed;
+		speed.x = ((float)rand() / RAND_MAX - 0.5f)*0.05f;
+		speed.y = (((float)rand() / RAND_MAX)) *0.05f;
+		speed.z = ((float)rand() / RAND_MAX - 0.5f)*0.05f;
+		particle->m_speed = speed;
 		particle->m_alpha = ((float)rand() / RAND_MAX);
 
-		m_particles.push_back(particle);
+		smoke->m_particles.push_back(particle);
 	}
+
+	return smoke;
 }
 
-Smoke* Smoke::Create(glm::vec3 _pos)
-{
-	return new Smoke(_pos);
-}
+//-------------------------------------
+//煙の描画
 
 void Smoke::Draw()
 {
@@ -47,6 +63,9 @@ void Smoke::Draw()
 	}
 	glPopAttrib();
 }
+
+//-------------------------------------
+//煙の更新
 
 void Smoke::Update()
 {
@@ -75,8 +94,15 @@ void Smoke::Update()
 	//パーティクルの更新
 	for (auto itr = m_particles.begin(); itr != m_particles.end(); itr++)
 	{
-		(*itr)->m_alpha -= 0.0025f;
-		(*itr)->m_transform.SetScale(m_transform.GetScale() + (*itr)->m_alpha*0.01f);
+		(*itr)->m_alpha -= 0.00005f;
+
+		//ある程度アルファ値が下がったら非活性にする
+		if ((*itr)->m_alpha <= 0.0f)
+		{
+			(*itr)->m_isActive = false;
+		}
+
+		(*itr)->m_transform.SetScale(m_transform.GetScale() + (*itr)->m_alpha*8.0f);
 		(*itr)->m_transform.SetPosition((*itr)->m_transform.GetPosition() + (*itr)->m_speed*(*itr)->m_alpha);
 	}
 }
