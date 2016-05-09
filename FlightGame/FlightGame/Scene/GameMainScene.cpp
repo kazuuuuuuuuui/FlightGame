@@ -62,7 +62,7 @@ void GameMainScene::Render()
 	glm::vec3 pos;
 	const float value = 7.0f;//•âŠ®ŒW”
 	pos.x = oka::CharacterManager::GetInstance()->m_characters[0]->m_transform.GetPosition().x + sin(oka::CharacterManager::GetInstance()->m_characters[0]->m_transform.GetRotation().y) * value;
-	pos.y = oka::CharacterManager::GetInstance()->m_characters[0]->m_transform.GetPosition().y +3.0f;
+	pos.y = oka::CharacterManager::GetInstance()->m_characters[0]->m_transform.GetPosition().y + 3.0f;
 	pos.z = oka::CharacterManager::GetInstance()->m_characters[0]->m_transform.GetPosition().z + cos(oka::CharacterManager::GetInstance()->m_characters[0]->m_transform.GetRotation().y) * value;
 
 	glm::vec3 target = {oka::CharacterManager::GetInstance()->m_characters[0]->m_transform.GetPosition()};

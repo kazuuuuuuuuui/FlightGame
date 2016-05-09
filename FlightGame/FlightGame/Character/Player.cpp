@@ -55,7 +55,7 @@ void Player::Control(unsigned short _pressedKey, unsigned int _downKeys, float _
 {
 	Accel(_pressedKey);
 	Yaw(_sThumbLX);
-	//Roll(_pressedKey);
+	Roll(_pressedKey);
 	//Pitch(_sThumbLY);
 	Shot(_downKeys);
 

@@ -35,8 +35,8 @@ Smoke* Smoke::Create(glm::vec3 _pos,const int _particleNum)
 		speed.y = (((float)rand() / RAND_MAX)) *0.05f;
 		speed.z = ((float)rand() / RAND_MAX - 0.5f)*0.05f;
 		particle->m_speed = speed;
-		particle->m_alpha = ((float)rand() / RAND_MAX);
-
+		particle->m_alpha = 0.5f + ((float)rand() / RAND_MAX)*0.5f;//0.5f～1.0fの値を取得
+	
 		smoke->m_particles.push_back(particle);
 	}
 
@@ -94,10 +94,10 @@ void Smoke::Update()
 	//パーティクルの更新
 	for (auto itr = m_particles.begin(); itr != m_particles.end(); itr++)
 	{
-		(*itr)->m_alpha -= 0.00005f;
+		(*itr)->m_alpha -= 0.0001f;
 
 		//ある程度アルファ値が下がったら非活性にする
-		if ((*itr)->m_alpha <= 0.0f)
+		if ((*itr)->m_alpha <= 0.75f)
 		{
 			(*itr)->m_isActive = false;
 		}
@@ -105,4 +105,32 @@ void Smoke::Update()
 		(*itr)->m_transform.SetScale(m_transform.GetScale() + (*itr)->m_alpha*8.0f);
 		(*itr)->m_transform.SetPosition((*itr)->m_transform.GetPosition() + (*itr)->m_speed*(*itr)->m_alpha);
 	}
+
+	//後で変更
+	auto itr = m_particles.begin();
+	while (itr != m_particles.end())
+	{
+		if ((*itr)->m_isActive)
+		{
+
+		}
+		else
+		{
+			delete (*itr);
+			itr = m_particles.erase(itr);
+			continue;
+		}
+
+		itr++;
+	}
+
+	//煙非活性
+	if (0 == m_particles.size())
+	{
+		m_isActive = false;
+	}
+
+	
+
+
 }

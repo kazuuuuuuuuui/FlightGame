@@ -96,7 +96,7 @@ void Character::Update()
 
 	//debug
 	m_transform.DrawMyToVec();
-	//m_transform.DrawMyUpVec();
+	m_transform.DrawMyUpVec();
 }
 
 //-------------------------------------

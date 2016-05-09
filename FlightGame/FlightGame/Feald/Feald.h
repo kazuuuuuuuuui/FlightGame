@@ -38,14 +38,15 @@ public:
 		//インデックスデータ
 		SetIndex();
 
+		//頂点の高さ設定
+		SetHeight("test.bmp");
+
 		//法線データ
 		SetNormal();
 
 		//uvデータ
 		SetTex();
 
-		//test
-		SetHeight("test.bmp");
 	};
 
 	~Feald()

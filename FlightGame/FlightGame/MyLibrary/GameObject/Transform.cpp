@@ -80,9 +80,10 @@ namespace oka
 				glVertex3f(root.x, root.y, root.z);
 
 				glm::vec3 aim;
-				aim.x = root.x + m_myUpVec.x * 2;
-				aim.y = root.y + m_myUpVec.y * 2;
-				aim.z = root.z + m_myUpVec.z * 2;
+				aim.x = root.x;
+				aim.z = root.z;
+
+				aim.y = root.y;
 
 				glVertex3f(aim.x, aim.y, aim.z);
 			}

@@ -67,6 +67,7 @@ void display()
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 	glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_CULL_FACE);
 
 
 	//debug
@@ -88,7 +89,7 @@ void display()
 
 void timer(int value) 
 {
-	//fps();
+	fps();
 	/*for (unsigned int i = 0; i<oka::CharacterManager::GetInstance()->m_characters.size(); i++)
 	{
 		printf("[%d]HP:%d\n", i, oka::CharacterManager::GetInstance()->m_characters[i]->m_hp);
