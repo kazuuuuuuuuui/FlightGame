@@ -40,7 +40,7 @@ public:
 		glm::mat4 translate = glm::mat4(1.0);
 		translate = glm::translate(translate,m_transform.GetPosition());
 		
-		m_matrix = translate;
+		m_transform.m_matrix = translate;
 		
 	}
 };

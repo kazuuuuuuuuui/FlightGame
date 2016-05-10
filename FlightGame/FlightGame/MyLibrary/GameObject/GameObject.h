@@ -39,23 +39,12 @@ namespace oka
 
 		//自身の位置・回転・拡大縮小情報
 		Transform m_transform;
-		
-		//自身の行列
-		glm::mat4 m_matrix;
-		glm::mat4 m_translate;
-		glm::mat4 m_rotate;
-		glm::mat4 m_scale;
-
 
 		bool CheckIsActive()const;
 
 		GameObject() :
 			m_flame(0),
-			m_isActive(true),
-			m_matrix(glm::mat4(1.0)),
-			m_translate(glm::mat4(1.0)),
-			m_rotate(glm::mat4(1.0)),
-			m_scale(glm::mat4(1.0))
+			m_isActive(true)
 		{};
 
 		virtual void Draw() = 0;

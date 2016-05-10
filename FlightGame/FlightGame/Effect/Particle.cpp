@@ -20,8 +20,6 @@ void Particle::Draw()
 
 		glPushMatrix();
 		{
-			//glMultMatrixf((GLfloat*)&m_matrix);
-
 			glTranslatef(m_transform.GetPosition().x, m_transform.GetPosition().y, m_transform.GetPosition().z);
 
 			//ビルボード回転行列適用

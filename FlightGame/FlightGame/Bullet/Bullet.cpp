@@ -15,7 +15,7 @@ void Bullet::Draw()
 		glPushMatrix();
 		{
 			//行列適応
-			glMultMatrixf((GLfloat*)&m_matrix);
+			glMultMatrixf((GLfloat*)&m_transform.m_matrix);
 
 			//glutSolidCube(0.5);
 			glutSolidCube(1);
@@ -52,30 +52,6 @@ void Bullet::Update()
 
 		//Homing(oka::CharacterManager::GetInstance()->m_characters[1]->m_transform.GetPosition());
 	}
-
-
-
-	//行列計算
-	m_matrix = glm::mat4(1.0);
-
-	glm::mat4 translate = glm::mat4(1.0);
-	translate = glm::translate(translate, m_transform.GetPosition());
-
-	glm::mat4 rotateX = glm::mat4(1.0);
-	rotateX = glm::rotate(rotateX, m_transform.GetRotation().x, glm::vec3(1, 0, 0));
-
-	glm::mat4 rotateY = glm::mat4(1.0);
-	rotateX = glm::rotate(rotateY, m_transform.GetRotation().y, glm::vec3(0, 1, 0));
-
-	glm::mat4 rotateZ = glm::mat4(1.0);
-	rotateX = glm::rotate(rotateZ, m_transform.GetRotation().z, glm::vec3(0, 0, 1));
-
-	glm::mat4 rotate = rotateX*rotateY*rotateZ;
-
-	glm::mat4 scale = glm::mat4(1.0);
-	scale = glm::scale(scale, m_transform.GetScale());
-
-	m_matrix = translate *rotate *scale;
 
 	m_transform.SetPosition(m_transform.GetPosition() + m_speed);
 

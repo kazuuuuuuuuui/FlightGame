@@ -24,6 +24,7 @@ void Player::Control()
 	Accel();
 	Yaw();
 	Roll();
+
 	Shot();
 
 	const float value = 0.4f * ((float)M_PI / 180.0f);
@@ -55,11 +56,11 @@ void Player::Control(unsigned short _pressedKey, unsigned int _downKeys, float _
 {
 	Accel(_pressedKey);
 	Yaw(_sThumbLX);
+	Pitch(_sThumbLY);
 	Roll(_pressedKey);
-	//Pitch(_sThumbLY);
 	Shot(_downKeys);
 
-
+	//printf("x:%f y:%f z:%f\n", m_transform.GetPosition().x, m_transform.GetPosition().y, m_transform.GetPosition().z);
 
 	//後で変更
 	DrawTarget();
@@ -157,11 +158,9 @@ void Player::Yaw()
 
 	glm::vec3 axis;
 
-	axis.x = 0.0f;
-	axis.y = 1.0f;
-	axis.z = 0.0f;
+	
 
-	axis = glm::normalize(axis);
+
 
 	glm::vec4 rotate;
 	float angle = m_transform.GetRotation().y;
@@ -174,8 +173,8 @@ void Player::Yaw()
 	glm::quat quat = glm::quat(rotate.w, rotate.x, rotate.y, rotate.z);
 
 	//rotate
-	m_rotate = glm::mat4(1.0);
-	m_rotate = glm::toMat4(quat);
+	m_transform.m_rotateMatrix = glm::mat4(1.0);
+	m_transform.m_rotateMatrix = glm::toMat4(quat);
 }
 
 //-------------------------------------
@@ -184,21 +183,22 @@ void Player::Yaw()
 void Player::Yaw(float _sThumbLX)
 {
 	//旋回の滑らかさ
-	const float value = 0.5f*(M_PI / 180.0f);
+	//ラジアン変換
+	const float value = 0.5f*((float)M_PI / 180.0f);
 
 	//正面右に移動
-	if (_sThumbLX > 0.3)
+	if (_sThumbLX > 0.3f)
 	{
-		_sThumbLX = 1.f;
+		_sThumbLX = 1.0f;
 		m_transform.SetRotationY(m_transform.GetRotation().y - value);
 
 		//m_transform.SetRotationZ(m_transform.GetRotation().z + ((-1)*(_sThumbLX / 2) - m_transform.GetRotation().z)*0.1f);
 	}
 
 	//正面左に移動
-	else if (_sThumbLX < -0.3)
+	else if (_sThumbLX < -0.3f)
 	{
-		_sThumbLX = -1.f;
+		_sThumbLX = -1.0f;
 		m_transform.SetRotationY(m_transform.GetRotation().y + value);
 
 		//m_transform.SetRotationZ(m_transform.GetRotation().z + ((-1)*(_sThumbLX / 2) - m_transform.GetRotation().z)*0.1f);
@@ -210,27 +210,19 @@ void Player::Yaw(float _sThumbLX)
 		//m_transform.SetRotationZ(m_transform.GetRotation().z + ((_sThumbLX / 2) - m_transform.GetRotation().z)*0.1f);
 	}
 
-	glm::vec3 axis;
-
-	axis.x = 0.0f;
-	axis.y = 1.0f;
-	axis.z = 0.0f;
-
-	axis = glm::normalize(axis);
-
-	glm::vec4 rotate;
+	glm::vec3 axis = m_transform.m_myUpVec;
 	float angle = m_transform.GetRotation().y;
 
-	rotate.x = axis.x * sin(angle / 2);
-	rotate.y = axis.y * sin(angle / 2);
-	rotate.z = axis.z * sin(angle / 2);
-	rotate.w = cos(angle / 2);
+	glm::quat quat;
 
-	glm::quat quat = glm::quat(rotate.w, rotate.x, rotate.y, rotate.z);
+	quat.x = axis.x * sin(angle / 2);
+	quat.y = axis.y * sin(angle / 2);
+	quat.z = axis.z * sin(angle / 2);
+	quat.w = cos(angle / 2);
 
-	//rotate
-	m_rotate = glm::mat4(1.0);
-	m_rotate = glm::toMat4(quat);
+	quat = glm::quat(quat);
+
+	m_transform.m_rotateMatrix = glm::toMat4(quat);
 
 }
 
@@ -259,7 +251,7 @@ void Player::Roll()
 
 void Player::Roll(unsigned short _pressedKey)
 {
-	const float value = 1.2f * (M_PI / 180);
+	const float value = 1.2f * ((float)M_PI / 180.0f);
 
 	//右ロール回転
 	if (_pressedKey & XINPUT_GAMEPAD_X)
@@ -273,28 +265,26 @@ void Player::Roll(unsigned short _pressedKey)
 		m_transform.SetRotationZ(m_transform.GetRotation().z + value);
 	}
 
-	glm::vec3 axis;
-
-	axis.x = -sin(m_transform.GetRotation().y);
-	axis.y = sin(m_transform.GetRotation().x);
-	axis.z = -cos(m_transform.GetRotation().y);
-
-	axis = glm::normalize(axis);
-
-	glm::vec4 rotate;
+	glm::vec3 axis = m_transform.m_myToVec;
 	float angle = m_transform.GetRotation().z;
 
-	rotate.x = axis.x * sin(angle / 2);
-	rotate.y = axis.y * sin(angle / 2);
-	rotate.z = axis.z * sin(angle / 2);
-	rotate.w = cos(angle / 2);
+	glm::quat quat;
+	quat.x = axis.x * sin(angle / 2);
+	quat.y = axis.y * sin(angle / 2);
+	quat.z = axis.z * sin(angle / 2);
+	quat.w = cos(angle / 2);
 
-	glm::quat quat = glm::quat(rotate.w, rotate.x, rotate.y, rotate.z);
+	quat = glm::quat(quat);
 
-	//rotate
-	//m_rotate = glm::mat4(1.0);
-	m_rotate = glm::toMat4(quat) * m_rotate;//右からかける
+	m_transform.m_rotateMatrix = glm::toMat4(quat);
+
 }
+
+
+
+
+
+
 
 //-------------------------------------
 //ゲームパッドによるピッチ回転
@@ -305,18 +295,18 @@ void Player::Pitch(float _sThumbLY)
 	const float value = 0.5f*(M_PI / 180.0f);
 
 	//正面右に移動
-	if (_sThumbLY > 0.3)
+	if (_sThumbLY > 0.3f)
 	{
-		_sThumbLY = 1.f;
+		_sThumbLY = 1.0f;
 		m_transform.SetRotationX(m_transform.GetRotation().x - value);
 
 		//m_transform.SetRotationZ(m_transform.GetRotation().z + ((-1)*(_sThumbLX / 2) - m_transform.GetRotation().z)*0.1f);
 	}
 
 	//正面左に移動
-	else if (_sThumbLY < -0.3)
+	else if (_sThumbLY < -0.3f)
 	{
-		_sThumbLY = -1.f;
+		_sThumbLY = -1.0f;
 		m_transform.SetRotationX(m_transform.GetRotation().x + value);
 
 		//m_transform.SetRotationZ(m_transform.GetRotation().z + ((-1)*(_sThumbLX / 2) - m_transform.GetRotation().z)*0.1f);
@@ -328,27 +318,18 @@ void Player::Pitch(float _sThumbLY)
 		
 	}
 
-	glm::vec3 axis;
-
-	axis.x = 1.0f;
-	axis.y = 0.0f;
-	axis.z = 0.0f;
-
-	axis = glm::normalize(axis);
-
-	glm::vec4 rotate;
+	glm::vec3 axis = m_transform.m_mySideVec;
 	float angle = m_transform.GetRotation().x;
 
-	rotate.x = axis.x * sin(angle / 2);
-	rotate.y = axis.y * sin(angle / 2);
-	rotate.z = axis.z * sin(angle / 2);
-	rotate.w = cos(angle / 2);
+	glm::quat quat;
+	quat.x = axis.x * sin(angle / 2);
+	quat.y = axis.y * sin(angle / 2);
+	quat.z = axis.z * sin(angle / 2);
+	quat.w = cos(angle / 2);
 
-	glm::quat quat = glm::quat(rotate.w, rotate.x, rotate.y, rotate.z);
+	quat = glm::quat(quat);
 
-	//rotate
-	//m_rotate = glm::mat4(1.0);
-	m_rotate = glm::toMat4(quat)*m_rotate;//右からかける
+	m_transform.m_rotateMatrix = glm::toMat4(quat);
 }
 
 

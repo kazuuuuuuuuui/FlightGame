@@ -59,16 +59,26 @@ void GameMainScene::Render()
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
+	const float value = 8.0f;//補完係数
+
+	//カメラの注視点
+	glm::vec3 v = oka::CharacterManager::GetInstance()->m_characters[0]->m_transform.GetPosition();
+	glm::vec3 target = v;
+
+	//カメラの座標
 	glm::vec3 pos;
-	const float value = 7.0f;//補完係数
-	pos.x = oka::CharacterManager::GetInstance()->m_characters[0]->m_transform.GetPosition().x + sin(oka::CharacterManager::GetInstance()->m_characters[0]->m_transform.GetRotation().y) * value;
-	pos.y = oka::CharacterManager::GetInstance()->m_characters[0]->m_transform.GetPosition().y + 3.0f;
-	pos.z = oka::CharacterManager::GetInstance()->m_characters[0]->m_transform.GetPosition().z + cos(oka::CharacterManager::GetInstance()->m_characters[0]->m_transform.GetRotation().y) * value;
+	glm::vec3 toVec = oka::CharacterManager::GetInstance()->m_characters[0]->m_transform.m_myToVec;
+	pos.x = v.x - toVec.x * value;
+	pos.y = v.y - toVec.y * value;
+	pos.z = v.z - toVec.z * value;
 
-	glm::vec3 target = {oka::CharacterManager::GetInstance()->m_characters[0]->m_transform.GetPosition()};
+	//カメラのupベクトル
+	glm::vec3 up;
+	glm::vec3 upVec = oka::CharacterManager::GetInstance()->m_characters[0]->m_transform.m_myUpVec;
+	up.x = 0.0f + upVec.x;
+	up.y = 1.0f + upVec.y;
+	up.z = 0.0f + upVec.z;
 
-	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-	
 	g_camera->Perspective();
 	g_camera->SetViewMatrix(pos, target, up);
 	g_camera->MultViewMatrix();

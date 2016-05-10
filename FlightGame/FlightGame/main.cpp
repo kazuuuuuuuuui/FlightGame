@@ -89,17 +89,7 @@ void display()
 
 void timer(int value) 
 {
-	fps();
-	/*for (unsigned int i = 0; i<oka::CharacterManager::GetInstance()->m_characters.size(); i++)
-	{
-		printf("[%d]HP:%d\n", i, oka::CharacterManager::GetInstance()->m_characters[i]->m_hp);
-	}*/
-
-	//Œã‚Å•ÏX
-	BillboardMatrix = glm::inverse(g_camera->GetViewMatrix());
-	BillboardMatrix[3][0] = 0;
-	BillboardMatrix[3][1] = 0;
-	BillboardMatrix[3][2] = 0;
+	//fps();
 
 	glutPostRedisplay();
 	glutTimerFunc(1000 / 60, timer, 0);

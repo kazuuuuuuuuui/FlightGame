@@ -11,12 +11,18 @@ namespace oka
 	private:
 		glm::vec3 m_position;
 		glm::vec3 m_lastPosition;
-		glm::vec3 m_rotate;//度数管理
+		glm::vec3 m_rotate;//ラジアン管理
 		glm::vec3 m_scale;
 
 	public:
+		glm::mat4 m_matrix;//自身の行列
+		glm::mat4 m_translateMatrix;
+		glm::mat4 m_rotateMatrix;
+		glm::mat4 m_scaleMatrix;
+
 		glm::vec3 m_myToVec;//自身の向きベクトル
 		glm::vec3 m_myUpVec;//自身の上向きを示すベクトル
+		glm::vec3 m_mySideVec;//自身の横向きを示すベクトル
 
 		void Update();
 
@@ -38,17 +44,22 @@ namespace oka
 
 		void SetToVec();
 		void SetUpVec();
+		void SetSideVec();
 
 		//debug用
 		void DrawMyToVec();
 		void DrawMyUpVec();
-
+		void DrawMySideVec();
 	
 		Transform() :
 			m_position(0.0f, 0.0f, 0.0f),
 			m_lastPosition(0.0f, 0.0f, 0.0f),
 			m_rotate(0.0f, 0.0f, 0.0f),
 			m_scale(1.0f, 1.0f, 1.0f),
+			m_matrix(glm::mat4(1.0)),
+			m_translateMatrix(glm::mat4(1.0)),
+			m_rotateMatrix(glm::mat4(1.0)),
+			m_scaleMatrix(glm::mat4(1.0)),
 			m_myToVec(glm::vec3(0.0f, 0.0f, 0.0f))
 		{}
 	};

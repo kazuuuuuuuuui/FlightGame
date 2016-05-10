@@ -159,16 +159,16 @@ namespace oka
 			oka::ImageManager::GetInstance()->SetHandle("FealdTex", oka::LoadImage3f("tex.bmp"));
 			oka::ImageManager::GetInstance()->SetHandle("Smoke", oka::LoadImage4f("smoke.bmp"));
 			oka::ImageManager::GetInstance()->SetHandle("Target", oka::LoadImage4f("target.bmp"));
-			oka::CharacterManager::GetInstance()->AddCharacter(new Player(glm::vec3(0.0f, 5.0f, 0.0f)));
-			oka::CharacterManager::GetInstance()->AddCharacter(new Enemy(glm::vec3(0.0f, 5.0f, -100.0f)));
+			oka::CharacterManager::GetInstance()->AddCharacter(new Player(glm::vec3(0.0f, 0.0f, 0.0f)));
+			//oka::CharacterManager::GetInstance()->AddCharacter(new Enemy(glm::vec3(0.0f, 5.0f, -100.0f)));
 			oka::GameManager::GetInstance()->AddGameObject("Character", oka::CharacterManager::GetInstance()->m_characters[0]);
-			oka::GameManager::GetInstance()->AddGameObject("Enemy", oka::CharacterManager::GetInstance()->m_characters[1]);
+			//oka::GameManager::GetInstance()->AddGameObject("Enemy", oka::CharacterManager::GetInstance()->m_characters[1]);
 
 			//debug
-			glm::vec3 pos = glm::vec3(0.0f, 0.0f, -50.0f);
-			int particleNum = 1;
-			//oka::EffectManager::GetInstance()->AddEffects(Smoke::Create(pos, particleNum));
-			//oka::EffectManager::GetInstance()->AddEffects(Fire::Create(glm::vec3(pos)));
+			/*glm::vec3 pos = glm::vec3(0.0f, 0.0f, -50.0f);
+			int particleNum = 20;
+			oka::EffectManager::GetInstance()->AddEffects(Smoke::Create(pos, particleNum));
+			oka::EffectManager::GetInstance()->AddEffects(Fire::Create(glm::vec3(pos)));*/
 
 
 			//oka::SoundManager::GetInstance()->AddSound("Shot", oka::Sound::LoadWavFile());

@@ -28,7 +28,7 @@ Smoke* Smoke::Create(glm::vec3 _pos,const int _particleNum)
 		color.y = 30.0f / 255.0f;
 		color.z = 30.0f / 255.0f;
 
-		Particle *particle = new Particle(color);
+		Particle *particle = new Particle(_pos,color);
 
 		glm::vec3 speed;
 		speed.x = ((float)rand() / RAND_MAX - 0.5f)*0.05f;
@@ -52,7 +52,7 @@ void Smoke::Draw()
 	{
 		glPushMatrix();
 		{
-			glMultMatrixf((GLfloat*)&m_matrix);
+			glMultMatrixf((GLfloat*)&m_transform.m_matrix);
 
 			for (auto itr = m_particles.begin(); itr != m_particles.end(); itr++)
 			{
@@ -69,28 +69,6 @@ void Smoke::Draw()
 
 void Smoke::Update()
 {
-	//行列計算
-	m_matrix = glm::mat4(1.0);
-
-	glm::mat4 translate = glm::mat4(1.0);
-	translate = glm::translate(translate, m_transform.GetPosition());
-
-	glm::mat4 rotateX = glm::mat4(1.0);
-	rotateX = glm::rotate(rotateX, m_transform.GetRotation().x, glm::vec3(1, 0, 0));
-
-	glm::mat4 rotateY = glm::mat4(1.0);
-	rotateX = glm::rotate(rotateY, m_transform.GetRotation().y, glm::vec3(0, 1, 0));
-
-	glm::mat4 rotateZ = glm::mat4(1.0);
-	rotateX = glm::rotate(rotateZ, m_transform.GetRotation().z, glm::vec3(0, 0, 1));
-
-	glm::mat4 rotate = rotateX*rotateY*rotateZ;
-
-	glm::mat4 scale = glm::mat4(1.0);
-	scale = glm::scale(scale, m_transform.GetScale());
-
-	m_matrix = translate *rotate *scale;
-
 	//パーティクルの更新
 	for (auto itr = m_particles.begin(); itr != m_particles.end(); itr++)
 	{
@@ -102,7 +80,7 @@ void Smoke::Update()
 			(*itr)->m_isActive = false;
 		}
 
-		(*itr)->m_transform.SetScale(m_transform.GetScale() + (*itr)->m_alpha*8.0f);
+		(*itr)->m_transform.SetScale(m_transform.GetScale() + (*itr)->m_alpha*10.0f);
 		(*itr)->m_transform.SetPosition((*itr)->m_transform.GetPosition() + (*itr)->m_speed*(*itr)->m_alpha);
 	}
 

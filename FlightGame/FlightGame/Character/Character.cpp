@@ -16,9 +16,9 @@ void Character::Draw()
 		glPushMatrix();
 		{
 			//行列適応
-			glMultMatrixf((GLfloat*)&m_matrix);
+			glMultMatrixf((GLfloat*)&m_transform.m_matrix);
 
-			glutSolidTeapot(1);
+			//glutSolidTeapot(1);
 		}
 		glPopMatrix();
 	}
@@ -61,21 +61,6 @@ void Character::Update()
 
 	m_isHitAttack = false;
 
-
-	//行列計算
-
-	//translate
-	m_translate = glm::mat4(1.0);
-	m_translate = glm::translate(m_translate,m_transform.GetPosition());
-
-	//scale
-	m_scale = glm::mat4(1.0);
-	m_scale = glm::scale(m_scale,m_transform.GetScale());
-
-	//行列乗算
-	m_matrix = glm::mat4(1.0f);
-	m_matrix = m_translate * m_rotate * m_scale;
-
 	//座標更新
 	m_speed += m_accel;
 	m_transform.SetPosition(m_transform.GetPosition() + m_speed);
@@ -97,6 +82,7 @@ void Character::Update()
 	//debug
 	m_transform.DrawMyToVec();
 	m_transform.DrawMyUpVec();
+	m_transform.DrawMySideVec();
 }
 
 //-------------------------------------
