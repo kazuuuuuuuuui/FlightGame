@@ -40,10 +40,10 @@ void Bullet::Draw()
 
 void Bullet::Update()
 {
-	if (CheckNearCharacter(oka::CharacterManager::GetInstance()->m_characters[1]->m_transform.GetPosition()))
+	/*if (CheckNearCharacter(oka::CharacterManager::GetInstance()->m_characters[1]->m_transform.GetPosition()))
 	{
 		m_isHorming = false;
-	}
+	}*/
 	
 	//debug
 	if (m_isHorming)
@@ -56,7 +56,7 @@ void Bullet::Update()
 	m_transform.SetPosition(m_transform.GetPosition() + m_speed);
 
 	//キャラクターとの当たり判定
-	unsigned int size = oka::CharacterManager::GetInstance()->m_characters.size();
+	/*unsigned int size = oka::CharacterManager::GetInstance()->m_characters.size();
 	for (unsigned int i = 0; i < size; i++)
 	{
 		glm::vec3 pos = oka::CharacterManager::GetInstance()->m_characters[i]->m_transform.GetPosition();
@@ -65,11 +65,11 @@ void Bullet::Update()
 		{
 			oka::CharacterManager::GetInstance()->m_characters[i]->m_isHitAttack = true;
 		}
-	}
+	}*/
 
 	//debug
-	m_transform.Update();
-	m_transform.DrawMyToVec();
+	//m_transform.Update();
+	//m_transform.DrawMyToVec();
 	//DrawToEnemyVec();
 
 }
@@ -148,7 +148,7 @@ bool Bullet::CheckNearCharacter(glm::vec3 _pos)const
 
 void Bullet::DrawToEnemyVec()
 {
-	glPushAttrib(GL_ALL_ATTRIB_BITS);
+	/*glPushAttrib(GL_ALL_ATTRIB_BITS);
 	{
 		glDisable(GL_LIGHTING);
 
@@ -165,6 +165,6 @@ void Bullet::DrawToEnemyVec()
 		}
 		glEnd();
 	}
-	glPopAttrib();
+	glPopAttrib();*/
 
 }

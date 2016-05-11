@@ -155,13 +155,19 @@ namespace oka
 			printf("\n");
 
 			//debug
-			oka::GameManager::GetInstance()->AddGameObject("Feald", new Feald());
+			//oka::GameManager::GetInstance()->AddGameObject("Feald", new Feald());
 			oka::ImageManager::GetInstance()->SetHandle("FealdTex", oka::LoadImage3f("tex.bmp"));
 			oka::ImageManager::GetInstance()->SetHandle("Smoke", oka::LoadImage4f("smoke.bmp"));
 			oka::ImageManager::GetInstance()->SetHandle("Target", oka::LoadImage4f("target.bmp"));
+			
 			oka::CharacterManager::GetInstance()->AddCharacter(new Player(glm::vec3(0.0f, 0.0f, 0.0f)));
 			//oka::CharacterManager::GetInstance()->AddCharacter(new Enemy(glm::vec3(0.0f, 5.0f, -100.0f)));
-			oka::GameManager::GetInstance()->AddGameObject("Character", oka::CharacterManager::GetInstance()->m_characters[0]);
+
+			//std::list<GameObject*>list;
+			std::list<Character*>list;
+
+oka::GameManager::GetInstance()->AddGameObject("hoge", list);
+			
 			//oka::GameManager::GetInstance()->AddGameObject("Enemy", oka::CharacterManager::GetInstance()->m_characters[1]);
 
 			//debug

@@ -2,6 +2,7 @@
 #define _OKA_MANAGER_H_
 
 #include<map>
+#include<list>
 #include<string>
 #include"../GameObject/GameObject.h"
 
@@ -13,10 +14,10 @@ namespace oka
 	class GameManager
 	{
 	public:
-		std::map<std::string,GameObject*>m_gameObject;
+		std::map<std::string,std::list<GameObject*>>m_gameObjects;
 
 		void Updata();
-		void AddGameObject(std::string _str,GameObject *_object);
+		void AddGameObject(std::string _str, std::list<GameObject*> _objects);
 		void CheckGameObject();
 
 		static GameManager* GetInstance();

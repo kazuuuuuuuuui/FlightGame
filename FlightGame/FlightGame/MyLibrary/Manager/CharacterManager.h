@@ -1,7 +1,7 @@
 #ifndef OKA_CHARACTERMANAGER_H_
 #define OKA_CHARACTERMANAGER_H_
 
-#include<vector>
+#include<list>
 #include"../../Character/Character.h"
 
 namespace oka
@@ -9,7 +9,7 @@ namespace oka
 	class CharacterManager
 	{
 	public:
-		std::vector<Character*> m_characters;
+		std::list<Character*> m_characters;
 
 		void Update();
 		static CharacterManager* GetInstance();

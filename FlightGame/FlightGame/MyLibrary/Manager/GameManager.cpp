@@ -36,13 +36,12 @@ namespace oka
 
 	void GameManager::Updata()
 	{
-		auto itr = m_gameObject.begin();
-		while (itr != m_gameObject.end())
+		auto itr = (m_gameObjects.begin())->second.begin();
+		while (itr != (m_gameObjects.begin())->second.end())
 		{
-			itr->second->m_transform.Update();
+			(*itr)->m_transform.Update();
 
 			itr++;
-
 		}
 		
 		CheckGameObject();
@@ -53,11 +52,11 @@ namespace oka
 	//keyのものが既に登録されているか検索し
 	//なければ管理しているマップに追加する
 
-	void GameManager::AddGameObject(std::string _str, GameObject *_object)
+	void GameManager::AddGameObject(std::string _str, std::list<GameObject*> _objects)
 	{
-		if (m_gameObject.find(_str) == m_gameObject.end())
+		if (m_gameObjects.find(_str) == m_gameObjects.end())
 		{
-			m_gameObject.insert(std::make_pair(_str, _object));
+			m_gameObjects.insert(std::make_pair(_str, _objects));
 		}
 		else
 		{
@@ -68,27 +67,27 @@ namespace oka
 
 	//--------------------------------------------
 	//ゲームに現れるオブジェクトのメモリ解放と削除
-	//非活性ならばメモリを解放しベクターから除外する
+	//非活性ならばメモリを解放しリストーから除外する
 
 	void GameManager::CheckGameObject()
 	{
-		auto itr = m_gameObject.begin();
-		while (itr != m_gameObject.end())
-		{
-			if (itr->second->CheckIsActive())
-			{
+		//auto itr = m_gameObjects.begin();
+		//while (itr != m_gameObjects.end()
+		//{
+		//	if ((*itr)->CheckIsActive())
+		//	{
 
-			}
-			else
-			{
-				delete itr->second;
-				itr = m_gameObject.erase(itr);
-				continue;
-			}
+		//	}
+		//	else
+		//	{
+		//		//delete itr->second;
+		//		itr = m_gameObjects.erase(itr);
+		//		continue;
+		//	}
 
-			itr++;
+		//	itr++;
 
-		}
+		//}
 	}
 
 

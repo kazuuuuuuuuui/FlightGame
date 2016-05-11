@@ -198,7 +198,7 @@ void Feald::Draw()
 void Feald::Update()
 {
 	//debug
-	DrawNormals();
+	//DrawNormals();
 }
 
 

@@ -25,8 +25,8 @@ public:
 	
 	Feald() :
 	//変更予定
-	m_width(64),
-	m_height(64)
+	m_width(256),
+	m_height(256)
 	{
 		//debug
 		printf("フィールドが生成されました\n");
