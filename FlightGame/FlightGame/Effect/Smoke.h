@@ -9,7 +9,7 @@ class Smoke :public oka::Effect
 {
 public:
 	std::list<Particle*>m_particles;
-	static Smoke* Create(glm::vec3 _pos,const int _particleNum);
+	static Smoke* Create(glm::vec3 _pos,const unsigned int _particleNum);
 
 	void Draw();
 	void Update();

@@ -15,9 +15,9 @@ public:
 
 	void Control(unsigned short _pressedKey, unsigned int _downKeys, float _sThumbLX, float _sThumbLY);
 	void Accel(unsigned short _pressedKey);
-	void Yaw(float _sThumbLX);
-	void Pitch(float _sThumbLY);
-	void Roll(unsigned short _pressedKey);
+
+	void Rotate(float _angle,glm::vec3 _axis);
+
 	void Shot(unsigned short _downKeys);
 
 	void DrawTarget();

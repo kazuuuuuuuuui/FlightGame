@@ -17,9 +17,6 @@
 #include"ModelManager.h"
 #include"../Model/xFile.h"
 
-#include"../../Effect/Smoke.h"
-#include"../../Effect/Fire.h"
-
 namespace oka
 {
 	SceneManager* SceneManager::m_instance = nullptr;
@@ -155,28 +152,26 @@ namespace oka
 			printf("\n");
 
 			//debug
-			//oka::GameManager::GetInstance()->AddGameObject("Feald", new Feald());
+			oka::GameManager::GetInstance()->AddGameObject("Feald", new Feald());
 			oka::ImageManager::GetInstance()->SetHandle("FealdTex", oka::LoadImage3f("tex.bmp"));
 			oka::ImageManager::GetInstance()->SetHandle("Smoke", oka::LoadImage4f("smoke.bmp"));
 			oka::ImageManager::GetInstance()->SetHandle("Target", oka::LoadImage4f("target.bmp"));
 			
-			oka::CharacterManager::GetInstance()->AddCharacter(new Player(glm::vec3(0.0f, 0.0f, 0.0f)));
-			//oka::CharacterManager::GetInstance()->AddCharacter(new Enemy(glm::vec3(0.0f, 5.0f, -100.0f)));
+			oka::CharacterManager::GetInstance()->AddCharacter(new Player(glm::vec3(0.0f, 5.0f, 0.0f)));
+			oka::CharacterManager::GetInstance()->AddCharacter(new Enemy(glm::vec3(0.0f, 5.0f, -100.0f)));
 
-			//std::list<GameObject*>list;
-			std::list<Character*>list;
+			auto itr = oka::CharacterManager::GetInstance()->m_characters.begin();
+			auto end = oka::CharacterManager::GetInstance()->m_characters.end();
 
-oka::GameManager::GetInstance()->AddGameObject("hoge", list);
+			while (itr!=end)
+			{
+				oka::GameManager::GetInstance()->AddGameObject("Character", (*itr));
+
+				itr++;
+			}
 			
-			//oka::GameManager::GetInstance()->AddGameObject("Enemy", oka::CharacterManager::GetInstance()->m_characters[1]);
 
 			//debug
-			/*glm::vec3 pos = glm::vec3(0.0f, 0.0f, -50.0f);
-			int particleNum = 20;
-			oka::EffectManager::GetInstance()->AddEffects(Smoke::Create(pos, particleNum));
-			oka::EffectManager::GetInstance()->AddEffects(Fire::Create(glm::vec3(pos)));*/
-
-
 			//oka::SoundManager::GetInstance()->AddSound("Shot", oka::Sound::LoadWavFile());
 
 		}

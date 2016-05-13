@@ -4,8 +4,10 @@
 Explode::Explode(glm::vec3 _pos)
 {
 	m_transform.SetPosition(_pos);
-	m_fire = new Fire(_pos);
-	m_smoke = new Smoke(_pos);
+
+	const unsigned int num = 20;
+	m_fire = Fire::Create(_pos);
+	m_smoke = Smoke::Create(_pos,num);
 }
 
 Explode* Explode::Create(glm::vec3 _pos)
@@ -19,7 +21,6 @@ void Explode::Draw()
 	{
 		glPushMatrix();
 		{
-			glMultMatrixf((GLfloat*)&m_matrix);
 			m_fire->Draw();
 			m_smoke->Draw();
 		}
@@ -30,14 +31,5 @@ void Explode::Draw()
 
 void Explode::Update()
 {
-	//çsóÒåvéZ
-	//m_matrix = glm::mat4(1.0);
-
-	//glm::mat4 translate = glm::translate(m_transform.GetPosition());
-
-	////glm::mat4 rotate = glm::rotate();
-
-	//glm::mat4 scale = glm::scale(m_transform.GetScale());
-
-	//m_matrix = translate *rotate *scale;
+	
 }

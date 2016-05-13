@@ -36,10 +36,10 @@ namespace oka
 
 	void GameManager::Updata()
 	{
-		auto itr = (m_gameObjects.begin())->second.begin();
-		while (itr != (m_gameObjects.begin())->second.end())
+		auto itr = m_gameObjects.begin();
+		while (itr != (m_gameObjects.end()))
 		{
-			(*itr)->m_transform.Update();
+			itr->second->m_transform.Update();
 
 			itr++;
 		}
@@ -49,19 +49,10 @@ namespace oka
 
 	//-------------------------------------
 	//ゲームに現れるオブジェクトの追加
-	//keyのものが既に登録されているか検索し
-	//なければ管理しているマップに追加する
 
-	void GameManager::AddGameObject(std::string _str, std::list<GameObject*> _objects)
+	void GameManager::AddGameObject(std::string _str,GameObject* _object)
 	{
-		if (m_gameObjects.find(_str) == m_gameObjects.end())
-		{
-			m_gameObjects.insert(std::make_pair(_str, _objects));
-		}
-		else
-		{
-			
-		}
+		m_gameObjects.insert(std::make_pair(_str, _object));
 	}
 
 
@@ -71,23 +62,24 @@ namespace oka
 
 	void GameManager::CheckGameObject()
 	{
-		//auto itr = m_gameObjects.begin();
-		//while (itr != m_gameObjects.end()
-		//{
-		//	if ((*itr)->CheckIsActive())
-		//	{
+		auto itr = m_gameObjects.begin();
+		auto end = m_gameObjects.end();
+		while (itr != end)
+		{
+			if (itr->second->CheckIsActive())
+			{
 
-		//	}
-		//	else
-		//	{
-		//		//delete itr->second;
-		//		itr = m_gameObjects.erase(itr);
-		//		continue;
-		//	}
+			}
+			else
+			{
+				//delete itr->second;
+				itr = m_gameObjects.erase(itr);
+				continue;
+			}
 
-		//	itr++;
+			itr++;
 
-		//}
+		}
 	}
 
 

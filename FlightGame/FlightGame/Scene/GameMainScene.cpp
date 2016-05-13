@@ -3,50 +3,31 @@
 #include"../MyLibrary/Manager/GameManager.h"
 #include"../MyLibrary/Manager/JoysticManager.h"
 #include"../MyLibrary/Manager/CharacterManager.h"
+#include"../MyLibrary/Manager/BulletManager.h"
 #include"../MyLibrary/Manager/EffectManager.h"
 #include"../glut.h"
 
 void GameMainScene::Update()
 {
-	//キャラクターの操作
-	//for (unsigned int i = 0; i < oka::JoysticManager::GetInstance()->GetContorollerNumber(); i++)
-	//{
-	//	if (oka::JoysticManager::GetInstance()->GetContoroller(i).m_isConnect)
-	//	{
-	//		unsigned short pressedKey = oka::JoysticManager::GetInstance()->GetContoroller(i).m_state.Gamepad.wButtons;
-	//		unsigned int downKeys = oka::JoysticManager::GetInstance()->GetContoroller(i).m_downkey;
-	//		float sThumbLX = oka::JoysticManager::GetInstance()->GetContoroller(i).m_sThumbLX;
-	//		float sThumbLY = oka::JoysticManager::GetInstance()->GetContoroller(i).m_sThumbLY;
-
-	//		oka::CharacterManager::GetInstance()->m_characters[i]->Control(pressedKey, downKeys, sThumbLX, sThumbLY);
-	//	}
-	//	else
-	//	{
-	//		//oka::CharacterManager::GetInstance()->m_characters[i]->Control();
-	//	}
-
-	//}
-
 	//全オブジェクトの更新
-	auto itr = oka::GameManager::GetInstance()->m_gameObjects.begin()->second.begin();
-	auto end = oka::GameManager::GetInstance()->m_gameObjects.begin()->second.end();
+	auto itr = oka::GameManager::GetInstance()->m_gameObjects.begin();
+	auto end = oka::GameManager::GetInstance()->m_gameObjects.end();
 
 	for (; itr != end; itr++)
 	{
-		(*itr)->Update();
+		itr->second->Update();
 	}
 
-	/*
-	
-	弾変更予定
-	
-	*/
 
-	//弾 
-	/*for (auto itr = oka::CharacterManager::GetInstance()->m_characters[0]->m_bullets.begin(); itr != oka::CharacterManager::GetInstance()->m_characters[0]->m_bullets.end();itr++)
+	auto hoge = oka::BulletManager::GetInstance()->m_bullets.begin();
+	auto piyo = oka::BulletManager::GetInstance()->m_bullets.end();
+	while (hoge != piyo)
 	{
-		(*itr)->Update();
-	}*/
+		(*hoge)->m_transform.Update();
+		(*hoge)->Update();
+		hoge++;
+	}
+
 
 }
 
@@ -73,7 +54,7 @@ void GameMainScene::Render()
 	glm::vec3 pos;
 	
 	pos.x = v.x - toVec.x * value;
-	pos.y = v.y - toVec.y * value;
+	pos.y = v.y + 3.0f;
 	pos.z = v.z - toVec.z * value;
 
 	//カメラのupベクトル
@@ -87,13 +68,22 @@ void GameMainScene::Render()
 	g_camera->MultViewMatrix();
 
 	//全オブジェクトの描画
-	auto itr = oka::GameManager::GetInstance()->m_gameObjects.begin()->second.begin();
-	auto end = oka::GameManager::GetInstance()->m_gameObjects.begin()->second.end();
+	auto itr = oka::GameManager::GetInstance()->m_gameObjects.begin();
+	auto end = oka::GameManager::GetInstance()->m_gameObjects.end();
 
 	for (; itr != end; itr++)
 	{
-		(*itr)->Draw();
+		itr->second->Draw();
 	}
+
+	auto hoge = oka::BulletManager::GetInstance()->m_bullets.begin();
+	auto piyo = oka::BulletManager::GetInstance()->m_bullets.end();
+	while (hoge != piyo)
+	{
+		(*hoge)->Draw();
+		hoge++;
+	}
+
 
 	/*for (auto itr = oka::EffectManager::GetInstance()->m_effects.begin(); itr != oka::EffectManager::GetInstance()->m_effects.end(); itr++)
 	{

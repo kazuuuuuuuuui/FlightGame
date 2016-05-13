@@ -1,11 +1,13 @@
 #define _USE_MATH_DEFINES
 #include<math.h>
+#include"../MyLibrary/Math/MyMath.h"
 #include"Player.h"
 #include"../MyLibrary/Input/Keyboard.h"
 #include"../MyLibrary/Input/Controller.h"
 #include"../MyLibrary/Manager/ImageManager.h"
 #include"../Effect/Smoke.h"
 #include"../MyLibrary/Manager/EffectManager.h"
+#include"../MyLibrary/Manager/BulletManager.h"
 #include"../MyLibrary/Camera/Camera.h"
 
 #include"../glm/glm.hpp"
@@ -55,17 +57,55 @@ void Player::Control()
 void Player::Control(unsigned short _pressedKey, unsigned int _downKeys, float _sThumbLX, float _sThumbLY)
 {
 	Accel(_pressedKey);
-	Yaw(_sThumbLX);
-	Pitch(_sThumbLY);
-	Roll(_pressedKey);
+
+	glm::vec3 nowRotate = m_transform.GetRotation();
+
+	const float value = oka::MyMath::ToRadian(1.0f);
+
+	//Roll
+	if (_pressedKey & XINPUT_GAMEPAD_B)
+	{
+		m_transform.SetRotationZ(nowRotate.z + value);
+		Rotate(value, m_transform.m_myToVec);
+	}
+	else if(_pressedKey & XINPUT_GAMEPAD_X)
+	{
+		m_transform.SetRotationZ(nowRotate.z - value);
+		Rotate(-value, m_transform.m_myToVec);
+	}
+
+	//Yaw
+	if (_sThumbLX > 0.3f)
+	{
+		_sThumbLX = 1.0f;
+		m_transform.SetRotationY(nowRotate.y - value);
+		Rotate(-value, m_transform.m_myUpVec);
+	}
+	else if (_sThumbLX < -0.3f)
+	{
+		_sThumbLX = -1.0f;
+		m_transform.SetRotationY(nowRotate.y + value);
+		Rotate(+value, m_transform.m_myUpVec);
+	}
+	
+	//Pitch
+	if (_sThumbLY > 0.3f)
+	{
+		_sThumbLY = 1.0f;
+		m_transform.SetRotationX(nowRotate.x + value);
+		Rotate(value, m_transform.m_mySideVec);
+	}
+	else if (_sThumbLY < -0.3f)
+	{
+		_sThumbLY = -1.0f;
+		m_transform.SetRotationX(nowRotate.x - value);
+		Rotate(-value, m_transform.m_mySideVec);
+	}
+
 	Shot(_downKeys);
 
-	//printf("x:%f y:%f z:%f\n", m_transform.GetPosition().x, m_transform.GetPosition().y, m_transform.GetPosition().z);
-
 	//後で変更
-	DrawTarget();
-
-
+	//DrawTarget();
 }
 
 //-------------------------------------
@@ -128,209 +168,96 @@ void Player::Accel(unsigned short _pressedKey)
 
 }
 
+
+//-------------------------------------
+//回転処理
+//引数として回転角度と回転軸を受けとる
+
+void Player::Rotate(float _angle, glm::vec3 _axis)
+{
+	glm::quat quat;
+	
+	quat.x = _axis.x * sin(_angle / 2);
+	quat.y = _axis.y * sin(_angle / 2);
+	quat.z = _axis.z * sin(_angle / 2);
+	quat.w = cos(_angle / 2);
+
+	quat = glm::quat(quat);
+	m_transform.m_rotateMatrix *= glm::toMat4(quat);
+}
+
+
 //-------------------------------------
 //キーボードによる旋回
 
 void Player::Yaw()
 {
 	//旋回の滑らかさ
-	const float value = 0.5f*(M_PI / 180.0f);
+	//const float value = 0.5f*(M_PI / 180.0f);
 
-	//右旋回
-	if (oka::Keyboard::GetStates('d'))
-	{
-		m_transform.SetRotationY(m_transform.GetRotation().y - value);
-		//m_transform.SetRotationZ(m_transform.GetRotation().m_z + ((-1)*(1.0f / 2.0f) - m_transform.GetRotation().m_z)*0.1f);
-	}
+	////右旋回
+	//if (oka::Keyboard::GetStates('d'))
+	//{
+	//	m_transform.SetRotationY(m_transform.GetRotation().y - value);
+	//	//m_transform.SetRotationZ(m_transform.GetRotation().m_z + ((-1)*(1.0f / 2.0f) - m_transform.GetRotation().m_z)*0.1f);
+	//}
 
-	//左旋回
-	else if (oka::Keyboard::GetStates('a'))
-	{
-		m_transform.SetRotationY(m_transform.GetRotation().y + value);
-		//m_transform.SetRotationZ(m_transform.GetRotation().m_z + ((-1)*(-1.0f / 2.0f) - m_transform.GetRotation().m_z)*0.1f);
-	}
+	////左旋回
+	//else if (oka::Keyboard::GetStates('a'))
+	//{
+	//	m_transform.SetRotationY(m_transform.GetRotation().y + value);
+	//	//m_transform.SetRotationZ(m_transform.GetRotation().m_z + ((-1)*(-1.0f / 2.0f) - m_transform.GetRotation().m_z)*0.1f);
+	//}
 
-	//元の姿勢に戻る
-	else
-	{
-		//m_transform.SetRotationZ(m_transform.GetRotation().m_z - (m_transform.GetRotation().m_z)*0.1f);
-	}
+	////元の姿勢に戻る
+	//else
+	//{
+	//	//m_transform.SetRotationZ(m_transform.GetRotation().m_z - (m_transform.GetRotation().m_z)*0.1f);
+	//}
 
-	glm::vec3 axis;
+	//glm::vec3 axis;
 
-	
+	//
 
 
 
-	glm::vec4 rotate;
-	float angle = m_transform.GetRotation().y;
+	//glm::vec4 rotate;
+	//float angle = m_transform.GetRotation().y;
 
-	rotate.x = axis.x * sin(angle / 2);
-	rotate.y = axis.y * sin(angle / 2);
-	rotate.z = axis.z * sin(angle / 2);
-	rotate.w = cos(angle / 2);
+	//rotate.x = axis.x * sin(angle / 2);
+	//rotate.y = axis.y * sin(angle / 2);
+	//rotate.z = axis.z * sin(angle / 2);
+	//rotate.w = cos(angle / 2);
 
-	glm::quat quat = glm::quat(rotate.w, rotate.x, rotate.y, rotate.z);
+	//glm::quat quat = glm::quat(rotate.w, rotate.x, rotate.y, rotate.z);
 
-	//rotate
-	m_transform.m_rotateMatrix = glm::mat4(1.0);
-	m_transform.m_rotateMatrix = glm::toMat4(quat);
+	////rotate
+	//m_transform.m_rotateMatrix = glm::mat4(1.0);
+	//m_transform.m_rotateMatrix = glm::toMat4(quat);
 }
 
-//-------------------------------------
-//ゲームパッドによる旋回
-
-void Player::Yaw(float _sThumbLX)
-{
-	//旋回の滑らかさ
-	//ラジアン変換
-	const float value = 0.5f*((float)M_PI / 180.0f);
-
-	//正面右に移動
-	if (_sThumbLX > 0.3f)
-	{
-		_sThumbLX = 1.0f;
-		m_transform.SetRotationY(m_transform.GetRotation().y - value);
-
-		//m_transform.SetRotationZ(m_transform.GetRotation().z + ((-1)*(_sThumbLX / 2) - m_transform.GetRotation().z)*0.1f);
-	}
-
-	//正面左に移動
-	else if (_sThumbLX < -0.3f)
-	{
-		_sThumbLX = -1.0f;
-		m_transform.SetRotationY(m_transform.GetRotation().y + value);
-
-		//m_transform.SetRotationZ(m_transform.GetRotation().z + ((-1)*(_sThumbLX / 2) - m_transform.GetRotation().z)*0.1f);
-	}
-
-	//元の姿勢に戻る
-	else
-	{
-		//m_transform.SetRotationZ(m_transform.GetRotation().z + ((_sThumbLX / 2) - m_transform.GetRotation().z)*0.1f);
-	}
-
-	glm::vec3 axis = m_transform.m_myUpVec;
-	float angle = m_transform.GetRotation().y;
-
-	glm::quat quat;
-
-	quat.x = axis.x * sin(angle / 2);
-	quat.y = axis.y * sin(angle / 2);
-	quat.z = axis.z * sin(angle / 2);
-	quat.w = cos(angle / 2);
-
-	quat = glm::quat(quat);
-
-	m_transform.m_rotateMatrix = glm::toMat4(quat);
-
-}
 
 //-------------------------------------
 //キーボードによるロール回転
 
 void Player::Roll()
 {
-	const float value = 1.2f * (M_PI / 180);
+	//const float value = 1.2f * (M_PI / 180);
 
-	//右ロール回転
-	if (oka::Keyboard::GetStates('n'))
-	{
-		m_transform.SetRotationZ(m_transform.GetRotation().z + value);
-	}
+	////右ロール回転
+	//if (oka::Keyboard::GetStates('n'))
+	//{
+	//	m_transform.SetRotationZ(m_transform.GetRotation().z + value);
+	//}
 
-	//左ロール回転
-	else if (oka::Keyboard::GetStates('m'))
-	{
-		m_transform.SetRotationZ(m_transform.GetRotation().z - value);
-	}
-}
-
-//-------------------------------------
-//ゲームパッドによるロール回転
-
-void Player::Roll(unsigned short _pressedKey)
-{
-	const float value = 1.2f * ((float)M_PI / 180.0f);
-
-	//右ロール回転
-	if (_pressedKey & XINPUT_GAMEPAD_X)
-	{
-		m_transform.SetRotationZ(m_transform.GetRotation().z - value);
-	}
-
-	//左ロール回転
-	else if (_pressedKey & XINPUT_GAMEPAD_B)
-	{
-		m_transform.SetRotationZ(m_transform.GetRotation().z + value);
-	}
-
-	glm::vec3 axis = m_transform.m_myToVec;
-	float angle = m_transform.GetRotation().z;
-
-	glm::quat quat;
-	quat.x = axis.x * sin(angle / 2);
-	quat.y = axis.y * sin(angle / 2);
-	quat.z = axis.z * sin(angle / 2);
-	quat.w = cos(angle / 2);
-
-	quat = glm::quat(quat);
-
-	m_transform.m_rotateMatrix = glm::toMat4(quat);
-
+	////左ロール回転
+	//else if (oka::Keyboard::GetStates('m'))
+	//{
+	//	m_transform.SetRotationZ(m_transform.GetRotation().z - value);
+	//}
 }
 
 
-
-
-
-
-
-//-------------------------------------
-//ゲームパッドによるピッチ回転
-
-void Player::Pitch(float _sThumbLY)
-{
-	//旋回の滑らかさ
-	const float value = 0.5f*(M_PI / 180.0f);
-
-	//正面右に移動
-	if (_sThumbLY > 0.3f)
-	{
-		_sThumbLY = 1.0f;
-		m_transform.SetRotationX(m_transform.GetRotation().x - value);
-
-		//m_transform.SetRotationZ(m_transform.GetRotation().z + ((-1)*(_sThumbLX / 2) - m_transform.GetRotation().z)*0.1f);
-	}
-
-	//正面左に移動
-	else if (_sThumbLY < -0.3f)
-	{
-		_sThumbLY = -1.0f;
-		m_transform.SetRotationX(m_transform.GetRotation().x + value);
-
-		//m_transform.SetRotationZ(m_transform.GetRotation().z + ((-1)*(_sThumbLX / 2) - m_transform.GetRotation().z)*0.1f);
-	}
-
-	//元の姿勢に戻る
-	else
-	{
-		
-	}
-
-	glm::vec3 axis = m_transform.m_mySideVec;
-	float angle = m_transform.GetRotation().x;
-
-	glm::quat quat;
-	quat.x = axis.x * sin(angle / 2);
-	quat.y = axis.y * sin(angle / 2);
-	quat.z = axis.z * sin(angle / 2);
-	quat.w = cos(angle / 2);
-
-	quat = glm::quat(quat);
-
-	m_transform.m_rotateMatrix = glm::toMat4(quat);
-}
 
 
 //-------------------------------------
@@ -340,7 +267,7 @@ void Player::Pitch(float _sThumbLY)
 
 void Player::Shot()
 {
-	if (oka::Keyboard::GetStates('b'))
+	/*if (oka::Keyboard::GetStates('b'))
 	{
 		glm::vec3 pos;
 		const float distance = 1.5f;
@@ -358,7 +285,7 @@ void Player::Shot()
 		speed.z = -cos(m_transform.GetRotation().y) * value*(180.0f / M_PI);
 
 		m_bullets.push_back(new Bullet(pos, rotate, speed));
-	}
+	}*/
 }
 
 //-------------------------------------
@@ -367,23 +294,20 @@ void Player::Shot()
 void Player::Shot(unsigned short _downKeys)
 {
 		glm::vec3 pos;
-		const float distance = 1.5f;//自機と弾発射点の間隔
-		pos.x = m_transform.GetPosition().x - sin(m_transform.GetRotation().y)*distance;
-		pos.y = m_transform.GetPosition().y;
-		pos.z = m_transform.GetPosition().z - cos(m_transform.GetRotation().y)*distance;
+		const float distance = 2.0f;//自機と弾発射点の間隔
+		pos = m_transform.GetPosition()+m_transform.m_myToVec*distance;
 
 		glm::vec3 rotate = m_transform.GetRotation();
 
 		glm::vec3 speed;
-		const float value = 0.005f;//弾のスピード補完値
+		const float value = 1.0f;//弾のスピード補完値
 
-		speed.x = -sin(m_transform.GetRotation().y) * value*(180.0f / M_PI);
-		speed.y = sin(m_transform.GetRotation().x)* value*(180.0f / M_PI);
-		speed.z = -cos(m_transform.GetRotation().y) * value*(180.0f / M_PI);
+		speed = m_transform.m_myToVec * value;
 
 	if (_downKeys & XINPUT_GAMEPAD_Y)
 	{
-		m_bullets.push_back(new Bullet(pos, rotate, speed));
+		Bullet *bullet = new Bullet(pos, rotate, speed);
+		oka::BulletManager::GetInstance()->AddBullet(bullet);
 	}
 	//else if (_downKeys & XINPUT_GAMEPAD_START)//後で変更
 	//{
@@ -407,7 +331,8 @@ void Player::DrawTarget()
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D,oka::ImageManager::GetInstance()->GetHandle("Target"));
+		const unsigned int texture = oka::ImageManager::GetInstance()->GetHandle("Target");
+		glBindTexture(GL_TEXTURE_2D, texture);
 
 		//的の縦横
 		const float width = 3.0f;
@@ -416,9 +341,14 @@ void Player::DrawTarget()
 		//描画場所
 		const float value = 30.0f;//キャラクターとの間隔補完値
 		glm::vec3 v;
-		v.x = m_transform.GetPosition().x - sin(m_transform.GetRotation().y)*value;
+		glm::vec3 pos = m_transform.GetPosition();
+		glm::vec3 toVec = m_transform.m_myToVec*value;
+
+		v = pos + toVec;
+
+		/*v.x = m_transform.GetPosition().x - sin(m_transform.GetRotation().y)*value;
 		v.y = m_transform.GetPosition().y + sin(m_transform.GetRotation().x)*value;
-		v.z = m_transform.GetPosition().z - cos(m_transform.GetRotation().y)*value;
+		v.z = m_transform.GetPosition().z - cos(m_transform.GetRotation().y)*value;*/
 
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 

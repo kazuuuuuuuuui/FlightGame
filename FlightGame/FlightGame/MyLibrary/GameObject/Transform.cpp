@@ -42,6 +42,12 @@ namespace oka
 		m_myToVec.z = -cos(GetRotation().y);
 
 		m_myToVec = glm::normalize(m_myToVec);
+
+		//debug
+printf("x:%f", m_myToVec.x);
+printf(" y:%f", m_myToVec.y);
+printf(" z:%f\n", m_myToVec.z);
+
 	}
 
 	//-------------------------------------
@@ -62,9 +68,9 @@ namespace oka
 		m_myUpVec = glm::normalize(m_myUpVec);
 
 //debug
-printf("x:%f", m_myUpVec.x);
-printf(" y:%f", m_myUpVec.y);
-printf(" z:%f\n", m_myUpVec.z);
+//printf("x:%f", m_myUpVec.x);
+//printf(" y:%f", m_myUpVec.y);
+//printf(" z:%f\n", m_myUpVec.z);
 
 	}
 

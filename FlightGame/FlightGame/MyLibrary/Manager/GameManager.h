@@ -14,10 +14,10 @@ namespace oka
 	class GameManager
 	{
 	public:
-		std::map<std::string,std::list<GameObject*>>m_gameObjects;
+		std::multimap<std::string,GameObject*>m_gameObjects;
 
 		void Updata();
-		void AddGameObject(std::string _str, std::list<GameObject*> _objects);
+		void AddGameObject(std::string _str, GameObject *_objects);
 		void CheckGameObject();
 
 		static GameManager* GetInstance();

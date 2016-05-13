@@ -40,32 +40,23 @@ void Bullet::Draw()
 
 void Bullet::Update()
 {
-	/*if (CheckNearCharacter(oka::CharacterManager::GetInstance()->m_characters[1]->m_transform.GetPosition()))
-	{
-		m_isHorming = false;
-	}*/
-	
-	//debug
-	if (m_isHorming)
-	{
-		//1発目が変な方向に飛んでいく
-
-		//Homing(oka::CharacterManager::GetInstance()->m_characters[1]->m_transform.GetPosition());
-	}
-
 	m_transform.SetPosition(m_transform.GetPosition() + m_speed);
 
 	//キャラクターとの当たり判定
-	/*unsigned int size = oka::CharacterManager::GetInstance()->m_characters.size();
-	for (unsigned int i = 0; i < size; i++)
+	auto itr = oka::CharacterManager::GetInstance()->m_characters.begin();
+	auto end = oka::CharacterManager::GetInstance()->m_characters.end();
+
+	while(itr != end)
 	{
-		glm::vec3 pos = oka::CharacterManager::GetInstance()->m_characters[i]->m_transform.GetPosition();
+		glm::vec3 pos = (*itr)->m_transform.GetPosition();
 
 		if (CheckIsHit(pos))
 		{
-			oka::CharacterManager::GetInstance()->m_characters[i]->m_isHitAttack = true;
+			(*itr)->m_isHitAttack = true;
 		}
-	}*/
+
+		itr++;
+	}
 
 	//debug
 	//m_transform.Update();

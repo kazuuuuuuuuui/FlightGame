@@ -67,7 +67,7 @@ void display()
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 
 
 	//debug
@@ -108,17 +108,7 @@ void reshape(int _width, int _height)
 void Init()
 {
 	srand(time(NULL));
-	g_camera = new oka::Camera();
-
-	//-------------------------------------
-	//ÉRÉìÉgÉçÅ[ÉâÇÃí«â¡
-	//ÇÊÇ≠ÇÌÇ©ÇÁÇ»Ç¢
-
-	for (unsigned int i = 0; i < 2; i++)
-	{
-		oka::JoysticManager::GetInstance()->AddController(new oka::Contoroller());
-	}
-	
+	g_camera = new oka::Camera();	
 }
 
 int main(int argc, char *argv[])
