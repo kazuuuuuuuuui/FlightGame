@@ -30,9 +30,7 @@ namespace oka
 		//uvî•ñ
 		std::vector<glm::vec2>m_tex;
 
-		xFile(const char *_xFileName);
-
-		static void LoadXfile(const char *_xFileName);
+		static xFile* LoadXFile(const char *_xFileName);
 
 	};
 

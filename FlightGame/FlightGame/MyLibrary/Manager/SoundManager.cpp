@@ -7,30 +7,13 @@ namespace oka
 {
 	SoundManager* SoundManager::m_instance = nullptr;
 	
-	//-------------------------------------
-	//ALの初期化処理
-	//デバイスの取得とコンテキストの作成をする
-
-	void SoundManager::init()
-	{
-		ALCdevice *device = alcOpenDevice(NULL);
-		assert(alcGetError(device) == ALC_NO_ERROR);
-
-		ALCcontext *context;
-		context = alcCreateContext(device, NULL);
-		assert(alcGetError(device) == ALC_NO_ERROR);
-
-		alcMakeContextCurrent(context);
-		assert(alcGetError(device) == ALC_NO_ERROR);
-	}
-
-
 	//--------------------------------------------
 	//シングルトンにするためにインスタンスが
 	//生成されていなければインスタンスを生成し
 	//既にインスタンスが生成されていればそのインスタンスを返す
 
-	SoundManager* SoundManager::GetInstance() {
+	SoundManager* SoundManager::GetInstance() 
+	{
 
 		if (nullptr == m_instance) 
 		{
@@ -44,7 +27,7 @@ namespace oka
 	//メンバのmapに既に登録されているかチェックし
 	//登録されていなければ追加する
 
-	void SoundManager::AddSound(const std::string _str, unsigned int _sound)
+	void SoundManager::AddSound(const std::string _str, const unsigned int _sound)
 	{
 		if (m_sounds.find(_str)==m_sounds.end())
 		{
@@ -58,7 +41,7 @@ namespace oka
 
 	//-------------------------------------
 	//引数として受け取ったkeyがmapに登録されているか
-	//検索し登録されていればそのkeyに対応するテクスチャハンドルを返す
+	//検索し登録されていればそのkeyに対応するハンドルを返す
 
 	unsigned int SoundManager::GetHandle(const std::string _str)const
 	{
@@ -85,7 +68,7 @@ namespace oka
 	{
 		if (m_sounds.find(_str) == m_sounds.end())
 		{
-			
+			assert(0);
 		}
 		else
 		{
@@ -100,7 +83,7 @@ namespace oka
 	{
 		if (m_sounds.find(_str) == m_sounds.end())
 		{
-	
+			assert(0);
 		}
 		else
 		{
@@ -116,7 +99,7 @@ namespace oka
 	{
 		if (m_sounds.find(_str) == m_sounds.end())
 		{
-
+			assert(0);
 		}
 		else
 		{

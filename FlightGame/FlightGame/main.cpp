@@ -5,7 +5,7 @@
 #include"MyLibrary\Manager\JoysticManager.h"
 #include"MyLibrary\Input\Controller.h"
 
-#include"MyLibrary\Manager\CharacterManager.h"
+#include"MyLibrary\Sound\Sound.h"
 
 #include"MyLibrary\Input\Keyboard.h"
 #include"MyLibrary\Screen\Screen.h"
@@ -108,7 +108,8 @@ void reshape(int _width, int _height)
 void Init()
 {
 	srand(time(NULL));
-	g_camera = new oka::Camera();	
+	oka::Sound::Init();
+	g_camera = new oka::Camera();
 }
 
 int main(int argc, char *argv[])

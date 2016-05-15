@@ -1,11 +1,12 @@
 #define _USE_MATH_DEFINES
 #include<math.h>
-#include"../MyLibrary/Math/MyMath.h"
 #include"Player.h"
+#include"../MyLibrary/Math/MyMath.h"
 #include"../MyLibrary/Input/Keyboard.h"
 #include"../MyLibrary/Input/Controller.h"
 #include"../MyLibrary/Manager/ImageManager.h"
-#include"../Effect/Smoke.h"
+#include"../MyLibrary/Manager/SoundManager.h"
+//#include"../Effect/Smoke.h"
 #include"../MyLibrary/Manager/EffectManager.h"
 #include"../MyLibrary/Manager/BulletManager.h"
 #include"../MyLibrary/Camera/Camera.h"
@@ -258,8 +259,6 @@ void Player::Roll()
 }
 
 
-
-
 //-------------------------------------
 //弾による攻撃
 //弾の座標を自身の座標にセットし
@@ -306,14 +305,10 @@ void Player::Shot(unsigned short _downKeys)
 
 	if (_downKeys & XINPUT_GAMEPAD_Y)
 	{
+		oka::SoundManager::GetInstance()->Play("Shot");
 		Bullet *bullet = new Bullet(pos, rotate, speed);
 		oka::BulletManager::GetInstance()->AddBullet(bullet);
 	}
-	//else if (_downKeys & XINPUT_GAMEPAD_START)//後で変更
-	//{
-	//	m_bullets.push_back(new HormingBullet(pos, speed));
-	//}
-
 }
 
 

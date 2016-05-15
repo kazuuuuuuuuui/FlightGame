@@ -1,11 +1,71 @@
 #include"GameMainScene.h"
 #include"../MyLibrary/Camera/Camera.h"
 #include"../MyLibrary/Manager/GameManager.h"
-#include"../MyLibrary/Manager/JoysticManager.h"
 #include"../MyLibrary/Manager/CharacterManager.h"
+#include"../MyLibrary/Manager/ImageManager.h"
+#include"../MyLibrary/Manager/SoundManager.h"
+#include"../MyLibrary/Sound/Sound.h"
+#include"../MyLibrary/Manager/ModelManager.h"
 #include"../MyLibrary/Manager/BulletManager.h"
+
 #include"../MyLibrary/Manager/EffectManager.h"
+#include"../MyLibrary/Image/BmpImage.h"
+#include"../Feald/Feald.h"
+#include"../Character/Player.h"
+#include"../Character/Enemy.h"
+
+
 #include"../glut.h"
+
+
+//-------------------------------------
+//コンストラクタ
+
+GameMainScene::GameMainScene()
+{
+	printf("ゲームメインシーン生成\n");
+	printf("\n");
+
+	//debug
+	oka::GameManager::GetInstance()->AddGameObject("Feald", new Feald());
+	oka::ImageManager::GetInstance()->SetHandle("FealdTex", oka::LoadImage3f("tex.bmp"));
+	oka::ImageManager::GetInstance()->SetHandle("Smoke", oka::LoadImage4f("smoke.bmp"));
+	oka::ImageManager::GetInstance()->SetHandle("Target", oka::LoadImage4f("target.bmp"));
+
+	oka::CharacterManager::GetInstance()->AddCharacter(new Player(glm::vec3(0.0f, 5.0f, 0.0f)));
+	oka::CharacterManager::GetInstance()->AddCharacter(new Enemy(glm::vec3(0.0f, 5.0f, -100.0f)));
+
+	auto itr = oka::CharacterManager::GetInstance()->m_characters.begin();
+	auto end = oka::CharacterManager::GetInstance()->m_characters.end();
+
+	while (itr != end)
+	{
+		oka::GameManager::GetInstance()->AddGameObject("Character", (*itr));
+
+		itr++;
+	}
+
+
+	//debug
+	oka::SoundManager::GetInstance()->AddSound("Shot", oka::Sound::LoadWavFile("Shot.wav"));
+	oka::SoundManager::GetInstance()->AddSound("Explode", oka::Sound::LoadWavFile("Explode.wav"));
+
+	oka::ModelManager::GetInstance()->AddModel("Airplane", oka::xFile::LoadXFile("f_35.x"));
+
+};
+
+
+//-------------------------------------
+//デストラクタ
+
+GameMainScene::~GameMainScene()
+{
+	printf("ゲームメインシーン削除\n");
+	printf("\n");
+};
+
+//-------------------------------------
+//
 
 void GameMainScene::Update()
 {
@@ -18,7 +78,19 @@ void GameMainScene::Update()
 		itr->second->Update();
 	}
 
+	//後で変更
 
+	/*
+	
+	キャラクターマネジャーからも
+	死んだ敵を除外する必要がある
+	当たり判定のみが残ってしまっている
+	
+	*/
+
+
+
+	oka::BulletManager::GetInstance()->Updata();
 	auto hoge = oka::BulletManager::GetInstance()->m_bullets.begin();
 	auto piyo = oka::BulletManager::GetInstance()->m_bullets.end();
 	while (hoge != piyo)

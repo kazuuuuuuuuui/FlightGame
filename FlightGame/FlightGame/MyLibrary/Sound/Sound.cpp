@@ -9,6 +9,23 @@
 namespace oka
 {
 	//-------------------------------------
+	//ALの初期化処理
+	//デバイスの取得とコンテキストの作成をする
+
+	void Sound::Init()
+	{
+		ALCdevice *device = alcOpenDevice(NULL);
+		assert(alcGetError(device) == ALC_NO_ERROR);
+
+		ALCcontext *context;
+		context = alcCreateContext(device, NULL);
+		assert(alcGetError(device) == ALC_NO_ERROR);
+
+		alcMakeContextCurrent(context);
+		assert(alcGetError(device) == ALC_NO_ERROR);
+	}
+
+	//-------------------------------------
 	//wavファイルの読み込み
 	//引数として.wav形式のファイル名前を受け取り
 	//ハンドル(ID)を返す

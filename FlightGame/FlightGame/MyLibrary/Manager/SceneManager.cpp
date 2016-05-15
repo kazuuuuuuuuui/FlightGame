@@ -1,21 +1,6 @@
 #include<stdio.h>
 #include"SceneManager.h"
-#include"GameManager.h"
-#include"ImageManager.h"
-#include"../Sound/Sound.h"
-#include"SoundManager.h"
-#include"EffectManager.h"
 #include"../../Scene/GameMainScene.h"
-
-//debug
-
-#include"CharacterManager.h"
-#include"../Image/BmpImage.h"
-#include"../../Feald/Feald.h"
-#include"../../Character/Player.h"
-#include"../../Character/Enemy.h"
-#include"ModelManager.h"
-#include"../Model/xFile.h"
 
 namespace oka
 {
@@ -150,29 +135,6 @@ namespace oka
 
 			printf("ƒQ[ƒ€ƒV[ƒ“‚ª‰Šú‰»‚³‚ê‚Ü‚µ‚½\n");
 			printf("\n");
-
-			//debug
-			oka::GameManager::GetInstance()->AddGameObject("Feald", new Feald());
-			oka::ImageManager::GetInstance()->SetHandle("FealdTex", oka::LoadImage3f("tex.bmp"));
-			oka::ImageManager::GetInstance()->SetHandle("Smoke", oka::LoadImage4f("smoke.bmp"));
-			oka::ImageManager::GetInstance()->SetHandle("Target", oka::LoadImage4f("target.bmp"));
-			
-			oka::CharacterManager::GetInstance()->AddCharacter(new Player(glm::vec3(0.0f, 5.0f, 0.0f)));
-			oka::CharacterManager::GetInstance()->AddCharacter(new Enemy(glm::vec3(0.0f, 5.0f, -100.0f)));
-
-			auto itr = oka::CharacterManager::GetInstance()->m_characters.begin();
-			auto end = oka::CharacterManager::GetInstance()->m_characters.end();
-
-			while (itr!=end)
-			{
-				oka::GameManager::GetInstance()->AddGameObject("Character", (*itr));
-
-				itr++;
-			}
-			
-
-			//debug
-			//oka::SoundManager::GetInstance()->AddSound("Shot", oka::Sound::LoadWavFile());
 
 		}
 

@@ -3,6 +3,7 @@
 #include"Character.h"
 #include"../MyLibrary/Manager/GameManager.h"
 #include"../MyLibrary/Manager/JoysticManager.h"
+#include"../MyLibrary/Manager/SoundManager.h"
 #include"../MyLibrary/Manager/ModelManager.h"
 #include"../MyLibrary/Input/Keyboard.h"
 #include"../Effect/Smoke.h"
@@ -20,6 +21,10 @@ Character::Character()
 
 	m_isHitAttack = false;
 	m_hp = 100;
+
+	//debug
+	m_transform.SetScale(glm::vec3(0.3f, 0.3f, 0.3f));
+	
 	m_speed=glm::vec3(0.0f, 0.0f, 0.0f);
 	m_accel=glm::vec3(0.0f, 0.0f, 0.0f);
 };
@@ -32,43 +37,45 @@ Character::Character()
 
 void Character::Draw()
 {
+	//glPushAttrib(GL_ALL_ATTRIB_BITS);
+	//{
+	//	glPushMatrix();
+	//	{
+	//		//行列適応
+	//		glMultMatrixf((GLfloat*)&m_transform.m_matrix);
+
+	//		glutSolidTeapot(1);
+	//	}
+	//	glPopMatrix();
+	//}
+	//glPopAttrib();
+
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
-	{
-		glPushMatrix();
-		{
-			//行列適応
-			glMultMatrixf((GLfloat*)&m_transform.m_matrix);
-
-			glutSolidTeapot(1);
-		}
-		glPopMatrix();
-	}
-	glPopAttrib();
-
-	/*glPushAttrib(GL_ALL_ATTRIB_BITS);
 	{
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glEnableClientState(GL_NORMAL_ARRAY);
 
 		glPushMatrix();
 		{
-			glMultMatrixf((GLfloat*)&m_matrix);
+			glMultMatrixf((GLfloat*)&m_transform.m_matrix);
 
-			auto v = m_body->m_vertex.begin();
+			const oka::xFile *model = oka::ModelManager::GetInstance()->m_models["Airplane"];
+
+			auto v = model->m_vertex.begin();
 			glVertexPointer(3, GL_FLOAT, 0, &(*v));
 
-			auto n = m_body->m_normal.begin();
+			auto n = model->m_normal.begin();
 			glNormalPointer(GL_FLOAT, 0, &(*n));
 
-			auto i = m_body->m_index.begin();
+			auto i = model->m_index.begin();
 
-			glDrawElements(GL_TRIANGLES, m_indeces * 3, GL_UNSIGNED_SHORT, &(*i));
+			glDrawElements(GL_TRIANGLES, model->m_indeces * 3, GL_UNSIGNED_SHORT, &(*i));
 
 		}
 		glPopMatrix();
 
 	}
-	glPopAttrib();*/
+	glPopAttrib();
 
 }
 
@@ -113,6 +120,9 @@ void Character::Update()
 		if (CheckIsDead())
 		{
 			m_isActive = false;
+
+			//爆発音
+			oka::SoundManager::GetInstance()->Play("Explode");
 
 			//爆発エフェクト
 			const unsigned int num = 20;

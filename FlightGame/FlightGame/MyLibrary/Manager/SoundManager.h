@@ -4,8 +4,6 @@
 #include<map>
 #include<string>
 
-#pragma comment(lib,"OpenAL32.lib")
-
 namespace oka
 {
 	//-------------------------------------
@@ -16,14 +14,13 @@ namespace oka
 	private:
 		static SoundManager* m_instance;
 		
-		void init();
-		SoundManager() { SoundManager::init(); }
+		SoundManager() {}
 		~SoundManager() {}
 
 	public:
 		std::map<std::string, unsigned int>m_sounds;
 		static SoundManager* GetInstance();
-		void AddSound(const std::string _str, unsigned int _sound);
+		void AddSound(const std::string _str, const unsigned int _sound);
 		void DeleteSound(const std::string _str);
 		unsigned int GetHandle(const std::string _str)const;
 		void Play(const std::string _str);

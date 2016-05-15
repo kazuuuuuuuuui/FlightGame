@@ -4,132 +4,111 @@
 #include<windows.h>
 #include<assert.h>
 #include"xFile.h"
-#include"../Vector/Vec3.h"
+//#include"../Vector/Vec3.h"
 
 namespace oka
 {
 	//-------------------------------------
 	//xファイルから3Dモデルを読み込み
-	//法線を自力計算(フラットシェイディング)する
-	//引数にxファイル名とモデルデータを格納するバッファを渡す
-
-	void xFile::LoadXfile(const char *_xFileName)
+	
+	xFile* xFile::LoadXFile(const char *_FileName)
 	{
-		FILE *pFile = fopen(_xFileName, "r");
+		xFile *model = new xFile();
 
-		printf("%sが見つかりません\n");
-		assert(pFile != NULL);
-
+		FILE *fp = fopen(_FileName, "r");
 		char buf[256];
-		char prevBuf[256];
-		while (EOF != fscanf(pFile, "%s", buf)) {
-			if (strcmp("Mesh", buf) == 0 && 0 != strcmp("template", prevBuf) && 0 != strcmp("the", prevBuf)) {
 
-				fscanf(pFile, "%s", buf);
-
-				//頂点数読み込み
-				fscanf(pFile, "%u", &(model->m_indeces));
-
-				fscanf(pFile, "%*c", buf);
-
-				//頂点の読み込み
-				for (unsigned int i = 0; i < model->m_indeces / 3; i++) {
-					oka::Vec3 v[3];
-					oka::Vec3 n;
-
-					fscanf(pFile, "%f", &v[0].m_x);
-					fscanf(pFile, "%*c", buf);
-
-					fscanf(pFile, "%f", &v[0].m_y);
-					fscanf(pFile, "%*c", buf);
-
-					fscanf(pFile, "%f", &v[0].m_z);
-					fscanf(pFile, "%*s", buf);
-
-					model->m_vertex.push_back(v[0].m_x);
-					model->m_vertex.push_back(v[0].m_y);
-					model->m_vertex.push_back(v[0].m_z);
-
-					fscanf(pFile, "%f", &v[1].m_x);
-					fscanf(pFile, "%*c", buf);
-
-					fscanf(pFile, "%f", &v[1].m_y);
-					fscanf(pFile, "%*c", buf);
-
-					fscanf(pFile, "%f", &v[1].m_z);
-					fscanf(pFile, "%*s", buf);
-
-					model->m_vertex.push_back(v[1].m_x);
-					model->m_vertex.push_back(v[1].m_y);
-					model->m_vertex.push_back(v[1].m_z);
-
-					fscanf(pFile, "%f", &v[2].m_x);
-					fscanf(pFile, "%*c", buf);
-
-					fscanf(pFile, "%f", &v[2].m_y);
-					fscanf(pFile, "%*c", buf);
-
-					fscanf(pFile, "%f", &v[2].m_z);
-					fscanf(pFile, "%*s", buf);
-
-					model->m_vertex.push_back(v[2].m_x);
-					model->m_vertex.push_back(v[2].m_y);
-					model->m_vertex.push_back(v[2].m_z);
-
-					//法線計算
-					oka::Vec3 v01 = v[1] - v[0];
-					oka::Vec3 v02 = v[2] - v[0];
-
-					n = oka::Vec3::Cross(v01, v02);
-
-					model->m_normal.push_back(n.m_x);
-					model->m_normal.push_back(n.m_y);
-					model->m_normal.push_back(n.m_z);
-
-					model->m_normal.push_back(n.m_x);
-					model->m_normal.push_back(n.m_y);
-					model->m_normal.push_back(n.m_z);
-
-					model->m_normal.push_back(n.m_x);
-					model->m_normal.push_back(n.m_y);
-					model->m_normal.push_back(n.m_z);
-
-				}
-
-				//インデックス数読み込み
-				fscanf(pFile, "%u", &(model->m_indeces));
-
-				fscanf(pFile, "%*c", buf);//*は読み捨てる
-
-				//インデックスの読み込み
-				for (unsigned int i = 0; i < model->m_indeces; i++) {
-
-					fscanf(pFile, "%*2s", buf);//*は読み捨てる
-
-					unsigned short indeces[3];
-					fscanf(pFile, "%hu", &indeces[0]);
-
-					fscanf(pFile, "%*c", buf);//*は読み捨てる
-
-					fscanf(pFile, "%hu", &indeces[1]);
-
-					fscanf(pFile, "%*c", buf);//*は読み捨てる
-
-					fscanf(pFile, "%hu", &indeces[2]);
-
-					fscanf(pFile, "%*s", buf);//*は読み捨てる
-
-					model->m_index.push_back(indeces[0]);
-					model->m_index.push_back(indeces[1]);
-					model->m_index.push_back(indeces[2]);
-				}
-
-			}
-
-			strcpy(prevBuf, buf);
+		if (NULL == fp)
+		{
+			assert(0);
 		}
 
-		fclose(pFile);
+		while (EOF != fscanf(fp, "%s", buf))
+		{
+			//-------------------------------------
+			//頂点データ読み込み
+
+			if (0 == strcmp("Mesh", buf))
+			{
+				fscanf(fp, "%*1s", buf);// { の読み飛ばし
+
+										//頂点数読み込み
+				fscanf(fp, "%u", &model->m_vertices);
+				
+				fscanf(fp, "%*1s", buf);// ; の読み飛ばし
+										//頂点の読み込み
+				for (unsigned int i = 0; i < model->m_vertices; i++)
+				{
+					glm::vec3 v;
+
+					fscanf(fp, "%f;%f;%f;", &v.x, &v.y, &v.z);
+
+					model->m_vertex.push_back(v);
+
+					fscanf(fp, "%*1s", buf);// ,　の読み飛ばし	
+				}
+
+
+				//-------------------------------------
+				//インデックスデータ読み込み
+
+				//インデックス数の読み込み
+				fscanf(fp, "%u", &model->m_indeces);
+
+				fscanf(fp, "%*s", buf);// ; の読み飛ばし
+
+									   //インデックスの読み込み
+				for (unsigned int i = 0; i < model->m_indeces; i++)
+				{
+					unsigned short index[3];
+
+					fscanf(fp, "%*2s", buf);// 3; 読み飛ばし
+
+					fscanf(fp, "%hu,%hu,%hu", &index[0], &index[1], &index[2]);
+
+					fscanf(fp, "%*s", buf);// , 読み飛ばし
+
+					model->m_index.push_back(index[0]);
+					model->m_index.push_back(index[1]);
+					model->m_index.push_back(index[2]);
+				}
+			}
+
+			//-------------------------------------
+			//法線情報の読み込み
+
+			if (0 == strcmp("MeshNormals", buf))
+			{
+				fscanf(fp, "%*1s", buf);// { の読み飛ばし
+
+										//法線数の読み込み
+				fscanf(fp, "%u", &model->m_normals);
+
+				fscanf(fp, "%*1s", buf);// ; の読み飛ばし
+
+										//法線の読み込み
+				for (unsigned int i = 0; i < model->m_normals; i++)
+				{
+					glm::vec3 n;
+
+					fscanf(fp, "%f;%f;%f;", &n.x, &n.y, &n.z);
+
+					model->m_normal.push_back(n);
+
+					fscanf(fp, "%*1s", buf);// ,　の読み飛ばし	
+				}
+			}
+
+			//-------------------------------------
+			//uv情報の読み込み
+
+			//fscanf(fp, "%s", buf);
+			//printf("%s", buf);
+		}
+
+		fclose(fp);
+
+		return model;
 	}
 
 }//namespace oka

@@ -10,18 +10,9 @@ public:
 	void Update();
 	void Render();
 
-	GameMainScene() 
-	{
-		printf("ゲームメインシーン生成\n");
-		printf("\n");
-	};
+	GameMainScene();
 
-	~GameMainScene()
-	{
-		printf("ゲームメインシーン削除\n");
-		printf("\n");
-	};
-
+	~GameMainScene();
 };
 
 #endif

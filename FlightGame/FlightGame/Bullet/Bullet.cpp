@@ -53,6 +53,7 @@ void Bullet::Update()
 		if (CheckIsHit(pos))
 		{
 			(*itr)->m_isHitAttack = true;
+			m_isActive = false;
 		}
 
 		itr++;
