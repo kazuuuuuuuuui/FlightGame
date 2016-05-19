@@ -18,6 +18,13 @@ namespace oka
 		m_position(0.0f, 0.0f, 0.0f),m_target(0.0f, 0.0f, 0.0f),m_up(0.0f, 1.0f, 0.0f)
 	{}
 
+	//-------------------------------------
+	//
+
+	void Camera::Update()
+	{
+
+	}
 
 	//-------------------------------------
 	//透視射影行列の適応
@@ -42,8 +49,7 @@ namespace oka
 		m_position = _position;
 		m_target = _target;
 		m_up = _up;
-
-		//書き換え
+		
 		m_viewMatrix = glm::lookAt(
 			glm::vec3(m_position.x, m_position.y, m_position.z),
 			glm::vec3(m_target.x, m_target.y, m_target.z),
@@ -70,11 +76,14 @@ namespace oka
 
 		//後で移動
 		//ライトの位置
-		float v[] = { 0, 1, 1, 0 };
+
+		float light[] = { 0,1,1, 0 };
+
+
 		glLightfv(
 			GL_LIGHT0,  // GLenum light
 			GL_POSITION,// GLenum pname
-			v);         // const GLfloat *params
+			light);         // const GLfloat *params
 
 		glMultMatrixf((GLfloat*)&m_viewMatrix);
 	}

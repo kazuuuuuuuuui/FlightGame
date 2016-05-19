@@ -42,9 +42,7 @@ namespace oka
 		glm::vec3 GetRotation()const { return m_rotate; }
 		glm::vec3 GetScale()const { return m_scale; }
 
-		void SetToVec();
-		void SetUpVec();
-		void SetSideVec();
+		void SetAimVec(glm::vec3 &_myVec, const glm::vec3 _aimVec);
 
 		//debug—p
 		void DrawMyToVec();
@@ -56,10 +54,10 @@ namespace oka
 			m_lastPosition(0.0f, 0.0f, 0.0f),
 			m_rotate(0.0f, 0.0f, 0.0f),
 			m_scale(1.0f, 1.0f, 1.0f),
-			m_matrix(glm::mat4(1.0)),
-			m_translateMatrix(glm::mat4(1.0)),
-			m_rotateMatrix(glm::mat4(1.0)),
-			m_scaleMatrix(glm::mat4(1.0)),
+			m_matrix(glm::mat4(1.0f)),
+			m_translateMatrix(glm::mat4(1.0f)),
+			m_rotateMatrix(glm::mat4(1.0f)),
+			m_scaleMatrix(glm::mat4(1.0f)),
 			m_myToVec(glm::vec3(0.0f, 0.0f, 0.0f))
 		{}
 	};

@@ -72,7 +72,7 @@ namespace oka
 			}
 			else
 			{
-				//delete itr->second;
+				delete itr->second;
 				itr = m_gameObjects.erase(itr);
 				continue;
 			}

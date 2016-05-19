@@ -5,6 +5,11 @@
 #include"../MyLibrary/Manager/CharacterManager.h"
 #include"../glut.h"
 
+Bullet::~Bullet()
+{
+	printf("’e‚ªíœ‚³‚ê‚Ü‚µ‚½\n");
+}
+
 void Bullet::Draw()
 {
 	//glPushAttrib(GL_ALL_ATTRIB_BITS);
@@ -17,8 +22,8 @@ void Bullet::Draw()
 			//s—ñ“K‰
 			glMultMatrixf((GLfloat*)&m_transform.m_matrix);
 
-			//glutSolidCube(0.5);
-			glutSolidCube(1);
+			glutSolidCube(0.5);
+			//glutSolidCube(1);
 
 			/*auto v = m_model.m_vertex.begin();
 			glVertexPointer(3, GL_FLOAT, 0, &(*v));

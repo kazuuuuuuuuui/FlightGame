@@ -4,17 +4,17 @@
 #include<stdio.h>
 #include<map>
 #include<string>
-#include"../Model/xFile.h"
+#include"../Model/Model.h"
 
 namespace oka
 {
 	class ModelManager 
 	{
 	public:
-		std::map<std::string, xFile*>m_models;
+		std::map<std::string, Model*>m_models;
 
 		void Updata() {};
-		void AddModel(std::string _str, xFile *_object);
+		void AddModel(std::string _str, Model *_object);
 
 		static ModelManager* GetInstance();
 		static void Destroy();

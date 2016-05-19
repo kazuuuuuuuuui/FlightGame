@@ -22,6 +22,7 @@ namespace oka
 		Camera();
 		~Camera() {};
 
+		void Update();
 		void Perspective();
 		void SetViewMatrix(const glm::vec3 _eye,const glm::vec3 _target,const glm::vec3 _up);
 		void MultViewMatrix();

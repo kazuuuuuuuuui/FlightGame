@@ -3,15 +3,16 @@
 
 #include<list>
 #include"../MyLibrary/GameObject/GameObject.h"
+#include"../MyLibrary/GameObject/Mesh.h"
 #include"../MyLibrary/Input/Controller.h"
-#include"../MyLibrary/Model/xFile.h"
 #include"../Bullet/Bullet.h"
-//#include"../Bullet/HomingBullet.h"
 
 class Character :public oka::GameObject
 {
 public:
-	//oka::xFile *m_body;
+	oka::Mesh *m_body;
+	oka::Mesh *m_propeller;
+	
 	oka::Contoroller *m_controller;
 
 	bool m_isHitAttack;

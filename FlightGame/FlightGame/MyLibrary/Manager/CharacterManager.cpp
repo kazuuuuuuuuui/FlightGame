@@ -83,7 +83,6 @@ namespace oka
 			}
 			else
 			{
-				delete (*itr);
 				itr = m_characters.erase(itr);
 				continue;
 			}

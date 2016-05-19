@@ -63,7 +63,6 @@ namespace oka
 			}
 			else
 			{
-				//delete itr->second;
 				itr = m_bullets.erase(itr);
 				continue;
 			}

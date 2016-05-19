@@ -34,7 +34,7 @@ namespace oka
 	//key‚Ì‚à‚Ì‚ªŠù‚É“o˜^‚³‚ê‚Ä‚¢‚é‚©ŒŸõ‚µ
 	//‚È‚¯‚ê‚ÎŠÇ—‚µ‚Ä‚¢‚éƒ}ƒbƒv‚É’Ç‰Á‚·‚é
 
-	void ModelManager::AddModel(std::string _str, xFile *_model)
+	void ModelManager::AddModel(std::string _str, Model *_model)
 	{
 		if (m_models.find(_str) == m_models.end())
 		{

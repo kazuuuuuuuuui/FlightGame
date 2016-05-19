@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include"Transform.h"
 #include"../Camera/Camera.h"
+
 #include"../../glut.h"
 
 glm::mat4 BillboardMatrix;
@@ -27,60 +28,33 @@ namespace oka
 		m_matrix = glm::mat4(1.0f);
 		m_matrix = m_translateMatrix * m_rotateMatrix * m_scaleMatrix;
 
-		SetToVec();
-		SetUpVec();
-		SetSideVec();
-	}
-
-	//-------------------------------------
-	//自身の向きベクトルの計算
-
-	void Transform::SetToVec()
-	{
-		m_myToVec.x = -sin(GetRotation().y);
-		m_myToVec.y = sin(GetRotation().x);
-		m_myToVec.z = -cos(GetRotation().y);
-
-		m_myToVec = glm::normalize(m_myToVec);
-
-		//debug
-printf("x:%f", m_myToVec.x);
-printf(" y:%f", m_myToVec.y);
-printf(" z:%f\n", m_myToVec.z);
+		SetAimVec(m_myToVec, glm::vec3(0, 0, -1));
+		SetAimVec(m_myUpVec, glm::vec3(0, 1, 0));
+		SetAimVec(m_mySideVec, glm::vec3(1, 0, 0));
 
 	}
 
-	//-------------------------------------
-	//自身の上向きベクトルの計算
+	//ﾜｰﾙﾄﾞ上のベクトル = 座標行列 * 回転行列
+	//(向きベクトル) = ( 0,0,-1 ) * ( オブジェクトの回転のみの行列 )
 
-	void Transform::SetUpVec()
+	void Transform::SetAimVec(glm::vec3 &_myVec, const glm::vec3 _aimVec)
 	{
+		//座標行列
+		glm::mat4 pos;
+		pos[3][0] = _aimVec.x;
+		pos[3][1] = _aimVec.y;
+		pos[3][2] = _aimVec.z;
+
+		//向きベクトルを求めるための行列
 		glm::mat4 mat;
-		glm::mat4 up;
-		up = glm::translate(up, glm::vec3(0, 1, 0));
+		mat = m_rotateMatrix*pos;
 
-		mat = m_rotateMatrix * up;
+		_myVec.x = mat[3][0];
+		_myVec.y = mat[3][1];
+		_myVec.z = mat[3][2];
 
-		m_myUpVec.x = mat[3][0];
-		m_myUpVec.y = mat[3][1];
-		m_myUpVec.z = mat[3][2];
-
-		m_myUpVec = glm::normalize(m_myUpVec);
-
-//debug
-//printf("x:%f", m_myUpVec.x);
-//printf(" y:%f", m_myUpVec.y);
-//printf(" z:%f\n", m_myUpVec.z);
-
-	}
-
-	//-------------------------------------
-	//自身の横向きのベクトル計算
-
-	void Transform::SetSideVec()
-	{		
-		m_mySideVec = glm::cross(m_myToVec, m_myUpVec);
-		m_mySideVec = glm::normalize(m_mySideVec);
+		//正規化
+		_myVec = (_myVec / glm::length(_myVec));
 	}
 
 	//-------------------------------------
@@ -104,9 +78,9 @@ printf(" z:%f\n", m_myToVec.z);
 				glVertex3f(root.x, root.y, root.z);
 
 				glm::vec3 aim;
-				aim.x = root.x + m_myToVec.x * 8;
-				aim.y = root.y + m_myToVec.y * 8;
-				aim.z = root.z + m_myToVec.z * 8;
+				aim.x = root.x + m_myToVec.x;
+				aim.y = root.y + m_myToVec.y;
+				aim.z = root.z + m_myToVec.z;
 
 				glVertex3f(aim.x, aim.y, aim.z);
 			}
@@ -133,9 +107,9 @@ printf(" z:%f\n", m_myToVec.z);
 				glVertex3f(root.x, root.y, root.z);
 
 				glm::vec3 aim;
-				aim.x = root.x + m_myUpVec.x * 3;
-				aim.y = root.y + m_myUpVec.y * 3;
-				aim.z = root.z + m_myUpVec.z * 3;
+				aim.x = root.x + m_myUpVec.x;
+				aim.y = root.y + m_myUpVec.y;
+				aim.z = root.z + m_myUpVec.z;
 
 				glVertex3f(aim.x, aim.y, aim.z);
 			}
@@ -163,9 +137,9 @@ printf(" z:%f\n", m_myToVec.z);
 				glVertex3f(root.x, root.y, root.z);
 
 				glm::vec3 aim;
-				aim.x = root.x + m_mySideVec.x * 3;
-				aim.y = root.y + m_mySideVec.y * 3;
-				aim.z = root.z + m_mySideVec.z * 3;
+				aim.x = root.x + m_mySideVec.x;
+				aim.y = root.y + m_mySideVec.y;
+				aim.z = root.z + m_mySideVec.z;
 
 				glVertex3f(aim.x, aim.y, aim.z);
 			}

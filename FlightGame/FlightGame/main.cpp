@@ -89,7 +89,7 @@ void display()
 
 void timer(int value) 
 {
-	//fps();
+	fps();
 
 	glutPostRedisplay();
 	glutTimerFunc(1000 / 60, timer, 0);

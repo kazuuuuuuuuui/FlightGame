@@ -1,11 +1,14 @@
 #define _USE_MATH_DEFINES
 #include<math.h>
 #include"Character.h"
+#include"../MyLibrary/Math/MyMath.h"
 #include"../MyLibrary/Manager/GameManager.h"
 #include"../MyLibrary/Manager/JoysticManager.h"
+#include"../MyLibrary/Manager/ImageManager.h"
 #include"../MyLibrary/Manager/SoundManager.h"
 #include"../MyLibrary/Manager/ModelManager.h"
 #include"../MyLibrary/Input/Keyboard.h"
+#include"Player.h"
 #include"../Effect/Smoke.h"
 #include"../Effect/Fire.h"
 
@@ -16,20 +19,34 @@
 
 Character::Character()
 {
+	printf("キャラクター生成\n");
+
+	//モデルデータ大きさ調整
+	m_transform.SetScale(glm::vec3(0.3f, 0.6f, 0.3f));
+
+	//体部分
+	oka::Model *body = oka::ModelManager::GetInstance()->m_models["Body"];
+	unsigned int tex = (oka::ImageManager::GetInstance()->GetHandle("FlyTex"));
+	m_body = new oka::Mesh(body, tex);
+	oka::GameManager::GetInstance()->AddGameObject("Body", m_body);
+
+	//プロペラ部分
+	/*oka::Model *propeller = oka::ModelManager::GetInstance()->m_models["Propeller"];
+	m_propeller = new oka::Mesh(propeller, tex);
+	oka::GameManager::GetInstance()->AddGameObject("Propeller", m_propeller);*/
+
+
+
 	m_controller = new oka::Contoroller();
 	oka::JoysticManager::GetInstance()->AddController(m_controller);
 
 	m_isHitAttack = false;
 	m_hp = 100;
 
-	//debug
-	m_transform.SetScale(glm::vec3(0.3f, 0.3f, 0.3f));
-	
-	m_speed=glm::vec3(0.0f, 0.0f, 0.0f);
-	m_accel=glm::vec3(0.0f, 0.0f, 0.0f);
+	//後で変更	
+	m_speed = glm::vec3(0.0f, 0.0f, 0.0f);
+	m_accel = glm::vec3(0.0f, 0.0f, 0.0f);
 };
-
-
 
 //-------------------------------------
 //自身の描画
@@ -37,51 +54,26 @@ Character::Character()
 
 void Character::Draw()
 {
-	//glPushAttrib(GL_ALL_ATTRIB_BITS);
-	//{
-	//	glPushMatrix();
-	//	{
-	//		//行列適応
-	//		glMultMatrixf((GLfloat*)&m_transform.m_matrix);
-
-	//		glutSolidTeapot(1);
-	//	}
-	//	glPopMatrix();
-	//}
-	//glPopAttrib();
-
-	glPushAttrib(GL_ALL_ATTRIB_BITS);
-	{
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glEnableClientState(GL_NORMAL_ARRAY);
-
-		glPushMatrix();
-		{
-			glMultMatrixf((GLfloat*)&m_transform.m_matrix);
-
-			const oka::xFile *model = oka::ModelManager::GetInstance()->m_models["Airplane"];
-
-			auto v = model->m_vertex.begin();
-			glVertexPointer(3, GL_FLOAT, 0, &(*v));
-
-			auto n = model->m_normal.begin();
-			glNormalPointer(GL_FLOAT, 0, &(*n));
-
-			auto i = model->m_index.begin();
-
-			glDrawElements(GL_TRIANGLES, model->m_indeces * 3, GL_UNSIGNED_SHORT, &(*i));
-
-		}
-		glPopMatrix();
-
-	}
-	glPopAttrib();
-
+	
 }
 
 void Character::Update()
 {
-	//m_controller->Update();
+	//ボディ
+	m_body->m_transform = m_transform;
+
+	//プロペラ
+	/*glm::mat4 translate;
+	translate = glm::translate(translate, glm::vec3(0.0f, 0.1f, -5.2f));*/
+
+	//glm::mat4 rotate;
+	//static float angle = 0.0f;
+	//angle += 0.2f;
+	//rotate = oka::MyMath::Rotate(angle, glm::vec3(0.0f, 0.0f, -1.0f));
+	//m_propeller->m_transform.m_matrix = m_transform.m_matrix*translate;//*rotate;
+
+
+
 
 	if (m_controller->CheckIsConect())
 	{
@@ -94,15 +86,13 @@ void Character::Update()
 	}
 	else
 	{
-			//Control();
+		//Control();
 	}
 	
-
-
 	if (m_isHitAttack)
 	{
 		//書き換え
-		m_hp -= 5;
+		m_hp -= 100;
 	}
 
 	m_isHitAttack = false;
@@ -119,7 +109,9 @@ void Character::Update()
 	{
 		if (CheckIsDead())
 		{
+			m_body->m_isActive = false;
 			m_isActive = false;
+			
 
 			//爆発音
 			oka::SoundManager::GetInstance()->Play("Explode");

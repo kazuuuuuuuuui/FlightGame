@@ -10,8 +10,8 @@ public:
 
 	float m_value;//•âŠ®‚ÌŠŠ‚ç‚©‚³
 
-	void Control();
-	void Control(unsigned short _pressedKey, unsigned int _downKeys, float _sThumbLX, float _sThumbLY) {};
+	virtual void Control();
+	virtual void Control(unsigned short _pressedKey, unsigned int _downKeys, float _sThumbLX, float _sThumbLY) {};
 	void MoveToAimPos();
 	void SetYaw();
 	void SetPitch();
@@ -43,6 +43,11 @@ public:
 		m_transform.m_matrix = translate;
 		
 	}
+
+	~Enemy() 
+	{
+printf("Enemyíœ\n");
+	};
 };
 
 #endif

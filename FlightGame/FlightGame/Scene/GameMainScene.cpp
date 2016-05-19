@@ -31,9 +31,19 @@ GameMainScene::GameMainScene()
 	oka::ImageManager::GetInstance()->SetHandle("FealdTex", oka::LoadImage3f("tex.bmp"));
 	oka::ImageManager::GetInstance()->SetHandle("Smoke", oka::LoadImage4f("smoke.bmp"));
 	oka::ImageManager::GetInstance()->SetHandle("Target", oka::LoadImage4f("target.bmp"));
+	oka::ImageManager::GetInstance()->SetHandle("FlyTex", oka::LoadImage3f("flyTex.bmp"));
+	
 
-	oka::CharacterManager::GetInstance()->AddCharacter(new Player(glm::vec3(0.0f, 5.0f, 0.0f)));
-	oka::CharacterManager::GetInstance()->AddCharacter(new Enemy(glm::vec3(0.0f, 5.0f, -100.0f)));
+	//debug
+	oka::SoundManager::GetInstance()->AddSound("Shot", oka::Sound::LoadWavFile("Shot.wav"));
+	oka::SoundManager::GetInstance()->AddSound("Explode", oka::Sound::LoadWavFile("Explode.wav"));
+
+	oka::ModelManager::GetInstance()->AddModel("Body", oka::Model::LoadXFile("body.x"));
+	oka::ModelManager::GetInstance()->AddModel("Propeller", oka::Model::LoadXFile("propeller.x"));
+
+	//キャラクターの登録
+	oka::CharacterManager::GetInstance()->AddCharacter(new Player(glm::vec3(0.0f, 0.0f, 0.0f)));
+	oka::CharacterManager::GetInstance()->AddCharacter(new Enemy(glm::vec3(0.0f, 0.0f, -20.0f)));
 
 	auto itr = oka::CharacterManager::GetInstance()->m_characters.begin();
 	auto end = oka::CharacterManager::GetInstance()->m_characters.end();
@@ -44,14 +54,6 @@ GameMainScene::GameMainScene()
 
 		itr++;
 	}
-
-
-	//debug
-	oka::SoundManager::GetInstance()->AddSound("Shot", oka::Sound::LoadWavFile("Shot.wav"));
-	oka::SoundManager::GetInstance()->AddSound("Explode", oka::Sound::LoadWavFile("Explode.wav"));
-
-	oka::ModelManager::GetInstance()->AddModel("Airplane", oka::xFile::LoadXFile("f_35.x"));
-
 };
 
 
@@ -79,26 +81,8 @@ void GameMainScene::Update()
 	}
 
 	//後で変更
-
-	/*
+	//oka::BulletManager::GetInstance()->Updata();
 	
-	キャラクターマネジャーからも
-	死んだ敵を除外する必要がある
-	当たり判定のみが残ってしまっている
-	
-	*/
-
-
-
-	oka::BulletManager::GetInstance()->Updata();
-	auto hoge = oka::BulletManager::GetInstance()->m_bullets.begin();
-	auto piyo = oka::BulletManager::GetInstance()->m_bullets.end();
-	while (hoge != piyo)
-	{
-		(*hoge)->m_transform.Update();
-		(*hoge)->Update();
-		hoge++;
-	}
 
 
 }
@@ -109,32 +93,32 @@ void GameMainScene::Render()
 
 	const float value = 8.0f;//補完係数
 
-	glm::vec3 v;
 	glm::vec3 toVec;
 	glm::vec3 upVec;
 
 	const auto begin = oka::CharacterManager::GetInstance()->m_characters.begin();
-	v = (*begin)->m_transform.GetPosition();
+
 	toVec = (*begin)->m_transform.m_myToVec;
 	upVec = (*begin)->m_transform.m_myUpVec;
 
 	//カメラの注視点
-
-	glm::vec3 target = v;
+	glm::vec3 target = (*begin)->m_transform.GetPosition();
 
 	//カメラの座標
-	glm::vec3 pos;
-	
-	pos.x = v.x - toVec.x * value;
-	pos.y = v.y + 3.0f;
-	pos.z = v.z - toVec.z * value;
+	glm::vec3 pos = glm::vec3(0, 1, 5);
+	pos = target - ( toVec * 5.0f ) ;
+	pos = pos + ( upVec * 2.0f ) ;
 
 	//カメラのupベクトル
-	glm::vec3 up;
-	up.x = 0.0f + upVec.x;
-	up.y = 1.0f + upVec.y;
-	up.z = 0.0f + upVec.z;
+	/*
+	ティーポット -　カメラ
+	その上
+	
+	*/
 
+	glm::vec3 up = upVec;
+	//glm::vec3 up = glm::vec3(0, 1, 0);
+	
 	g_camera->Perspective();
 	g_camera->SetViewMatrix(pos, target, up);
 	g_camera->MultViewMatrix();
@@ -147,25 +131,4 @@ void GameMainScene::Render()
 	{
 		itr->second->Draw();
 	}
-
-	auto hoge = oka::BulletManager::GetInstance()->m_bullets.begin();
-	auto piyo = oka::BulletManager::GetInstance()->m_bullets.end();
-	while (hoge != piyo)
-	{
-		(*hoge)->Draw();
-		hoge++;
-	}
-
-
-	/*for (auto itr = oka::EffectManager::GetInstance()->m_effects.begin(); itr != oka::EffectManager::GetInstance()->m_effects.end(); itr++)
-	{
-		(*itr)->Draw();
-	}
-
-
-	for (auto itr = oka::CharacterManager::GetInstance()->m_characters[0]->m_bullets.begin(); itr != oka::CharacterManager::GetInstance()->m_characters[0]->m_bullets.end(); itr++)
-	{
-		(*itr)->Draw();
-	}*/
-
 }

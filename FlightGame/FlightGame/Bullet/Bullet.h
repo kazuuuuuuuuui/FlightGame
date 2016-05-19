@@ -34,6 +34,8 @@ public:
 		m_speed = _speed;
 	}
 
+	~Bullet();
+
 };
 
 #endif

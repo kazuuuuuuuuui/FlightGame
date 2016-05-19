@@ -4,6 +4,7 @@
 #include"../MyLibrary/Math/MyMath.h"
 #include"../MyLibrary/Input/Keyboard.h"
 #include"../MyLibrary/Input/Controller.h"
+#include"../MyLibrary/Manager/GameManager.h"
 #include"../MyLibrary/Manager/ImageManager.h"
 #include"../MyLibrary/Manager/SoundManager.h"
 //#include"../Effect/Smoke.h"
@@ -13,9 +14,6 @@
 
 #include"../glm/glm.hpp"
 #include"../glm/gtc/matrix_transform.hpp"
-
-#include"../glm/gtc/quaternion.hpp"
-#include"../glm/gtx/quaternion.hpp"
 
 #include"../glut.h"
 
@@ -59,48 +57,36 @@ void Player::Control(unsigned short _pressedKey, unsigned int _downKeys, float _
 {
 	Accel(_pressedKey);
 
-	glm::vec3 nowRotate = m_transform.GetRotation();
-
 	const float value = oka::MyMath::ToRadian(1.0f);
 
 	//Roll
 	if (_pressedKey & XINPUT_GAMEPAD_B)
 	{
-		m_transform.SetRotationZ(nowRotate.z + value);
-		Rotate(value, m_transform.m_myToVec);
+		m_transform.m_rotateMatrix *= oka::MyMath::Rotate(value, glm::vec3(0, 0, -1));
 	}
 	else if(_pressedKey & XINPUT_GAMEPAD_X)
 	{
-		m_transform.SetRotationZ(nowRotate.z - value);
-		Rotate(-value, m_transform.m_myToVec);
+		m_transform.m_rotateMatrix *= oka::MyMath::Rotate(-value, glm::vec3(0, 0, -1));
 	}
 
 	//Yaw
-	if (_sThumbLX > 0.3f)
+	if (_sThumbLX > 0.5f)
 	{
-		_sThumbLX = 1.0f;
-		m_transform.SetRotationY(nowRotate.y - value);
-		Rotate(-value, m_transform.m_myUpVec);
+		m_transform.m_rotateMatrix *= oka::MyMath::Rotate(-value, glm::vec3(0, 1, 0));
 	}
-	else if (_sThumbLX < -0.3f)
+	else if (_sThumbLX < -0.5f)
 	{
-		_sThumbLX = -1.0f;
-		m_transform.SetRotationY(nowRotate.y + value);
-		Rotate(+value, m_transform.m_myUpVec);
+		m_transform.m_rotateMatrix *= oka::MyMath::Rotate(value, glm::vec3(0, 1, 0));
 	}
 	
 	//Pitch
-	if (_sThumbLY > 0.3f)
+	if (_sThumbLY > 0.5f)
 	{
-		_sThumbLY = 1.0f;
-		m_transform.SetRotationX(nowRotate.x + value);
-		Rotate(value, m_transform.m_mySideVec);
+		m_transform.m_rotateMatrix *= oka::MyMath::Rotate(-value, glm::vec3(1, 0, 0));
 	}
-	else if (_sThumbLY < -0.3f)
+	else if (_sThumbLY < -0.5f)
 	{
-		_sThumbLY = -1.0f;
-		m_transform.SetRotationX(nowRotate.x - value);
-		Rotate(-value, m_transform.m_mySideVec);
+		m_transform.m_rotateMatrix *= oka::MyMath::Rotate(value, glm::vec3(1, 0, 0));
 	}
 
 	Shot(_downKeys);
@@ -143,24 +129,14 @@ void Player::Accel(unsigned short _pressedKey)
 {
 	if (_pressedKey & XINPUT_GAMEPAD_A)
 	{
-		const float value = -0.05f;
+		const float value = 0.01f;
+		
 		glm::vec3 accel;
-		accel.x = value*sin(m_transform.GetRotation().y);
-		accel.y = (-1)*value*sin(m_transform.GetRotation().x);
-		accel.z = value*cos(m_transform.GetRotation().y);
+		accel.x = m_transform.m_myToVec.x*value;
+		accel.y = m_transform.m_myToVec.y*value;
+		accel.z = m_transform.m_myToVec.z*value;
 
 		m_accel = accel;
-
-		//前進時の煙噴出
-		/*glm::vec3 myPos = m_transform.GetPosition();
-		glm::vec3 pos;
-		pos.x = myPos.x - sin(m_transform.GetRotation().y);
-		pos.y = myPos.y + sin(m_transform.GetRotation().x);
-		pos.z = myPos.z - cos(m_transform.GetRotation().y);
-
-		int particleNum = 1;
-		oka::EffectManager::GetInstance()->AddEffects(Smoke::Create(pos, particleNum));*/
-
 	}
 	else
 	{
@@ -168,25 +144,6 @@ void Player::Accel(unsigned short _pressedKey)
 	}
 
 }
-
-
-//-------------------------------------
-//回転処理
-//引数として回転角度と回転軸を受けとる
-
-void Player::Rotate(float _angle, glm::vec3 _axis)
-{
-	glm::quat quat;
-	
-	quat.x = _axis.x * sin(_angle / 2);
-	quat.y = _axis.y * sin(_angle / 2);
-	quat.z = _axis.z * sin(_angle / 2);
-	quat.w = cos(_angle / 2);
-
-	quat = glm::quat(quat);
-	m_transform.m_rotateMatrix *= glm::toMat4(quat);
-}
-
 
 //-------------------------------------
 //キーボードによる旋回
@@ -308,6 +265,7 @@ void Player::Shot(unsigned short _downKeys)
 		oka::SoundManager::GetInstance()->Play("Shot");
 		Bullet *bullet = new Bullet(pos, rotate, speed);
 		oka::BulletManager::GetInstance()->AddBullet(bullet);
+		oka::GameManager::GetInstance()->AddGameObject("Bullet", bullet);
 	}
 }
 

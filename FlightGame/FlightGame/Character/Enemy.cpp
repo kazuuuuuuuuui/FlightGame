@@ -6,13 +6,16 @@
 //debug
 #include"../MyLibrary/Manager/CharacterManager.h"
 
-void Enemy::Control() 
-{	
-	//MoveToAimPos();
+//-------------------------------------
+//敵のAI
+
+void Enemy::Control()
+{
+	MoveToAimPos();
 	//SetYaw();
 	//SetPitch();
 
-	m_value += 0.00001f*(M_PI/180);//変更予定
+	m_value += 0.00001f*(M_PI / 180);//変更予定
 
 	if (m_value >= 1.0f)
 	{
@@ -29,10 +32,6 @@ void Enemy::Control()
 	//DrawAimPos();
 	//DrawToAimVec();
 }
-
-
-//-------------------------------------
-//敵のAI
 
 //-------------------------------------
 //一点座標を決めてそこに向かって移動する

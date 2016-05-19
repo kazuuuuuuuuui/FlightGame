@@ -58,8 +58,7 @@ namespace oka
 	{
 		if (m_images.find(_str) == m_images.end())
 		{
-			printf("%s‚Í“o˜^‚³‚ê‚Ä‚¢‚Ü‚¹‚ñ\n",_str);
-			assert(0);
+			return 0;
 		}
 		else
 		{
