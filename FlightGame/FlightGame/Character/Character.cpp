@@ -11,8 +11,9 @@
 #include"Player.h"
 #include"../Effect/Smoke.h"
 #include"../Effect/Fire.h"
-
+#include"../glm/gtx/transform.hpp"
 #include"../glut.h"
+
 
 //-------------------------------------
 //コンストラクタ
@@ -21,8 +22,8 @@ Character::Character()
 {
 	printf("キャラクター生成\n");
 
-	//モデルデータ大きさ調整
-	m_transform.SetScale(glm::vec3(0.3f, 0.6f, 0.3f));
+	m_transform.m_scale = glm::vec3(0.3f, 0.6f, 0.3f);
+
 
 	//体部分
 	oka::Model *body = oka::ModelManager::GetInstance()->m_models["Body"];
@@ -33,9 +34,8 @@ Character::Character()
 	//プロペラ部分
 	/*oka::Model *propeller = oka::ModelManager::GetInstance()->m_models["Propeller"];
 	m_propeller = new oka::Mesh(propeller, tex);
+	m_propeller->m_transform.m_scale = glm::vec3(0.5f, 1.0f, 0.5f);
 	oka::GameManager::GetInstance()->AddGameObject("Propeller", m_propeller);*/
-
-
 
 	m_controller = new oka::Contoroller();
 	oka::JoysticManager::GetInstance()->AddController(m_controller);
@@ -43,37 +43,32 @@ Character::Character()
 	m_isHitAttack = false;
 	m_hp = 100;
 
-	//後で変更	
 	m_speed = glm::vec3(0.0f, 0.0f, 0.0f);
 	m_accel = glm::vec3(0.0f, 0.0f, 0.0f);
 };
 
-//-------------------------------------
-//自身の描画
-//モデルマネージャーからモデルデータを参照する
-
-void Character::Draw()
-{
-	
-}
-
 void Character::Update()
 {
+	//座標更新
+	m_speed += m_accel;
+	m_transform.m_position += m_speed;
+
+	//慣性
+	m_speed *= 0.965f;
+
 	//ボディ
 	m_body->m_transform = m_transform;
 
-	//プロペラ
-	/*glm::mat4 translate;
-	translate = glm::translate(translate, glm::vec3(0.0f, 0.1f, -5.2f));*/
+	//オフセット計算
+	//glm::mat4 offSet = glm::translate(glm::vec3(0.0f, 0.0f, -10.0f));
 
-	//glm::mat4 rotate;
-	//static float angle = 0.0f;
-	//angle += 0.2f;
-	//rotate = oka::MyMath::Rotate(angle, glm::vec3(0.0f, 0.0f, -1.0f));
-	//m_propeller->m_transform.m_matrix = m_transform.m_matrix*translate;//*rotate;
+	
+   //プロペラ
+	/*m_propeller->m_transform.m_translateMatrix = m_transform.m_translateMatrix;
+	m_propeller->m_transform.m_rotateMatrix = m_transform.m_rotateMatrix;
 
-
-
+	m_propeller->m_transform.m_matrix *= offSet;*/
+	//
 
 	if (m_controller->CheckIsConect())
 	{
@@ -97,29 +92,22 @@ void Character::Update()
 
 	m_isHitAttack = false;
 
-	//座標更新
-	m_speed += m_accel;
-	m_transform.SetPosition(m_transform.GetPosition() + m_speed);
-
-	//慣性
-	m_speed *= 0.965f;
 
 	//死亡判定
 	if (m_isActive)
 	{
 		if (CheckIsDead())
 		{
-			m_body->m_isActive = false;
 			m_isActive = false;
+			m_body->m_isActive = false;
 			
-
 			//爆発音
 			oka::SoundManager::GetInstance()->Play("Explode");
 
 			//爆発エフェクト
-			const unsigned int num = 20;
-			oka::GameManager::GetInstance()->AddGameObject("Smoke", Smoke::Create(m_transform.GetPosition(), num));
-			oka::GameManager::GetInstance()->AddGameObject("Fire", Fire::Create(m_transform.GetPosition()));
+			const unsigned int num = 15;
+			oka::GameManager::GetInstance()->AddGameObject("Smoke", Smoke::Create(m_transform.m_position, num));
+			oka::GameManager::GetInstance()->AddGameObject("Fire", Fire::Create(m_transform.m_position));
 		}
 	}
 

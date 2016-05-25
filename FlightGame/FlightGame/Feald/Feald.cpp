@@ -104,6 +104,11 @@ void Feald::SetTex()
 	}
 }
 
+struct RGB
+{
+	unsigned char r, g, b;
+};
+
 //-------------------------------------
 //拡張子bmpからコースの各頂点のY座標を設定する
 
@@ -120,11 +125,11 @@ void Feald::SetHeight(const char *_fileName)
 	BITMAPINFOHEADER bih;
 	fread(&bih, sizeof(BITMAPINFOHEADER), 1, fp);
 
-	int imageSize = bih.biWidth * bih.biHeight * sizeof(oka::RGB);
+	int imageSize = bih.biWidth * bih.biHeight * sizeof(RGB);
 
-	oka::RGB *pixels = (oka::RGB*)malloc(imageSize);
+	RGB *pixels = (RGB*)malloc(imageSize);
 
-	pixels = (oka::RGB*)malloc(imageSize);
+	pixels = (RGB*)malloc(imageSize);
 
 	fread(pixels, imageSize, 1, fp);
 
@@ -150,7 +155,7 @@ void Feald::SetHeight(const char *_fileName)
 			height /= 255.0f;//0.0～1.0f;
 
 			//最高座標点
-			const int max = 3.0f;
+			const int max = 10.0f;
 			height *= max;//0.0～max
 
 			m_vertex[z*bih.biWidth + x].y = height;

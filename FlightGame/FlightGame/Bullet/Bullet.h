@@ -20,18 +20,16 @@ public:
 
 	//debug
 	void DrawToEnemyVec();
-
 	
 		
 		Bullet() {};
-	Bullet(glm::vec3 _pos, glm::vec3 _rotate, glm::vec3 _speed):
-		m_speed(glm::vec3(0.0f, 0.0f, 0.0f)),
+	Bullet(glm::vec3 _pos, glm::vec3 _speed, glm::mat4 _rotate):
 		m_attack(5),
+		m_speed(_speed),
 		m_isHorming(true)
 	{
-		m_transform.SetPosition(_pos);
-		m_transform.SetRotation(_rotate);
-		m_speed = _speed;
+		m_transform.m_position = _pos;
+		m_transform.m_rotate = _rotate;
 	}
 
 	~Bullet();

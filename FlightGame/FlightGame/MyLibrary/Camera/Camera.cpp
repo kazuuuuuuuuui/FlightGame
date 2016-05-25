@@ -74,17 +74,6 @@ namespace oka
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 
-		//Œã‚ÅˆÚ“®
-		//ƒ‰ƒCƒg‚ÌˆÊ’u
-
-		float light[] = { 0,1,1, 0 };
-
-
-		glLightfv(
-			GL_LIGHT0,  // GLenum light
-			GL_POSITION,// GLenum pname
-			light);         // const GLfloat *params
-
 		glMultMatrixf((GLfloat*)&m_viewMatrix);
 	}
 

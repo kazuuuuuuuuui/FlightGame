@@ -20,12 +20,12 @@ void Particle::Draw()
 
 		glPushMatrix();
 		{
-			glTranslatef(m_transform.GetPosition().x, m_transform.GetPosition().y, m_transform.GetPosition().z);
+			glTranslatef(m_transform.m_position.x, m_transform.m_position.y, m_transform.m_position.z);
 
 			//ビルボード回転行列適用
 			glMultMatrixf((GLfloat*)&BillboardMatrix);
 
-			glScalef(m_transform.GetScale().x, m_transform.GetScale().y, m_transform.GetScale().z);
+			glScalef(m_transform.m_scale.x, m_transform.m_scale.y, m_transform.m_scale.z);
 
 			glColor4f(m_color.x, m_color.y, m_color.z, m_alpha);
 

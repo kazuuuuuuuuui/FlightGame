@@ -16,7 +16,7 @@ public:
 	Particle(glm::vec3 _color):
 	m_alpha(1.0f)
 	{
-		m_transform.SetScale(glm::vec3(0.0f, 0.0f, 0.0f));
+		m_transform.m_scale = glm::vec3(0.0f, 0.0f, 0.0f);
 		m_color = _color;
 	}
 };

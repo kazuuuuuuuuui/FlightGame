@@ -7,7 +7,7 @@
 
 Smoke::Smoke(glm::vec3 _pos)
 {
-	m_transform.SetPosition(_pos);
+	m_transform.m_position = _pos;
 
 }
 
@@ -80,8 +80,8 @@ void Smoke::Update()
 			(*itr)->m_isActive = false;
 		}
 
-		(*itr)->m_transform.SetScale(m_transform.GetScale() + (*itr)->m_alpha*10.0f);
-		(*itr)->m_transform.SetPosition((*itr)->m_transform.GetPosition() + (*itr)->m_speed*(*itr)->m_alpha);
+		(*itr)->m_transform.m_scale = (m_transform.m_scale + (*itr)->m_alpha*10.0f);
+		(*itr)->m_transform.m_position = ((*itr)->m_transform.m_position + (*itr)->m_speed*(*itr)->m_alpha);
 	}
 
 	//Œã‚Å•ÏX

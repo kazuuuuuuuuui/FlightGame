@@ -9,6 +9,12 @@ public:
 	const int m_width;
 	const int m_height;
 
+	/*
+	
+	Mesh‚É‘‚«Š·‚¦
+	
+	*/
+
 	//’¸“_”
 	unsigned int m_vertices;
 

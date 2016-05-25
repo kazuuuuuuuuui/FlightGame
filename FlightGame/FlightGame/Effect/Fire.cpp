@@ -1,11 +1,11 @@
 #include"Fire.h"
 #include"../glut.h"
 
-const int Fire::m_particleNum = 30;
+const int Fire::m_particleNum = 20;
 
 Fire::Fire(glm::vec3 _pos)
 {
-	m_transform.SetPosition(_pos);
+	m_transform.m_position = _pos;
 
 	for (int i = 0; i < m_particleNum; i++)
 	{
@@ -49,7 +49,7 @@ void Fire::Update()
 	for (auto itr = m_particles.begin(); itr != m_particles.end(); itr++)
 	{
 		(*itr)->m_alpha -= 0.01f;
-		(*itr)->m_transform.SetScale(m_transform.GetScale() + 3.0f);
-		(*itr)->m_transform.SetPosition((*itr)->m_transform.GetPosition() + (*itr)->m_speed*(*itr)->m_alpha);
+		(*itr)->m_transform.m_scale = (m_transform.m_scale + 3.0f);
+		(*itr)->m_transform.m_position = ((*itr)->m_transform.m_position + (*itr)->m_speed*(*itr)->m_alpha);
 	}
 }

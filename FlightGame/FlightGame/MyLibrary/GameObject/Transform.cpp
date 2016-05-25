@@ -1,7 +1,7 @@
 #include<stdio.h>
 #include"Transform.h"
 #include"../Camera/Camera.h"
-
+#include"../../glm/gtx/transform.hpp"
 #include"../../glut.h"
 
 glm::mat4 BillboardMatrix;
@@ -17,17 +17,15 @@ namespace oka
 		BillboardMatrix[3][2] = 0;
 
 		//translate
-		m_translateMatrix = glm::mat4(1.0f);
-		m_translateMatrix = glm::translate(m_translateMatrix, GetPosition());
+		glm::mat4 translate = glm::translate(m_position);
 
 		//scale
-		m_scaleMatrix = glm::mat4(1.0f);
-		m_scaleMatrix = glm::scale(m_scaleMatrix, GetScale());
+		glm::mat4 scale = glm::scale(m_scale);
 
-		//行列乗算
-		m_matrix = glm::mat4(1.0f);
-		m_matrix = m_translateMatrix * m_rotateMatrix * m_scaleMatrix;
+		m_matrix = translate * m_rotate * scale;
 
+
+		//debug
 		SetAimVec(m_myToVec, glm::vec3(0, 0, -1));
 		SetAimVec(m_myUpVec, glm::vec3(0, 1, 0));
 		SetAimVec(m_mySideVec, glm::vec3(1, 0, 0));
@@ -47,7 +45,7 @@ namespace oka
 
 		//向きベクトルを求めるための行列
 		glm::mat4 mat;
-		mat = m_rotateMatrix*pos;
+		mat = m_rotate*pos;
 
 		_myVec.x = mat[3][0];
 		_myVec.y = mat[3][1];
@@ -74,7 +72,7 @@ namespace oka
 
 			glBegin(GL_LINES);
 			{
-				glm::vec3 root = GetPosition();
+				glm::vec3 root = m_position;
 				glVertex3f(root.x, root.y, root.z);
 
 				glm::vec3 aim;
@@ -103,7 +101,7 @@ namespace oka
 
 			glBegin(GL_LINES);
 			{
-				glm::vec3 root = GetPosition();
+				glm::vec3 root = m_position;
 				glVertex3f(root.x, root.y, root.z);
 
 				glm::vec3 aim;
@@ -133,7 +131,7 @@ namespace oka
 
 			glBegin(GL_LINES);
 			{
-				glm::vec3 root = GetPosition();
+				glm::vec3 root = m_position;
 				glVertex3f(root.x, root.y, root.z);
 
 				glm::vec3 aim;

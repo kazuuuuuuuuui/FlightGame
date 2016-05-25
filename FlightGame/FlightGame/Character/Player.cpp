@@ -22,32 +22,32 @@
 
 void Player::Control()
 {
-	Accel();
-	Yaw();
-	Roll();
+	//Accel();
+	//Yaw();
+	//Roll();
 
-	Shot();
+	//Shot();
 
-	const float value = 0.4f * ((float)M_PI / 180.0f);
+	//const float value = 0.4f * ((float)M_PI / 180.0f);
 
 
-	//上昇
-	if (oka::Keyboard::GetStates('s'))
-	{
-		m_transform.SetRotationX(m_transform.GetRotation().x + value);
-	}
+	////上昇
+	//if (oka::Keyboard::GetStates('s'))
+	//{
+	//	//m_transform.SetRotationX(m_transform.GetRotation().x + value);
+	//}
 
-	//下降
-	else if (oka::Keyboard::GetStates('w'))
-	{
-		m_transform.SetRotationX(m_transform.GetRotation().x - value);
-	}
+	////下降
+	//else if (oka::Keyboard::GetStates('w'))
+	//{
+	//	//m_transform.SetRotationX(m_transform.GetRotation().x - value);
+	//}
 
-	//元の姿勢に戻る
-	else
-	{
-		//.SetRotationX(m_transform.GetRotation().m_x - (m_transform.GetRotation().m_x)*0.1f);
-	}
+	////元の姿勢に戻る
+	//else
+	//{
+	//	//.SetRotationX(m_transform.GetRotation().m_x - (m_transform.GetRotation().m_x)*0.1f);
+	//}
 }
 
 //-------------------------------------
@@ -55,6 +55,9 @@ void Player::Control()
 
 void Player::Control(unsigned short _pressedKey, unsigned int _downKeys, float _sThumbLX, float _sThumbLY)
 {
+	//m_speed = m_transform.m_myToVec*0.2f;
+	m_speed += m_accel;
+
 	Accel(_pressedKey);
 
 	const float value = oka::MyMath::ToRadian(1.0f);
@@ -62,31 +65,31 @@ void Player::Control(unsigned short _pressedKey, unsigned int _downKeys, float _
 	//Roll
 	if (_pressedKey & XINPUT_GAMEPAD_B)
 	{
-		m_transform.m_rotateMatrix *= oka::MyMath::Rotate(value, glm::vec3(0, 0, -1));
+		m_transform.m_rotate *= oka::MyMath::Rotate(value, glm::vec3(0, 0, -1));
 	}
 	else if(_pressedKey & XINPUT_GAMEPAD_X)
 	{
-		m_transform.m_rotateMatrix *= oka::MyMath::Rotate(-value, glm::vec3(0, 0, -1));
+		m_transform.m_rotate *= oka::MyMath::Rotate(-value, glm::vec3(0, 0, -1));
 	}
 
 	//Yaw
 	if (_sThumbLX > 0.5f)
 	{
-		m_transform.m_rotateMatrix *= oka::MyMath::Rotate(-value, glm::vec3(0, 1, 0));
+		m_transform.m_rotate *= oka::MyMath::Rotate(-value, glm::vec3(0, 1, 0));
 	}
 	else if (_sThumbLX < -0.5f)
 	{
-		m_transform.m_rotateMatrix *= oka::MyMath::Rotate(value, glm::vec3(0, 1, 0));
+		m_transform.m_rotate *= oka::MyMath::Rotate(value, glm::vec3(0, 1, 0));
 	}
 	
 	//Pitch
 	if (_sThumbLY > 0.5f)
 	{
-		m_transform.m_rotateMatrix *= oka::MyMath::Rotate(-value, glm::vec3(1, 0, 0));
+		m_transform.m_rotate *= oka::MyMath::Rotate(-value, glm::vec3(1, 0, 0));
 	}
 	else if (_sThumbLY < -0.5f)
 	{
-		m_transform.m_rotateMatrix *= oka::MyMath::Rotate(value, glm::vec3(1, 0, 0));
+		m_transform.m_rotate *= oka::MyMath::Rotate(value, glm::vec3(1, 0, 0));
 	}
 
 	Shot(_downKeys);
@@ -107,18 +110,18 @@ void Player::Control(unsigned short _pressedKey, unsigned int _downKeys, float _
 
 void Player::Accel()
 {
-	if (oka::Keyboard::GetStates(' '))
-	{
-		const float value = -0.05f;//補完係数
-		glm::vec3 accel;
-		accel.x = value*sin(m_transform.GetRotation().y);
-		accel.y = (-1)*value*sin(m_transform.GetRotation().x);
-		accel.z = value*cos(m_transform.GetRotation().y);
-	}
-	else
-	{
-		m_accel = glm::vec3(0.0f, 0.0f, 0.0f);
-	}
+	//if (oka::Keyboard::GetStates(' '))
+	//{
+	//	const float value = -0.05f;//補完係数
+	//	glm::vec3 accel;
+	//	accel.x = value*sin(m_transform.GetRotation().y);
+	//	accel.y = (-1)*value*sin(m_transform.GetRotation().x);
+	//	accel.z = value*cos(m_transform.GetRotation().y);
+	//}
+	//else
+	//{
+	//	m_accel = glm::vec3(0.0f, 0.0f, 0.0f);
+	//}
 }
 
 //-------------------------------------
@@ -132,15 +135,13 @@ void Player::Accel(unsigned short _pressedKey)
 		const float value = 0.01f;
 		
 		glm::vec3 accel;
-		accel.x = m_transform.m_myToVec.x*value;
-		accel.y = m_transform.m_myToVec.y*value;
-		accel.z = m_transform.m_myToVec.z*value;
+		accel = m_transform.m_myToVec*value;
 
 		m_accel = accel;
 	}
 	else
 	{
-		m_accel = glm::vec3(0.0f, 0.0f, 0.0f);
+		m_accel = glm::vec3(0, 0, 0);
 	}
 
 }
@@ -148,72 +149,7 @@ void Player::Accel(unsigned short _pressedKey)
 //-------------------------------------
 //キーボードによる旋回
 
-void Player::Yaw()
-{
-	//旋回の滑らかさ
-	//const float value = 0.5f*(M_PI / 180.0f);
 
-	////右旋回
-	//if (oka::Keyboard::GetStates('d'))
-	//{
-	//	m_transform.SetRotationY(m_transform.GetRotation().y - value);
-	//	//m_transform.SetRotationZ(m_transform.GetRotation().m_z + ((-1)*(1.0f / 2.0f) - m_transform.GetRotation().m_z)*0.1f);
-	//}
-
-	////左旋回
-	//else if (oka::Keyboard::GetStates('a'))
-	//{
-	//	m_transform.SetRotationY(m_transform.GetRotation().y + value);
-	//	//m_transform.SetRotationZ(m_transform.GetRotation().m_z + ((-1)*(-1.0f / 2.0f) - m_transform.GetRotation().m_z)*0.1f);
-	//}
-
-	////元の姿勢に戻る
-	//else
-	//{
-	//	//m_transform.SetRotationZ(m_transform.GetRotation().m_z - (m_transform.GetRotation().m_z)*0.1f);
-	//}
-
-	//glm::vec3 axis;
-
-	//
-
-
-
-	//glm::vec4 rotate;
-	//float angle = m_transform.GetRotation().y;
-
-	//rotate.x = axis.x * sin(angle / 2);
-	//rotate.y = axis.y * sin(angle / 2);
-	//rotate.z = axis.z * sin(angle / 2);
-	//rotate.w = cos(angle / 2);
-
-	//glm::quat quat = glm::quat(rotate.w, rotate.x, rotate.y, rotate.z);
-
-	////rotate
-	//m_transform.m_rotateMatrix = glm::mat4(1.0);
-	//m_transform.m_rotateMatrix = glm::toMat4(quat);
-}
-
-
-//-------------------------------------
-//キーボードによるロール回転
-
-void Player::Roll()
-{
-	//const float value = 1.2f * (M_PI / 180);
-
-	////右ロール回転
-	//if (oka::Keyboard::GetStates('n'))
-	//{
-	//	m_transform.SetRotationZ(m_transform.GetRotation().z + value);
-	//}
-
-	////左ロール回転
-	//else if (oka::Keyboard::GetStates('m'))
-	//{
-	//	m_transform.SetRotationZ(m_transform.GetRotation().z - value);
-	//}
-}
 
 
 //-------------------------------------
@@ -249,21 +185,21 @@ void Player::Shot()
 
 void Player::Shot(unsigned short _downKeys)
 {
-		glm::vec3 pos;
-		const float distance = 2.0f;//自機と弾発射点の間隔
-		pos = m_transform.GetPosition()+m_transform.m_myToVec*distance;
-
-		glm::vec3 rotate = m_transform.GetRotation();
-
-		glm::vec3 speed;
-		const float value = 1.0f;//弾のスピード補完値
-
-		speed = m_transform.m_myToVec * value;
-
 	if (_downKeys & XINPUT_GAMEPAD_Y)
 	{
+		glm::vec3 pos;
+		const float distance = 2.0f;//自機と弾発射点の間隔
+		pos = m_transform.m_position + m_transform.m_myToVec*distance;
+
+		glm::vec3 speed;
+		const float value = 4.0f;//弾のスピード補完値
+		speed = m_transform.m_myToVec * value;
+
+		glm::mat4 mat = m_transform.m_rotate;
+	
 		oka::SoundManager::GetInstance()->Play("Shot");
-		Bullet *bullet = new Bullet(pos, rotate, speed);
+		Bullet *bullet = new Bullet(pos, speed, mat);
+
 		oka::BulletManager::GetInstance()->AddBullet(bullet);
 		oka::GameManager::GetInstance()->AddGameObject("Bullet", bullet);
 	}
@@ -294,7 +230,7 @@ void Player::DrawTarget()
 		//描画場所
 		const float value = 30.0f;//キャラクターとの間隔補完値
 		glm::vec3 v;
-		glm::vec3 pos = m_transform.GetPosition();
+		glm::vec3 pos = m_transform.m_position;
 		glm::vec3 toVec = m_transform.m_myToVec*value;
 
 		v = pos + toVec;

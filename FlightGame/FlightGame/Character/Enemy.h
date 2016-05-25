@@ -36,12 +36,7 @@ public:
 		m_aimPos.z = ((float)rand() / RAND_MAX)*z_max;
 
 
-		m_transform.SetPosition(_pos);
-		glm::mat4 translate = glm::mat4(1.0);
-		translate = glm::translate(translate,m_transform.GetPosition());
-		
-		m_transform.m_matrix = translate;
-		
+		m_transform.m_position = _pos;	
 	}
 
 	~Enemy() 

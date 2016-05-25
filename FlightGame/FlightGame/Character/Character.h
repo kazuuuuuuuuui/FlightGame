@@ -21,7 +21,7 @@ public:
 	glm::vec3 m_speed;
 	glm::vec3 m_accel;
 
-	void Draw();
+	void Draw() {};
 	void Update();
 	virtual void Control() = 0;
 	virtual void Control(unsigned short _pressedKey, unsigned int _downKeys, float _sThumbLX, float _sThumbLY) = 0;

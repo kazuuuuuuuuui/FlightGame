@@ -64,9 +64,11 @@ void display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	glEnable(GL_NORMALIZE);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 	glEnable(GL_DEPTH_TEST);
+	
 	//glEnable(GL_CULL_FACE);
 
 

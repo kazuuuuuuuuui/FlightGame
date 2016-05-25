@@ -39,7 +39,7 @@ void Enemy::Control()
 void Enemy::MoveToAimPos()
 {	
 	//自分の座標から目標点への向きベクトル
-	glm::vec3 vec = m_aimPos - m_transform.GetPosition();
+	glm::vec3 vec = m_aimPos - m_transform.m_position;
 	vec = glm::normalize(vec);
 
 	//スピードの設定
@@ -53,16 +53,16 @@ void Enemy::MoveToAimPos()
 void Enemy::SetYaw()
 {
 	//自身の座標と向けたい方向のベクトルとの差分
-	glm::vec3 dif = m_aimPos - m_transform.GetPosition();
+	//glm::vec3 dif = m_aimPos - m_transform.GetPosition();
 
-	//移動の補完値
+	////移動の補完値
 
-	dif = dif * m_value;
+	//dif = dif * m_value;
 
-	float x = (m_transform.m_myToVec + dif).x;
-	float z = (m_transform.m_myToVec + dif).z;
-	float yaw = atan2f(-x, -z);
-	m_transform.SetRotationY(yaw);
+	//float x = (m_transform.m_myToVec + dif).x;
+	//float z = (m_transform.m_myToVec + dif).z;
+	//float yaw = atan2f(-x, -z);
+	//m_transform.SetRotationY(yaw);
 
 }
 
@@ -72,16 +72,16 @@ void Enemy::SetYaw()
 void Enemy::SetPitch()
 {
 	//向きベクトルと向けたい方向のベクトルとの差分
-	glm::vec3 dif = - m_transform.GetPosition();
+	//glm::vec3 dif = - m_transform.GetPosition();
 
-	//移動の補完値
+	////移動の補完値
 
-	dif = dif * m_value;
+	//dif = dif * m_value;
 
-	float y = (m_transform.m_myToVec + dif).y;
-	float z = (m_transform.m_myToVec + dif).z;
-	float pitch = atan2f(-y, -z);
-	m_transform.SetRotationX(pitch);
+	//float y = (m_transform.m_myToVec + dif).y;
+	//float z = (m_transform.m_myToVec + dif).z;
+	//float pitch = atan2f(-y, -z);
+	//m_transform.SetRotationX(pitch);
 
 }
 
@@ -92,7 +92,7 @@ void Enemy::SetPitch()
 bool Enemy::CheckNearAimPis()const
 {
 	glm::vec3 v;
-	v = m_aimPos - m_transform.GetPosition();
+	v = m_aimPos - m_transform.m_position;
 
 	//距離の一定値
 	const float value = 5.0f;
@@ -161,7 +161,7 @@ void Enemy::DrawToAimVec()
 
 		glBegin(GL_LINES);
 		{
-			glm::vec3 root = m_transform.GetPosition();
+			glm::vec3 root = m_transform.m_position;
 			glVertex3f(root.x, root.y, root.z);
 
 			glm::vec3 aim = m_aimPos;
