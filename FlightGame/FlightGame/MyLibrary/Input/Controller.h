@@ -14,7 +14,7 @@ namespace oka
 
 		XINPUT_STATE m_state;
 
-		bool m_isConnect;
+		bool m_isConnected;
 
 		//現フレームのスティックx方向の情報
 		float m_sThumbLX;
@@ -40,18 +40,15 @@ namespace oka
 		unsigned int m_downkey;
 
 		void Update();
-		bool CheckIsConect();
+		bool IsConected()const;
 		void stick_x();
 		void stick_y();
 
-		Contoroller() :
-			m_isConnect(false),
-			m_sThumbLX(0.0f), m_sThumbLY(0.0f),
-			m_xRightDown(false), m_xRightLast(false), m_xLeftDown(false), m_xLeftLast(false),
-			m_yTopDown(false), m_yTopLast(false), m_yBottomDown(false), m_yBottomLast(false),
-			m_pressedKey(0), m_lastkey(0), m_changedKey(0), m_downkey(0)
-		{};
+		Contoroller();
 
 	};
 
 }
+
+
+

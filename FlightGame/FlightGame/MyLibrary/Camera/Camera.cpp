@@ -1,8 +1,8 @@
 #define _USE_MATH_DEFINES
 #include<math.h>
 #include"Camera.h"
-#include"../../glm/glm.hpp"
-#include"../../glm/gtc/matrix_transform.hpp"
+//#include"../../glm/glm.hpp"
+//#include"../../glm/gtc/matrix_transform.hpp"
 #include"../../glut.h"
 
 oka::Camera *g_camera = nullptr;
@@ -55,7 +55,6 @@ namespace oka
 			glm::vec3(m_target.x, m_target.y, m_target.z),
 			glm::vec3(m_up.x, m_up.y, m_up.z));
 	}
-
 
 	//-------------------------------------
 	//ƒrƒ…[s—ñ‚Ìæ“¾

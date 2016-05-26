@@ -9,12 +9,6 @@ public:
 	const int m_width;
 	const int m_height;
 
-	/*
-	
-	Meshに書き換え
-	
-	*/
-
 	//頂点数
 	unsigned int m_vertices;
 
@@ -63,7 +57,7 @@ public:
 		SetIndex();
 
 		//頂点の高さ設定
-		SetHeight("test.bmp");
+		SetHeight("heightmap.bmp");
 
 		//法線データ
 		SetNormal();

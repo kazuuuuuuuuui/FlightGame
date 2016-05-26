@@ -56,27 +56,28 @@ void Feald::SetNormal()
 {
 	for (unsigned int i = 0; i < m_indeces ;i+=3)
 	{
-		glm::vec3 v0 = m_vertex[m_index[i]];
-		glm::vec3 v1 = m_vertex[m_index[i + 1]];
-		glm::vec3 v2 = m_vertex[m_index[i + 2]];
+		//glm::vec3 v0 = m_vertex[m_index[i]];
+		//glm::vec3 v1 = m_vertex[m_index[i + 1]];
+		//glm::vec3 v2 = m_vertex[m_index[i + 2]];
 
 //printf("v0 x:%f y:%f z:%f\n", m_vertex[m_index[i]].x, m_vertex[m_index[i]].y, m_vertex[m_index[i]].z);
 //printf("v1 x:%f y:%f z:%f\n", m_vertex[m_index[i+1]].x, m_vertex[m_index[i + 1]].y, m_vertex[m_index[i + 1]].z);
 //printf("v2 x:%f y:%f z:%f\n", m_vertex[m_index[i + 2]].x, m_vertex[m_index[i + 2]].y, m_vertex[m_index[i + 2]].z);
 
-		glm::vec3 v01 = v1 - v0;
-		glm::vec3 v02 = v2 - v0;
+		//glm::vec3 v01 = v1 - v0;
+		//glm::vec3 v02 = v2 - v0;
 
 //printf("v01 x:%f y:%f z:%f\n", v01.x, v01.y, v01.z);
 //printf("v02 x:%f y:%f z:%f\n", v02.x, v02.y, v02.z);
 
-		glm::vec3 normal= glm::cross(v01, v02);
+		//glm::vec3 normal= glm::cross(v01, v02);
 
 //printf("normal x:%f y:%f z:%f\n", normal.x, normal.y, normal.z);
 
 //printf("\n");
 
-		normal = glm::normalize(normal);
+		//normal = glm::normalize(normal);
+		glm::vec3 normal = glm::vec3(0, 1, 0);
 		
 		m_normal.push_back(normal);
 		m_normal.push_back(normal);
@@ -155,7 +156,7 @@ void Feald::SetHeight(const char *_fileName)
 			height /= 255.0f;//0.0`1.0f;
 
 			//Å‚À•W“_
-			const int max = 10.0f;
+			const int max = 15.0f;
 			height *= max;//0.0`max
 
 			m_vertex[z*bih.biWidth + x].y = height;

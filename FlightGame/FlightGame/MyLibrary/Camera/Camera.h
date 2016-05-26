@@ -2,7 +2,6 @@
 #define _OKA_CAMERA_H_
 
 #include"../GameObject/Transform.h"
-#include"../../glm/mat4x4.hpp"
 
 namespace oka 
 {

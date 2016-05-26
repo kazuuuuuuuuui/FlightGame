@@ -40,11 +40,14 @@ GLenum g_mode = GL_FILL;
 void keyboard(unsigned char key, int x, int y)
 {
 	//debug
-	//printf("keyboard: key:%c x:%d y:%d\n", key, x, y);
-	if (GL_FILL == g_mode)
+	if ('l' == key)
+	{
 		g_mode = GL_LINE;
-	else
+	}
+	else if ('f' == key)
+	{
 		g_mode = GL_FILL;
+	}
 
 	oka::Keyboard::KeyPress(key);
 }
@@ -69,9 +72,6 @@ void display()
 	glEnable(GL_LIGHT0);
 	glEnable(GL_DEPTH_TEST);
 	
-	//glEnable(GL_CULL_FACE);
-
-
 	//debug
 	glPolygonMode(GL_FRONT_AND_BACK, g_mode);
 
@@ -95,7 +95,6 @@ void timer(int value)
 
 	glutPostRedisplay();
 	glutTimerFunc(1000 / 60, timer, 0);
-
 }
 
 //-------------------------------------

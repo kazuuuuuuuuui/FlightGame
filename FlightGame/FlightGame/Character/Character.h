@@ -21,11 +21,15 @@ public:
 	glm::vec3 m_speed;
 	glm::vec3 m_accel;
 
-	void Draw() {};
 	void Update();
 	virtual void Control() = 0;
-	virtual void Control(unsigned short _pressedKey, unsigned int _downKeys, float _sThumbLX, float _sThumbLY) = 0;
-	bool CheckIsDead()const;
+	virtual void Control(unsigned short _pressedKey, unsigned int _downKeys, float _sThumbLX, float _sThumbLY);
+	void Accel(unsigned short _pressedKey);
+	void Shot(unsigned short _downKeys);
+	
+	bool IsGroundOut()const;
+	bool IsIntersectGround()const;
+	bool IsDead()const;
 
 	Character();
 };

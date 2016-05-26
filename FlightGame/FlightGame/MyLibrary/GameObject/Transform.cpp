@@ -24,8 +24,6 @@ namespace oka
 
 		m_matrix = translate * m_rotate * scale;
 
-
-		//debug
 		SetAimVec(m_myToVec, glm::vec3(0, 0, -1));
 		SetAimVec(m_myUpVec, glm::vec3(0, 1, 0));
 		SetAimVec(m_mySideVec, glm::vec3(1, 0, 0));
@@ -39,6 +37,8 @@ namespace oka
 	{
 		//ç¿ïWçsóÒ
 		glm::mat4 pos;
+		//pos = glm::translate(_aimVec);
+
 		pos[3][0] = _aimVec.x;
 		pos[3][1] = _aimVec.y;
 		pos[3][2] = _aimVec.z;
@@ -51,8 +51,7 @@ namespace oka
 		_myVec.y = mat[3][1];
 		_myVec.z = mat[3][2];
 
-		//ê≥ãKâª
-		_myVec = (_myVec / glm::length(_myVec));
+		_myVec = glm::normalize(_myVec);
 	}
 
 	//-------------------------------------

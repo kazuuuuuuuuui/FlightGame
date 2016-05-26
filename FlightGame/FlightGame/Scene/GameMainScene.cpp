@@ -7,8 +7,7 @@
 #include"../MyLibrary/Sound/Sound.h"
 #include"../MyLibrary/Manager/ModelManager.h"
 #include"../MyLibrary/Manager/BulletManager.h"
-
-#include"../MyLibrary/Manager/EffectManager.h"
+#include"../MyLibrary/Manager/FealdManager.h"
 #include"../MyLibrary/Image/BmpImage.h"
 #include"../Feald/Feald.h"
 #include"../Character/Player.h"
@@ -28,8 +27,7 @@ GameMainScene::GameMainScene()
 	printf("\n");
 
 	//debug
-	
-	oka::ImageManager::GetInstance()->SetHandle("FealdTex", oka::LoadImage3f("tex.bmp"));
+	oka::ImageManager::GetInstance()->SetHandle("FealdTex", oka::LoadImage3f("grand.bmp"));
 	oka::ImageManager::GetInstance()->SetHandle("Smoke", oka::LoadImage4f("smoke.bmp"));
 	oka::ImageManager::GetInstance()->SetHandle("Target", oka::LoadImage4f("target.bmp"));
 	oka::ImageManager::GetInstance()->SetHandle("FlyTex", oka::LoadImage3f("flyTex.bmp"));
@@ -43,7 +41,9 @@ GameMainScene::GameMainScene()
 	oka::ModelManager::GetInstance()->AddModel("Propeller", oka::Model::LoadXFile("propeller.x"));
 
 	//フィールド
-	oka::GameManager::GetInstance()->AddGameObject("Feald", new Feald());
+	Feald *feald = new Feald();
+	oka::GameManager::GetInstance()->AddGameObject("Feald", feald);
+	oka::FealdManager::GetInstance()->AddFeald(feald);
 
 	//空
 	oka::ImageManager::GetInstance()->SetHandle("Sky", oka::LoadImage3f("sky.bmp"));
@@ -56,8 +56,8 @@ GameMainScene::GameMainScene()
 	oka::GameManager::GetInstance()->AddGameObject("Sea", new oka::Sea());
 
 	//キャラクターの登録
-	oka::CharacterManager::GetInstance()->AddCharacter(new Player(glm::vec3(0.0f, 10.0f, 0.0f)));
-	oka::CharacterManager::GetInstance()->AddCharacter(new Enemy(glm::vec3(100.0f, 10.0f, 0.0f)));
+	oka::CharacterManager::GetInstance()->AddCharacter(new Player(glm::vec3(50.0f, 100.0f, 0.0f)));
+	//oka::CharacterManager::GetInstance()->AddCharacter(new Enemy(glm::vec3(100.0f, 50.0f, -100.0f)));
 
 	auto itr = oka::CharacterManager::GetInstance()->m_characters.begin();
 	auto end = oka::CharacterManager::GetInstance()->m_characters.end();
@@ -123,7 +123,7 @@ void GameMainScene::Render()
 	g_camera->SetViewMatrix(pos, target, up);
 	g_camera->MultViewMatrix();
 
-	float v[] = { 0,100,100,0 };
+	float v[] = { 0,100,0,0 };
 	glLightfv(GL_LIGHT0, GL_POSITION, v);
 
 	//全オブジェクトの描画

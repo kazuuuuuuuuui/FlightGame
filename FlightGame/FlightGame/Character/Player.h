@@ -2,6 +2,7 @@
 #define PLAYER_H_
 
 #include"Character.h"
+#include"../MyLibrary/Manager/JoysticManager.h"
 
 class Player :public Character
 {
@@ -9,10 +10,6 @@ public:
 	void Control();
 	void Accel();
 	void Shot();
-
-	void Control(unsigned short _pressedKey, unsigned int _downKeys, float _sThumbLX, float _sThumbLY);
-	void Accel(unsigned short _pressedKey);
-	void Shot(unsigned short _downKeys);
 
 	void DrawTarget();
 

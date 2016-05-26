@@ -7,7 +7,6 @@
 #include"../MyLibrary/Manager/GameManager.h"
 #include"../MyLibrary/Manager/ImageManager.h"
 #include"../MyLibrary/Manager/SoundManager.h"
-//#include"../Effect/Smoke.h"
 #include"../MyLibrary/Manager/EffectManager.h"
 #include"../MyLibrary/Manager/BulletManager.h"
 #include"../MyLibrary/Camera/Camera.h"
@@ -22,118 +21,53 @@
 
 void Player::Control()
 {
-	//Accel();
-	//Yaw();
-	//Roll();
-
-	//Shot();
-
-	//const float value = 0.4f * ((float)M_PI / 180.0f);
-
-
-	////上昇
-	//if (oka::Keyboard::GetStates('s'))
-	//{
-	//	//m_transform.SetRotationX(m_transform.GetRotation().x + value);
-	//}
-
-	////下降
-	//else if (oka::Keyboard::GetStates('w'))
-	//{
-	//	//m_transform.SetRotationX(m_transform.GetRotation().x - value);
-	//}
-
-	////元の姿勢に戻る
-	//else
-	//{
-	//	//.SetRotationX(m_transform.GetRotation().m_x - (m_transform.GetRotation().m_x)*0.1f);
-	//}
-}
-
-//-------------------------------------
-//ゲームパッドでの操作
-
-void Player::Control(unsigned short _pressedKey, unsigned int _downKeys, float _sThumbLX, float _sThumbLY)
-{
-	//m_speed = m_transform.m_myToVec*0.2f;
-	m_speed += m_accel;
-
-	Accel(_pressedKey);
+	Accel();
+	Shot();
 
 	const float value = oka::MyMath::ToRadian(1.0f);
 
 	//Roll
-	if (_pressedKey & XINPUT_GAMEPAD_B)
+	if (oka::Keyboard::GetStates('m'))
 	{
 		m_transform.m_rotate *= oka::MyMath::Rotate(value, glm::vec3(0, 0, -1));
 	}
-	else if(_pressedKey & XINPUT_GAMEPAD_X)
+	else if (oka::Keyboard::GetStates('n'))
 	{
 		m_transform.m_rotate *= oka::MyMath::Rotate(-value, glm::vec3(0, 0, -1));
 	}
 
 	//Yaw
-	if (_sThumbLX > 0.5f)
+	if (oka::Keyboard::GetStates('d'))
 	{
 		m_transform.m_rotate *= oka::MyMath::Rotate(-value, glm::vec3(0, 1, 0));
 	}
-	else if (_sThumbLX < -0.5f)
+	else if (oka::Keyboard::GetStates('a'))
 	{
 		m_transform.m_rotate *= oka::MyMath::Rotate(value, glm::vec3(0, 1, 0));
 	}
-	
+
 	//Pitch
-	if (_sThumbLY > 0.5f)
+	if (oka::Keyboard::GetStates('s'))
 	{
 		m_transform.m_rotate *= oka::MyMath::Rotate(-value, glm::vec3(1, 0, 0));
 	}
-	else if (_sThumbLY < -0.5f)
+	else if (oka::Keyboard::GetStates('w'))
 	{
 		m_transform.m_rotate *= oka::MyMath::Rotate(value, glm::vec3(1, 0, 0));
 	}
 
-	Shot(_downKeys);
-
-	//後で変更
-	//DrawTarget();
 }
 
 //-------------------------------------
 //前進処理
 //キーボード スペースキー で前進
 
-/*
-
-進まない
-
-*/
-
 void Player::Accel()
 {
-	//if (oka::Keyboard::GetStates(' '))
-	//{
-	//	const float value = -0.05f;//補完係数
-	//	glm::vec3 accel;
-	//	accel.x = value*sin(m_transform.GetRotation().y);
-	//	accel.y = (-1)*value*sin(m_transform.GetRotation().x);
-	//	accel.z = value*cos(m_transform.GetRotation().y);
-	//}
-	//else
-	//{
-	//	m_accel = glm::vec3(0.0f, 0.0f, 0.0f);
-	//}
-}
-
-//-------------------------------------
-//前進処理
-//ゲームパッド A で前進
-
-void Player::Accel(unsigned short _pressedKey)
-{
-	if (_pressedKey & XINPUT_GAMEPAD_A)
+	if (oka::Keyboard::GetStates(' '))
 	{
-		const float value = 0.01f;
-		
+		const float value = 0.02f;
+
 		glm::vec3 accel;
 		accel = m_transform.m_myToVec*value;
 
@@ -143,14 +77,7 @@ void Player::Accel(unsigned short _pressedKey)
 	{
 		m_accel = glm::vec3(0, 0, 0);
 	}
-
 }
-
-//-------------------------------------
-//キーボードによる旋回
-
-
-
 
 //-------------------------------------
 //弾による攻撃
@@ -159,33 +86,7 @@ void Player::Accel(unsigned short _pressedKey)
 
 void Player::Shot()
 {
-	/*if (oka::Keyboard::GetStates('b'))
-	{
-		glm::vec3 pos;
-		const float distance = 1.5f;
-		pos.x = m_transform.GetPosition().x - sin(m_transform.GetRotation().y)*distance;
-		pos.y = m_transform.GetPosition().y;
-		pos.z = m_transform.GetPosition().z - cos(m_transform.GetRotation().y)*distance;
-
-		glm::vec3 rotate = m_transform.GetRotation();
-
-		glm::vec3 speed;
-		float value = 0.1f;
-	
-		speed.x = -sin(m_transform.GetRotation().y) * value*(180.0f / M_PI);
-		speed.y = sin(m_transform.GetRotation().x)* value*(180.0f / M_PI);
-		speed.z = -cos(m_transform.GetRotation().y) * value*(180.0f / M_PI);
-
-		m_bullets.push_back(new Bullet(pos, rotate, speed));
-	}*/
-}
-
-//-------------------------------------
-//弾による攻撃
-
-void Player::Shot(unsigned short _downKeys)
-{
-	if (_downKeys & XINPUT_GAMEPAD_Y)
+	if (oka::Keyboard::GetStates('b'))
 	{
 		glm::vec3 pos;
 		const float distance = 2.0f;//自機と弾発射点の間隔
@@ -196,7 +97,7 @@ void Player::Shot(unsigned short _downKeys)
 		speed = m_transform.m_myToVec * value;
 
 		glm::mat4 mat = m_transform.m_rotate;
-	
+
 		oka::SoundManager::GetInstance()->Play("Shot");
 		Bullet *bullet = new Bullet(pos, speed, mat);
 

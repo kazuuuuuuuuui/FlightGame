@@ -3,47 +3,67 @@
 
 namespace oka
 {
-	//--------------------------
-	//コントローラーの接続の有無
+	//-------------------------------------
+	//コンストラクタ
 
-	bool Contoroller::CheckIsConect()
+	Contoroller::Contoroller()
 	{
-		if (XInputGetState(m_state.dwPacketNumber, &m_state))
-		{
-			m_isConnect = true;
-		}
-		else
-		{
-			m_isConnect = false;
-		}
+		m_isConnected = false;
+		m_state.dwPacketNumber = 0;
+		m_state.Gamepad.bLeftTrigger = 0;
+		m_state.Gamepad.bRightTrigger = 0;
+		m_state.Gamepad.sThumbLX = 0;
+		m_state.Gamepad.sThumbLY = 0;
+		m_state.Gamepad.sThumbRX = 0;
+		m_state.Gamepad.sThumbRY = 0;
+		m_state.Gamepad.wButtons = 0;
 
-		return m_isConnect;
-
+		m_sThumbLX = 0.0f;
+		m_sThumbLY = 0.0f;
+		m_xRightDown = false;
+		m_xRightLast = false;
+		m_xLeftDown = false;
+		m_xLeftLast = false;
+		m_yTopDown = false;
+		m_yTopLast = false;
+		m_yBottomDown = false;
+		m_yBottomLast = false;
+		m_pressedKey = 0;
+		m_lastkey = 0;
+		m_changedKey = 0;
+		m_downkey = 0;
 	}
+
+	//-------------------------------------
+	//自身の接続状態を返す
+
+	bool Contoroller::IsConected()const
+	{
+		return m_isConnected;
+	}
+
+	//-------------------------------------
+	//更新
 
 	void Contoroller::Update()
 	{
-		if (CheckIsConect())
-		{
-			//ボタン
-			m_pressedKey = m_state.Gamepad.wButtons;
-			m_changedKey = m_pressedKey ^ m_lastkey;
-			m_downkey = m_pressedKey & m_changedKey;
+		//ボタン
+		m_pressedKey = m_state.Gamepad.wButtons;
+		m_changedKey = m_pressedKey ^ m_lastkey;
+		m_downkey = m_pressedKey & m_changedKey;
 
-			//スティック
-			m_sThumbLX = m_state.Gamepad.sThumbLX;
-			m_sThumbLY = m_state.Gamepad.sThumbLY;
+		//スティック
+		m_sThumbLX = m_state.Gamepad.sThumbLX;
+		m_sThumbLY = m_state.Gamepad.sThumbLY;
 
-			//-32768～32767の値を-1～1の値に変換
-			m_sThumbLX /= 32768;
-			m_sThumbLY /= 32768;
+		//-32768～32767の値を-1～1の値に変換
+		m_sThumbLX /= 32768;
+		m_sThumbLY /= 32768;
 
-			stick_x();
-			stick_y();
+		stick_x();
+		stick_y();
 
-			m_lastkey = m_state.Gamepad.wButtons;
-		}
-
+		m_lastkey = m_state.Gamepad.wButtons;
 	}
 
 	//-------------------------------------

@@ -7,6 +7,8 @@
 #include"../MyLibrary/Manager/ImageManager.h"
 #include"../MyLibrary/Manager/SoundManager.h"
 #include"../MyLibrary/Manager/ModelManager.h"
+#include"../MyLibrary/Manager/BulletManager.h"
+#include"../MyLibrary/Manager/FealdManager.h"
 #include"../MyLibrary/Input/Keyboard.h"
 #include"Player.h"
 #include"../Effect/Smoke.h"
@@ -20,10 +22,7 @@
 
 Character::Character()
 {
-	printf("キャラクター生成\n");
-
 	m_transform.m_scale = glm::vec3(0.3f, 0.6f, 0.3f);
-
 
 	//体部分
 	oka::Model *body = oka::ModelManager::GetInstance()->m_models["Body"];
@@ -32,10 +31,9 @@ Character::Character()
 	oka::GameManager::GetInstance()->AddGameObject("Body", m_body);
 
 	//プロペラ部分
-	/*oka::Model *propeller = oka::ModelManager::GetInstance()->m_models["Propeller"];
+	oka::Model *propeller = oka::ModelManager::GetInstance()->m_models["Propeller"];
 	m_propeller = new oka::Mesh(propeller, tex);
-	m_propeller->m_transform.m_scale = glm::vec3(0.5f, 1.0f, 0.5f);
-	oka::GameManager::GetInstance()->AddGameObject("Propeller", m_propeller);*/
+	oka::GameManager::GetInstance()->AddGameObject("Propeller", m_propeller);
 
 	m_controller = new oka::Contoroller();
 	oka::JoysticManager::GetInstance()->AddController(m_controller);
@@ -60,17 +58,25 @@ void Character::Update()
 	m_body->m_transform = m_transform;
 
 	//オフセット計算
-	//glm::mat4 offSet = glm::translate(glm::vec3(0.0f, 0.0f, -10.0f));
-
+	glm::mat4 offSet;
 	
+	const glm::mat4 translate = glm::translate(glm::vec3(0.0f, 0.3f, -5.2f));
+	
+	//static float angle = 0.0f;
+	//angle += oka::MyMath::ToRadian(2.0f);
+	//const glm::vec3 axis = glm::vec3(0, 1, 0);
+	//const glm::mat4 rotate = glm::rotate(angle, axis);
+
+	const glm::mat4 scale = glm::scale(glm::vec3(2, 2, 2));
+
+	offSet = translate*scale;
+
    //プロペラ
-	/*m_propeller->m_transform.m_translateMatrix = m_transform.m_translateMatrix;
-	m_propeller->m_transform.m_rotateMatrix = m_transform.m_rotateMatrix;
+	m_propeller->m_transform = m_transform;
+	m_propeller->m_transform.m_matrix = m_transform.m_matrix * offSet;
+	
 
-	m_propeller->m_transform.m_matrix *= offSet;*/
-	//
-
-	if (m_controller->CheckIsConect())
+	if (m_controller->IsConected())
 	{
 		unsigned short pressedKey = m_controller->m_state.Gamepad.wButtons;
 		unsigned int downKeys = m_controller->m_downkey;
@@ -81,7 +87,7 @@ void Character::Update()
 	}
 	else
 	{
-		//Control();
+		Control();
 	}
 	
 	if (m_isHitAttack)
@@ -93,13 +99,24 @@ void Character::Update()
 	m_isHitAttack = false;
 
 
+//debug
+printf("z:%f\n", m_transform.m_position.z);
+
+	//フィールドとの判定
+	if (IsGroundOut())
+	{
+		//debug
+		printf("出てるよおおおおおおおおおお\n");
+	}
+
 	//死亡判定
 	if (m_isActive)
 	{
-		if (CheckIsDead())
+		if (IsDead())
 		{
 			m_isActive = false;
 			m_body->m_isActive = false;
+			m_propeller->m_isActive = false;
 			
 			//爆発音
 			oka::SoundManager::GetInstance()->Play("Explode");
@@ -110,18 +127,141 @@ void Character::Update()
 			oka::GameManager::GetInstance()->AddGameObject("Fire", Fire::Create(m_transform.m_position));
 		}
 	}
+}
 
-	//debug
-	m_transform.DrawMyToVec();
-	m_transform.DrawMyUpVec();
-	m_transform.DrawMySideVec();
+//-------------------------------------
+//ゲームパッドでの操作
+
+void Character::Control(unsigned short _pressedKey, unsigned int _downKeys, float _sThumbLX, float _sThumbLY)
+{
+	Accel(_pressedKey);
+	Shot(_downKeys);
+
+	const float value = oka::MyMath::ToRadian(1.0f);
+
+	//Roll
+	if (_pressedKey & XINPUT_GAMEPAD_B)
+	{
+		m_transform.m_rotate *= oka::MyMath::Rotate(value, glm::vec3(0, 0, -1));
+	}
+	else if (_pressedKey & XINPUT_GAMEPAD_X)
+	{
+		m_transform.m_rotate *= oka::MyMath::Rotate(-value, glm::vec3(0, 0, -1));
+	}
+
+	//Yaw
+	if (_sThumbLX > 0.5f)
+	{
+		m_transform.m_rotate *= oka::MyMath::Rotate(-value, glm::vec3(0, 1, 0));
+	}
+	else if (_sThumbLX < -0.5f)
+	{
+		m_transform.m_rotate *= oka::MyMath::Rotate(value, glm::vec3(0, 1, 0));
+	}
+
+	//Pitch
+	if (_sThumbLY > 0.5f)
+	{
+		m_transform.m_rotate *= oka::MyMath::Rotate(-value, glm::vec3(1, 0, 0));
+	}
+	else if (_sThumbLY < -0.5f)
+	{
+		m_transform.m_rotate *= oka::MyMath::Rotate(value, glm::vec3(1, 0, 0));
+	}
+}
+
+//-------------------------------------
+//前進処理
+//ゲームパッド A で前進
+
+void Character::Accel(unsigned short _pressedKey)
+{
+	if (_pressedKey & XINPUT_GAMEPAD_A)
+	{
+		const float value = 0.02f;
+
+		glm::vec3 accel;
+		accel = m_transform.m_myToVec*value;
+
+		m_accel = accel;
+	}
+	else
+	{
+		m_accel = glm::vec3(0, 0, 0);
+	}
+
+}
+
+//-------------------------------------
+//弾による攻撃
+
+void Character::Shot(unsigned short _downKeys)
+{
+	if (_downKeys & XINPUT_GAMEPAD_Y)
+	{
+		glm::vec3 pos;
+		const float distance = 2.0f;//自機と弾発射点の間隔
+		pos = m_transform.m_position + m_transform.m_myToVec*distance;
+
+		glm::vec3 speed;
+		const float value = 4.0f;//弾のスピード補完値
+		speed = m_transform.m_myToVec * value;
+
+		glm::mat4 mat = m_transform.m_rotate;
+
+		//oka::SoundManager::GetInstance()->Play("Shot");
+		Bullet *bullet = new Bullet(pos, speed, mat);
+
+		oka::BulletManager::GetInstance()->AddBullet(bullet);
+		oka::GameManager::GetInstance()->AddGameObject("Bullet", bullet);
+	}
+}
+
+//-------------------------------------
+//地形部分内にいるか外にいるかの判定
+
+bool Character::IsGroundOut()const
+{
+	//x
+	const float width = oka::FealdManager::GetInstance()->m_feald->m_width;
+	const float x = m_transform.m_position.x;
+
+	if (x < 0 || width < x)
+	{
+		return  true;
+	}
+
+	//z
+	const float height = oka::FealdManager::GetInstance()->m_feald->m_height;
+	const float z = m_transform.m_position.z;
+
+	if (z < -height || 0 < z)
+	{
+		return  true;
+	}
+
+	return false;
+}
+
+
+
+//-------------------------------------
+//フィールドとの衝突判定
+//各フィールド頂点のy座標値と
+//自身のy座標値で比較する
+
+bool Character::IsIntersectGround()const
+{
+
+
+	return false;
 }
 
 //-------------------------------------
 //HPの値を参照し0以下になっていればtrue
 //そうでなければfalseを返す
 
-bool Character::CheckIsDead()const
+bool Character::IsDead()const
 {
 	if (m_hp <= 0)
 	{	

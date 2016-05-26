@@ -27,24 +27,10 @@ namespace oka
 		m_contoroller.push_back(_controller);
 	}
 
+	
 	//-------------------------------------
-	//
-
-	unsigned int JoysticManager::GetContorollerNumber()const
-	{
-		return m_contoroller.size();
-	}
-
-
-
-	Contoroller JoysticManager::GetContoroller(const int _num)const
-	{
-		return *(m_contoroller[_num]);	
-	}
-
-	//-------------------------------------
-	//コントローラーが繋がっているかのチェックと
-	//現在繋がっているコントローラーの台数チェック
+	//登録されているコントローラーの
+	//接続状態をチェックする
 
 	void JoysticManager::Update()
 	{
@@ -52,12 +38,12 @@ namespace oka
 		{
 			if (ERROR_SUCCESS == XInputGetState(i, &m_contoroller[i]->m_state))
 			{
-				m_contoroller[i]->m_isConnect = true;
+				m_contoroller[i]->m_isConnected = true;
 				m_contoroller[i]->Update();
 			}
 			else
 			{
-				m_contoroller[i]->m_isConnect = false;
+				m_contoroller[i]->m_isConnected = false;
 			}
 
 		}

@@ -28,7 +28,7 @@ namespace oka
 			m_isActive(true)
 		{};
 
-		virtual void Draw() = 0;
+		virtual void Draw() {};
 		virtual void Update() = 0;
 	};
 

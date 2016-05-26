@@ -1,109 +1,31 @@
 #define _USE_MATH_DEFINES
 #include<math.h>
 #include"Enemy.h"
+#include"../glm/gtx/transform.hpp"
 #include"../glut.h"
-
-//debug
-#include"../MyLibrary/Manager/CharacterManager.h"
 
 //-------------------------------------
 //敵のAI
 
 void Enemy::Control()
 {
-	MoveToAimPos();
-	//SetYaw();
-	//SetPitch();
+	/*glm::vec3 v = m_aimPos - m_transform.m_position;
 
-	m_value += 0.00001f*(M_PI / 180);//変更予定
-
-	if (m_value >= 1.0f)
-	{
-		m_value = 1.0f;
-	}
-
-	//ここ？
-	if (CheckNearAimPis())
+	if (glm::length(v) <= 5.0f)
 	{
 		ResetAimPos();
 	}
 
+	v = glm::normalize(v);
+	v *= 0.01f;
+	m_accel = v;*/
+
+	
+
+printf("x:%f,y:%f,z:%f\n", m_transform.m_position.x, m_transform.m_position.y, m_transform.m_position.z);
+
 	//debug
-	//DrawAimPos();
-	//DrawToAimVec();
-}
-
-//-------------------------------------
-//一点座標を決めてそこに向かって移動する
-
-void Enemy::MoveToAimPos()
-{	
-	//自分の座標から目標点への向きベクトル
-	glm::vec3 vec = m_aimPos - m_transform.m_position;
-	vec = glm::normalize(vec);
-
-	//スピードの設定
-	m_speed = vec*0.2f;
-
-}
-
-//-------------------------------------
-//ヨー回転処理
-
-void Enemy::SetYaw()
-{
-	//自身の座標と向けたい方向のベクトルとの差分
-	//glm::vec3 dif = m_aimPos - m_transform.GetPosition();
-
-	////移動の補完値
-
-	//dif = dif * m_value;
-
-	//float x = (m_transform.m_myToVec + dif).x;
-	//float z = (m_transform.m_myToVec + dif).z;
-	//float yaw = atan2f(-x, -z);
-	//m_transform.SetRotationY(yaw);
-
-}
-
-//-------------------------------------
-//ピッチ回転処理
-
-void Enemy::SetPitch()
-{
-	//向きベクトルと向けたい方向のベクトルとの差分
-	//glm::vec3 dif = - m_transform.GetPosition();
-
-	////移動の補完値
-
-	//dif = dif * m_value;
-
-	//float y = (m_transform.m_myToVec + dif).y;
-	//float z = (m_transform.m_myToVec + dif).z;
-	//float pitch = atan2f(-y, -z);
-	//m_transform.SetRotationX(pitch);
-
-}
-
-//-------------------------------------
-//目標点と自身の距離が一定値以内ならtrue
-//一定値外であればfalseを返す
-
-bool Enemy::CheckNearAimPis()const
-{
-	glm::vec3 v;
-	v = m_aimPos - m_transform.m_position;
-
-	//距離の一定値
-	const float value = 5.0f;
-	float distance = glm::length(v);
-
-	if (distance <= value)
-	{
-		return true;
-	}
-
-	return false;
+	DrawAimPos();
 }
 
 //-------------------------------------
@@ -114,7 +36,7 @@ void Enemy::ResetAimPos()
 	const float x_max = 256.0f;
 	m_aimPos.x = ((float)rand() / RAND_MAX)*x_max;
 
-	const float bottom = 5.0f;
+	const float bottom = 20.0f;
 	m_aimPos.y = bottom + ((float)rand() / RAND_MAX)*10.0f;
 
 	const float z_max = -256.0f;

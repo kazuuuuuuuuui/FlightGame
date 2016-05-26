@@ -1,7 +1,6 @@
 #ifndef OKA_TRANSFORM_H_
 #define OKA_TRANSFORM_H_
 
-#include"../../glm/mat4x4.hpp"
 #include"../../glm/gtc/matrix_transform.hpp"
 
 namespace oka
