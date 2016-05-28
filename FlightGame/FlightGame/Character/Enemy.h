@@ -34,7 +34,8 @@ public:
 
 	~Enemy() 
 	{
-printf("Enemyíœ\n");
+		//debug
+		printf("Enemy‚ğíœ‚µ‚Ü‚µ‚½\n");
 	};
 };
 

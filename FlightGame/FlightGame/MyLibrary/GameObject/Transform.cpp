@@ -28,6 +28,12 @@ namespace oka
 		SetAimVec(m_myUpVec, glm::vec3(0, 1, 0));
 		SetAimVec(m_mySideVec, glm::vec3(1, 0, 0));
 
+
+		//debug
+		DrawMyToVec();
+		DrawMyUpVec();
+		DrawMySideVec();
+
 	}
 
 	//ﾜｰﾙﾄﾞ上のベクトル = 座標行列 * 回転行列
@@ -37,11 +43,7 @@ namespace oka
 	{
 		//座標行列
 		glm::mat4 pos;
-		//pos = glm::translate(_aimVec);
-
-		pos[3][0] = _aimVec.x;
-		pos[3][1] = _aimVec.y;
-		pos[3][2] = _aimVec.z;
+		pos = glm::translate(_aimVec);
 
 		//向きベクトルを求めるための行列
 		glm::mat4 mat;

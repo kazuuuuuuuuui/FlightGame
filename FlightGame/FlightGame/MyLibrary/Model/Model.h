@@ -1,22 +1,24 @@
-#ifndef XFILE_H_
-#define XFILE_H_
+#ifndef OKA_MODEL_H_
+#define OKA_MODEL_H_
 
 #include"../GameObject/GameObject.h"
 
 namespace oka
 {
-
-	class xFile
+	class Model
 	{
 	public:
 		//頂点数
-		unsigned int m_vertices;
+		unsigned int m_vertexNum;
 
 		//インデックス数
-		unsigned int m_indeces;
+		unsigned int m_indexNum;
 
 		//法線数
-		unsigned int m_normals;
+		unsigned int m_normalNum;
+
+		//uv数
+		unsigned int m_texNum;
 
 		//頂点情報
 		std::vector<glm::vec3>m_vertex;
@@ -30,7 +32,7 @@ namespace oka
 		//uv情報
 		std::vector<glm::vec2>m_tex;
 
-		static xFile* LoadXFile(const char *_xFileName);
+		static Model* LoadXFile(const char *_xFileName);
 
 	};
 

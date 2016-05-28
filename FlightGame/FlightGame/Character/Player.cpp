@@ -88,6 +88,8 @@ void Player::Shot()
 {
 	if (oka::Keyboard::GetStates('b'))
 	{
+		oka::SoundManager::GetInstance()->Play("Shot");
+		
 		glm::vec3 pos;
 		const float distance = 2.0f;//Ž©‹@‚Æ’e”­ŽË“_‚ÌŠÔŠu
 		pos = m_transform.m_position + m_transform.m_myToVec*distance;
@@ -97,10 +99,8 @@ void Player::Shot()
 		speed = m_transform.m_myToVec * value;
 
 		glm::mat4 mat = m_transform.m_rotate;
-
-		oka::SoundManager::GetInstance()->Play("Shot");
-		Bullet *bullet = new Bullet(pos, speed, mat);
-
+	
+		Bullet *bullet = Bullet::Create(pos, mat, speed);
 		oka::BulletManager::GetInstance()->AddBullet(bullet);
 		oka::GameManager::GetInstance()->AddGameObject("Bullet", bullet);
 	}

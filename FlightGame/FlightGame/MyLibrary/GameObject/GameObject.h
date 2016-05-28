@@ -21,6 +21,8 @@ namespace oka
 		//©g‚ÌˆÊ’uE‰ñ“]EŠg‘åk¬î•ñ
 		Transform m_transform;
 
+		virtual void Draw() {};
+		virtual void Update() = 0;
 		bool CheckIsActive()const;
 
 		GameObject() :
@@ -28,8 +30,7 @@ namespace oka
 			m_isActive(true)
 		{};
 
-		virtual void Draw() {};
-		virtual void Update() = 0;
+		virtual ~GameObject() {};
 	};
 
 }

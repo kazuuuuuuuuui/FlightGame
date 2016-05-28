@@ -100,13 +100,25 @@ void Character::Update()
 
 
 //debug
-printf("z:%f\n", m_transform.m_position.z);
+glm::vec3 pos = m_transform.m_position;
+//printf("x:%f,y:%f,z:%f\n", pos.x, pos.y, pos.z);
+
+
 
 	//フィールドとの判定
 	if (IsGroundOut())
 	{
-		//debug
-		printf("出てるよおおおおおおおおおお\n");
+//debug
+//printf("出てるよおおおおおおおおおお\n");
+	}
+	else
+	{
+		if (IsIntersectGround())
+		{
+//debug
+//printf("地面に当たってるよおおおおおおおお\n");
+			m_hp = 0;
+		}
 	}
 
 	//死亡判定
@@ -199,19 +211,19 @@ void Character::Shot(unsigned short _downKeys)
 {
 	if (_downKeys & XINPUT_GAMEPAD_Y)
 	{
+		oka::SoundManager::GetInstance()->Play("Shot");
+
 		glm::vec3 pos;
 		const float distance = 2.0f;//自機と弾発射点の間隔
 		pos = m_transform.m_position + m_transform.m_myToVec*distance;
 
 		glm::vec3 speed;
-		const float value = 4.0f;//弾のスピード補完値
+		const float value = 0.2f;//弾のスピード補完値
 		speed = m_transform.m_myToVec * value;
 
 		glm::mat4 mat = m_transform.m_rotate;
 
-		//oka::SoundManager::GetInstance()->Play("Shot");
-		Bullet *bullet = new Bullet(pos, speed, mat);
-
+		Bullet *bullet = Bullet::Create(pos, mat, speed);
 		oka::BulletManager::GetInstance()->AddBullet(bullet);
 		oka::GameManager::GetInstance()->AddGameObject("Bullet", bullet);
 	}
@@ -252,7 +264,21 @@ bool Character::IsGroundOut()const
 
 bool Character::IsIntersectGround()const
 {
+	const int x = m_transform.m_position.x;
+	const float y = m_transform.m_position.y;
+	const int z = -m_transform.m_position.z;
 
+	const int width = oka::FealdManager::GetInstance()->m_feald->m_width;
+
+	const float height = oka::FealdManager::GetInstance()->m_feald->m_vertex[z * width + x].y;
+
+//debug
+//printf("h:%f\n", height);
+
+	if ( y <= height)
+	{
+		return true;
+	}
 
 	return false;
 }

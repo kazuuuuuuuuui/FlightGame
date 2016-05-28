@@ -9,7 +9,7 @@ Fire::Fire(glm::vec3 _pos)
 
 	for (int i = 0; i < m_particleNum; i++)
 	{
-		Particle *particle = new Particle(glm::vec3(1.0f,0.5f,0.25f));
+		Particle *particle = new Particle(glm::vec3(1.0f,0.25f,0.125f));
 
 		particle->m_speed.x = ((float)rand() / RAND_MAX - 0.5f)*0.05f;
 		particle->m_speed.y = (((float)rand() / RAND_MAX)) *0.2f;

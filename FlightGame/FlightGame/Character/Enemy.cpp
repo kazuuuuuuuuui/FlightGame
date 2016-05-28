@@ -9,6 +9,9 @@
 
 void Enemy::Control()
 {
+	m_speed.z = -0.1f;
+
+	
 	/*glm::vec3 v = m_aimPos - m_transform.m_position;
 
 	if (glm::length(v) <= 5.0f)
@@ -22,7 +25,7 @@ void Enemy::Control()
 
 	
 
-printf("x:%f,y:%f,z:%f\n", m_transform.m_position.x, m_transform.m_position.y, m_transform.m_position.z);
+//printf("x:%f,y:%f,z:%f\n", m_transform.m_position.x, m_transform.m_position.y, m_transform.m_position.z);
 
 	//debug
 	DrawAimPos();

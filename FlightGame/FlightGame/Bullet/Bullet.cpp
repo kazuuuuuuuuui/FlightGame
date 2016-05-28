@@ -1,14 +1,35 @@
-#define _USE_MATH_DEFINES
-#include<math.h>
-
 #include"Bullet.h"
 #include"../MyLibrary/Manager/CharacterManager.h"
+#include"../MyLibrary/Manager/FealdManager.h"
 #include"../glut.h"
+
+Bullet::Bullet()
+{
+	//debug
+	printf("弾が生成されました\n");
+}
 
 Bullet::~Bullet()
 {
+	//debug
 	printf("弾が削除されました\n");
 }
+
+//-------------------------------------
+//弾の生成
+
+Bullet* Bullet::Create(glm::vec3 _pos, glm::mat4 _rotate, glm::vec3 _speed)
+{
+	Bullet *bullet = new Bullet();
+	bullet->m_transform.m_position = _pos;
+	bullet->m_transform.m_rotate = _rotate;
+	bullet->m_speed = _speed;
+
+	return bullet;
+}
+
+//-------------------------------------
+//描画
 
 void Bullet::Draw()
 {
@@ -43,9 +64,31 @@ void Bullet::Draw()
 
 }
 
+//-------------------------------------
+//更新
+
 void Bullet::Update()
 {
 	m_transform.m_position += m_speed;
+
+//debug
+glm::vec3 pos = m_transform.m_position;
+printf("x:%f,y:%f,z:%f\n", pos.x, pos.y, pos.z);
+
+	//フィールド内にいるか
+	if (IsGroundOut())
+	{
+//debug
+printf("出てるうううううううううううう\n");
+m_isActive = false;
+	}
+	else
+	{
+		if (IsIntersectGround())
+		{
+			m_isActive = false;
+		}
+	}
 
 	//キャラクターとの当たり判定
 	auto itr = oka::CharacterManager::GetInstance()->m_characters.begin();
@@ -55,7 +98,7 @@ void Bullet::Update()
 	{
 		const glm::vec3 pos = (*itr)->m_transform.m_position;
 		
-			if (CheckIsHit(pos))
+		if (IsHit(pos))
 		{
 			(*itr)->m_isHitAttack = true;
 			m_isActive = false;
@@ -63,15 +106,13 @@ void Bullet::Update()
 
 		itr++;
 	}
-
-	//debug
-	//m_transform.Update();
-	//m_transform.DrawMyToVec();
-	//DrawToEnemyVec();
-
 }
 
-bool Bullet::CheckIsHit(glm::vec3 _pos)const
+//-------------------------------------
+//弾とキャラクターとの当たり判定
+//引数としてキャラクター座標をもらってくる
+
+bool Bullet::IsHit(glm::vec3 _pos)const
 {
 	glm::vec3 v;
 	v = m_transform.m_position - _pos;
@@ -89,79 +130,52 @@ bool Bullet::CheckIsHit(glm::vec3 _pos)const
 
 }
 
+//-------------------------------------
+//地形部分内にいるか外にいるかの判定
 
-/*
-
-HomingBulletの方に移す
-
-*/
-
-void Bullet::Homing(glm::vec3 _pos)
+bool Bullet::IsGroundOut()const
 {
-	//自身の座標と向けたい方向のベクトルとの差分
-	//glm::vec3 dif = _pos - m_transform.GetPosition();
+	//x
+	const float width = oka::FealdManager::GetInstance()->m_feald->m_width;
+	const float x = m_transform.m_position.x;
 
-	////移動の補完値
-	//static float val = 0.0f;
+	if (x < 0 || width < x)
+	{
+		return  true;
+	}
 
-	//dif = dif * val;
+	//z
+	const float height = oka::FealdManager::GetInstance()->m_feald->m_height;
+	const float z = m_transform.m_position.z;
 
-	//val += 0.0000001f*(M_PI / 180);//変更予定
-
-	//if (val >= 1.0f)
-	//{
-	//	val = 1.0f;
-	//}
-
-	//float x = (m_transform.m_myToVec + dif).x;
-	//float z = (m_transform.m_myToVec + dif).z;
-	//float yaw = atan2f(-x, -z);
-	//m_transform.SetRotationY(yaw);
-
-	//float value = 0.005f;//弾のスピード補完値
-	//m_speed.x = -sin(m_transform.GetRotation().y) * value*(180.0f / M_PI);
-	//m_speed.y = sin(m_transform.GetRotation().x)* value*(180.0f / M_PI);
-	//m_speed.z = -cos(m_transform.GetRotation().y) * value*(180.0f / M_PI);
-
-}
-
-bool Bullet::CheckNearCharacter(glm::vec3 _pos)const
-{
-	//glm::vec3 v = _pos - m_transform.m_position;
-	//float distance = glm::length(v);
-
-	//const float value = 25.0f;//弾と目標物の間隔
-
-	//if (distance <= value)
-	//{
-	//	return true;
-	//}
+	if (z < -height || 0 < z)
+	{
+		return  true;
+	}
 
 	return false;
 }
 
 //-------------------------------------
-//debug
+//弾と地形との接触判定
 
-void Bullet::DrawToEnemyVec()
+bool Bullet::IsIntersectGround()const
 {
-	/*glPushAttrib(GL_ALL_ATTRIB_BITS);
+	const int x = m_transform.m_position.x;
+	const float y = m_transform.m_position.y;
+	const int z = -m_transform.m_position.z;
+
+	const int width = oka::FealdManager::GetInstance()->m_feald->m_width;
+
+	const float height = oka::FealdManager::GetInstance()->m_feald->m_vertex[z * width + x].y;
+
+	//debug
+	//printf("h:%f\n", height);
+
+	if (y <= height)
 	{
-		glDisable(GL_LIGHTING);
-
-		glLineWidth(3.0f);
-		glColor3f(1.0f, 0.0f, 1.0f);
-
-		glBegin(GL_LINES);
-		{
-			glm::vec3 root = m_transform.GetPosition();
-			glVertex3f(root.x, root.y, root.z);
-
-			glm::vec3 aim = oka::CharacterManager::GetInstance()->m_characters[1]->m_transform.GetPosition();
-			glVertex3f(aim.x, aim.y, aim.z);
-		}
-		glEnd();
+		return true;
 	}
-	glPopAttrib();*/
 
+	return false;
 }

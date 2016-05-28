@@ -58,6 +58,7 @@ public:
 
 		//頂点の高さ設定
 		SetHeight("heightmap.bmp");
+		//SetHeight("test.bmp");
 
 		//法線データ
 		SetNormal();

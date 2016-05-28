@@ -56,8 +56,8 @@ GameMainScene::GameMainScene()
 	oka::GameManager::GetInstance()->AddGameObject("Sea", new oka::Sea());
 
 	//キャラクターの登録
-	oka::CharacterManager::GetInstance()->AddCharacter(new Player(glm::vec3(50.0f, 100.0f, 0.0f)));
-	//oka::CharacterManager::GetInstance()->AddCharacter(new Enemy(glm::vec3(100.0f, 50.0f, -100.0f)));
+	oka::CharacterManager::GetInstance()->AddCharacter(new Player(glm::vec3(0.0f, 30.0f, 0.0f)));
+	oka::CharacterManager::GetInstance()->AddCharacter(new Enemy(glm::vec3(50.0f, 10.0f, 0.0f)));
 
 	auto itr = oka::CharacterManager::GetInstance()->m_characters.begin();
 	auto end = oka::CharacterManager::GetInstance()->m_characters.end();
@@ -104,13 +104,13 @@ void GameMainScene::Render()
 	glm::vec3 toVec;
 	glm::vec3 upVec;
 
-	const auto begin = oka::CharacterManager::GetInstance()->m_characters.begin();
+	const auto itr = oka::CharacterManager::GetInstance()->m_characters.begin();
 
-	toVec = (*begin)->m_transform.m_myToVec;
-	upVec = (*begin)->m_transform.m_myUpVec;
+	toVec = (*itr)->m_transform.m_myToVec;
+	upVec = (*itr)->m_transform.m_myUpVec;
 
 	//カメラの注視点
-	glm::vec3 target = (*begin)->m_transform.m_position;
+	glm::vec3 target = (*itr)->m_transform.m_position;
 
 	//カメラの座標
 	glm::vec3 pos;
@@ -127,12 +127,12 @@ void GameMainScene::Render()
 	glLightfv(GL_LIGHT0, GL_POSITION, v);
 
 	//全オブジェクトの描画
-	auto itr = oka::GameManager::GetInstance()->m_gameObjects.begin();
+	auto begin = oka::GameManager::GetInstance()->m_gameObjects.begin();
 	auto end = oka::GameManager::GetInstance()->m_gameObjects.end();
 
-	for (; itr != end; itr++)
+	for (; begin != end; begin++)
 	{
-		itr->second->Draw();
+		begin->second->Draw();
 	}
 }
 
