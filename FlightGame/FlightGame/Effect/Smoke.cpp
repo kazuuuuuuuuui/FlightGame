@@ -24,9 +24,9 @@ Smoke* Smoke::Create(glm::vec3 _pos,const unsigned int _particleNum)
 	for (unsigned int i = 0; i < _particleNum; i++)
 	{
 		glm::vec3 color;
-		color.x = 30.0f / 255.0f;
-		color.y = 30.0f / 255.0f;
-		color.z = 30.0f / 255.0f;
+		color.x = 50.0f / 255.0f;
+		color.y = 50.0f / 255.0f;
+		color.z = 50.0f / 255.0f;
 
 		Particle *particle = new Particle(color);
 
@@ -72,7 +72,7 @@ void Smoke::Update()
 	//パーティクルの更新
 	for (auto itr = m_particles.begin(); itr != m_particles.end(); itr++)
 	{
-		(*itr)->m_alpha -= 0.0001f;
+		(*itr)->m_alpha -= 0.0005f;
 
 		//ある程度アルファ値が下がったら非活性にする
 		if ((*itr)->m_alpha <= 0.75f)

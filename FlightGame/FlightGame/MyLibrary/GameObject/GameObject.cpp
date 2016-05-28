@@ -2,7 +2,7 @@
 
 namespace oka
 {
-	bool GameObject::CheckIsActive()const
+	bool GameObject::IsActive()const
 	{
 		return m_isActive;
 	}

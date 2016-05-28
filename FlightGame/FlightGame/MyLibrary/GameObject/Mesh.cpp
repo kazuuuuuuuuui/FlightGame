@@ -30,9 +30,7 @@ namespace oka
 			if (m_isBlend)
 			{
 				glEnable(GL_BLEND);
-				//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 				glBlendFunc(GL_SRC_COLOR, GL_DST_COLOR);
-				//glColor4f(1, 0, 1, 0.5);
 			}
 
 			glEnableClientState(GL_VERTEX_ARRAY);

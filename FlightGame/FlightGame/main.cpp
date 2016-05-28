@@ -79,7 +79,6 @@ void display()
 	oka::JoysticManager::GetInstance()->Update();
 	oka::SceneManager::GetInstance()->Update();
 
-
 	oka::Keyboard::GetPrevStates();
 
 	glFlush();
@@ -106,27 +105,25 @@ void reshape(int _width, int _height)
 	oka::Screen::GetInstance()->SetHeight(_height);
 }
 
-void Init()
-{
-	srand(time(NULL));
-	oka::Sound::Init();
-	g_camera = new oka::Camera();
-}
-
 int main(int argc, char *argv[])
 {
 	glutInit(&argc, argv);
-	glutInitWindowSize(oka::Screen::GetInstance()->GetWidth(), oka::Screen::GetInstance()->GetHeight());
-	glutInitWindowSize(900, 900);
-	
+
+	const int width = oka::Screen::GetInstance()->GetWidth();
+	const int height = oka::Screen::GetInstance()->GetHeight();
+
+	glutInitWindowSize(width, height);
 	glutCreateWindow("Flight Game");
+	
 	glutReshapeFunc(reshape);
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard);
 	glutKeyboardUpFunc(keyboardUp);
 	glutTimerFunc(0, timer, 0);
 
-	Init();
+	srand(time(NULL));
+	oka::Sound::Init();
+	g_camera = new oka::Camera();
 
 	glutMainLoop();
 }

@@ -1,8 +1,6 @@
 #define _USE_MATH_DEFINES
 #include<math.h>
 #include"Camera.h"
-//#include"../../glm/glm.hpp"
-//#include"../../glm/gtc/matrix_transform.hpp"
 #include"../../glut.h"
 
 oka::Camera *g_camera = nullptr;
@@ -36,9 +34,9 @@ namespace oka
 
 		float fov = m_fovy*(M_PI / 180);
 
-		glm::mat4 perspective = glm::perspective(fov, m_aspect, m_zNear, m_zFar);
+		glm::mat4 mat = glm::perspective(fov, m_aspect, m_zNear, m_zFar);
 
-		glMultMatrixf((GLfloat*)&perspective);
+		glMultMatrixf((GLfloat*)&mat);
 	}
 
 	//-------------------------------------
@@ -77,15 +75,17 @@ namespace oka
 	}
 
 	//-------------------------------------
-	//正射影行列の設定と適応
+	//射影行列の設定と適応
 
 	void Camera::Ortho(const float _left, const float _right, const float _bottom, const float _top, const float _near, const float _far)
 	{
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
+
+		//後で移動
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
-
+	
 		 glm::mat4 mat = glm::ortho(_left, _right, _bottom, _top, _near, _far);
 
 		glMultMatrixf((GLfloat*)&mat);

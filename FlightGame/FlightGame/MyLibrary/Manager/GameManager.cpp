@@ -66,7 +66,7 @@ namespace oka
 		auto end = m_gameObjects.end();
 		while (itr != end)
 		{
-			if (itr->second->CheckIsActive())
+			if (itr->second->IsActive())
 			{
 
 			}

@@ -1,4 +1,5 @@
 #include"GameMainScene.h"
+#include"../MyLibrary/Screen/Screen.h"
 #include"../MyLibrary/Camera/Camera.h"
 #include"../MyLibrary/Manager/GameManager.h"
 #include"../MyLibrary/Manager/CharacterManager.h"
@@ -15,8 +16,10 @@
 #include"../MyLibrary/SkyDome/Sky.h"
 #include"../MyLibrary/Sea/Sea.h"
 
-#include"../glut.h"
 
+#include"../MyLibrary/MyString/MyString.h"
+
+#include"../glut.h"
 
 //-------------------------------------
 //コンストラクタ
@@ -68,6 +71,9 @@ GameMainScene::GameMainScene()
 
 		itr++;
 	}
+
+	//文字
+
 };
 
 
@@ -89,9 +95,11 @@ void GameMainScene::Update()
 	auto itr = oka::GameManager::GetInstance()->m_gameObjects.begin();
 	auto end = oka::GameManager::GetInstance()->m_gameObjects.end();
 
-	for (; itr != end; itr++)
+	while(itr != end)
 	{
 		itr->second->Update();
+
+		itr++;
 	}
 }
 
@@ -104,13 +112,13 @@ void GameMainScene::Render()
 	glm::vec3 toVec;
 	glm::vec3 upVec;
 
-	const auto itr = oka::CharacterManager::GetInstance()->m_characters.begin();
+	const auto characterTop = oka::CharacterManager::GetInstance()->m_characters.begin();
 
-	toVec = (*itr)->m_transform.m_myToVec;
-	upVec = (*itr)->m_transform.m_myUpVec;
+	toVec = (*characterTop)->m_transform.m_myToVec;
+	upVec = (*characterTop)->m_transform.m_myUpVec;
 
 	//カメラの注視点
-	glm::vec3 target = (*itr)->m_transform.m_position;
+	glm::vec3 target = (*characterTop)->m_transform.m_position;
 
 	//カメラの座標
 	glm::vec3 pos;
@@ -127,13 +135,26 @@ void GameMainScene::Render()
 	glLightfv(GL_LIGHT0, GL_POSITION, v);
 
 	//全オブジェクトの描画
-	auto begin = oka::GameManager::GetInstance()->m_gameObjects.begin();
+	auto itr = oka::GameManager::GetInstance()->m_gameObjects.begin();
 	auto end = oka::GameManager::GetInstance()->m_gameObjects.end();
 
-	for (; begin != end; begin++)
+	while (itr != end)
 	{
-		begin->second->Draw();
+		itr->second->Draw();
+
+		itr++;
 	}
+
+
+	//文字
+	const float left = 0.0f;
+	const float right = (float)oka::Screen::GetInstance()->GetWidth() * 2.0f;
+	const float bottom = 0.0f;
+	const float top = (float)oka::Screen::GetInstance()->GetHeight() * 2.0f;
+
+	g_camera->Ortho(left, right, bottom, top, 1.0f, -1.0f);
+
+	
 }
 
 

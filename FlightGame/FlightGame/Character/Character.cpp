@@ -218,7 +218,7 @@ void Character::Shot(unsigned short _downKeys)
 		pos = m_transform.m_position + m_transform.m_myToVec*distance;
 
 		glm::vec3 speed;
-		const float value = 0.2f;//弾のスピード補完値
+		const float value = 4.0f;//弾のスピード補完値
 		speed = m_transform.m_myToVec * value;
 
 		glm::mat4 mat = m_transform.m_rotate;

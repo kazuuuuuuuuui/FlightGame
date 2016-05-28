@@ -57,7 +57,7 @@ namespace oka
 		auto itr = m_bullets.begin();
 		while (itr != m_bullets.end())
 		{
-			if ((*itr)->CheckIsActive())
+			if ((*itr)->IsActive())
 			{
 
 			}

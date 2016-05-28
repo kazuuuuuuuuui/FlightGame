@@ -22,8 +22,8 @@ namespace oka
 		Transform m_transform;
 
 		virtual void Draw() {};
-		virtual void Update() = 0;
-		bool CheckIsActive()const;
+		virtual void Update() {};
+		bool IsActive()const;
 
 		GameObject() :
 			m_flame(0),

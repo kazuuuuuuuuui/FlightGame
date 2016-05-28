@@ -21,6 +21,7 @@ namespace oka
 		static SceneManager* m_instance;
 
 		void GameMain(float _delta);
+		void Pause(float _delta);
 			 
 		SceneManager();		
 
