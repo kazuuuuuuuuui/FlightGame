@@ -30,9 +30,9 @@ namespace oka
 
 
 		//debug
-		DrawMyToVec();
+		/*DrawMyToVec();
 		DrawMyUpVec();
-		DrawMySideVec();
+		DrawMySideVec();*/
 
 	}
 

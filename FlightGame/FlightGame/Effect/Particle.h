@@ -3,6 +3,9 @@
 
 #include"Effect.h"
 
+class Particle;
+typedef std::shared_ptr<Particle> ParticleSP;
+
 class Particle :public oka::Effect
 {
 public:

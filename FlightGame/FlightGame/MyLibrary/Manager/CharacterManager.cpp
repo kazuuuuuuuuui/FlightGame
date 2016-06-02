@@ -64,7 +64,7 @@ namespace oka
 	//------------------
 	//キャラクターの追加
 
-	void CharacterManager::AddCharacter(Character *_character)
+	void CharacterManager::AddCharacter(CharacterSP _character)
 	{
 		m_characters.push_back(_character);
 	}

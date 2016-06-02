@@ -34,43 +34,40 @@ GameMainScene::GameMainScene()
 	oka::ImageManager::GetInstance()->SetHandle("Smoke", oka::LoadImage4f("smoke.bmp"));
 	oka::ImageManager::GetInstance()->SetHandle("Target", oka::LoadImage4f("target.bmp"));
 	oka::ImageManager::GetInstance()->SetHandle("FlyTex", oka::LoadImage3f("flyTex.bmp"));
+	oka::ImageManager::GetInstance()->SetHandle("Sky", oka::LoadImage3f("sky.bmp"));
+	oka::ImageManager::GetInstance()->SetHandle("Sea", oka::LoadImage4f("sea.bmp"));
 
 	//音データ
 	oka::SoundManager::GetInstance()->AddSound("Shot", oka::Sound::LoadWavFile("Shot.wav"));
 	oka::SoundManager::GetInstance()->AddSound("Explode", oka::Sound::LoadWavFile("Explode.wav"));
 
 	//モデルデータ
-	oka::ModelManager::GetInstance()->AddModel("Body", oka::Model::LoadXFile("body.x"));
-	oka::ModelManager::GetInstance()->AddModel("Propeller", oka::Model::LoadXFile("propeller.x"));
+	oka::ModelManager::GetInstance()->Add("Body", oka::Model::LoadXFile("body.x"));
+	oka::ModelManager::GetInstance()->Add("Propeller", oka::Model::LoadXFile("propeller.x"));
+	oka::ModelManager::GetInstance()->Add("Sky", oka::Model::LoadXFile("sky.x"));
+	oka::ModelManager::GetInstance()->Add("Sea", oka::Model::LoadXFile("sea.x"));
 
 	//フィールド
-	Feald *feald = new Feald();
-	oka::GameManager::GetInstance()->AddGameObject("Feald", feald);
+	FealdSP feald = Feald::Create();
+	oka::GameManager::GetInstance()->Add("Feald", feald);
 	oka::FealdManager::GetInstance()->AddFeald(feald);
 
 	//空
-	oka::ImageManager::GetInstance()->SetHandle("Sky", oka::LoadImage3f("sky.bmp"));
-	oka::ModelManager::GetInstance()->AddModel("Sky", oka::Model::LoadXFile("sky.x"));
-	oka::GameManager::GetInstance()->AddGameObject("Sky", new oka::Sky());
+	oka::SkySP sky = oka::Sky::Create();
+	oka::GameManager::GetInstance()->Add("Sky", sky);
 
 	//海
-	oka::ImageManager::GetInstance()->SetHandle("Sea", oka::LoadImage4f("sea.bmp"));
-	oka::ModelManager::GetInstance()->AddModel("Sea", oka::Model::LoadXFile("sea.x"));
-	oka::GameManager::GetInstance()->AddGameObject("Sea", new oka::Sea());
+	oka::GameManager::GetInstance()->Add("Sea", oka::Sea::Create());
 
 	//キャラクターの登録
-	oka::CharacterManager::GetInstance()->AddCharacter(new Player(glm::vec3(0.0f, 30.0f, 0.0f)));
-	oka::CharacterManager::GetInstance()->AddCharacter(new Enemy(glm::vec3(50.0f, 10.0f, 0.0f)));
-
-	auto itr = oka::CharacterManager::GetInstance()->m_characters.begin();
-	auto end = oka::CharacterManager::GetInstance()->m_characters.end();
-
-	while (itr != end)
-	{
-		oka::GameManager::GetInstance()->AddGameObject("Character", (*itr));
-
-		itr++;
-	}
+	PlayerSP player = Player::Create(glm::vec3(0.0f, 30.0f, 0.0f));
+	oka::CharacterManager::GetInstance()->AddCharacter(player);
+	oka::GameManager::GetInstance()->Add("Player", player);
+	
+	EnemySP enemy = Enemy::Create(glm::vec3(50.0f, 30.0f, 0.0f));
+	oka::CharacterManager::GetInstance()->AddCharacter(enemy);
+	oka::GameManager::GetInstance()->Add("Enemy", enemy);
+	
 
 	//文字
 
@@ -97,10 +94,15 @@ void GameMainScene::Update()
 
 	while(itr != end)
 	{
+		itr->second->GameObject::Update();
 		itr->second->Update();
 
 		itr++;
 	}
+
+	/*変えたい*/
+	oka::CharacterManager::GetInstance()->Update();
+	oka::BulletManager::GetInstance()->Updata();
 }
 
 void GameMainScene::Render()
@@ -147,12 +149,12 @@ void GameMainScene::Render()
 
 
 	//文字
-	const float left = 0.0f;
+	/*const float left = 0.0f;
 	const float right = (float)oka::Screen::GetInstance()->GetWidth() * 2.0f;
 	const float bottom = 0.0f;
 	const float top = (float)oka::Screen::GetInstance()->GetHeight() * 2.0f;
 
-	g_camera->Ortho(left, right, bottom, top, 1.0f, -1.0f);
+	g_camera->Ortho(left, right, bottom, top, 1.0f, -1.0f);*/
 
 	
 }

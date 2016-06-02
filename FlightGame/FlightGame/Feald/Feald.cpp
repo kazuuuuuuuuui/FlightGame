@@ -5,8 +5,18 @@
 #include"Feald.h"
 #include"../MyLibrary/Manager/ImageManager.h"
 #include"../MyLibrary/Image/BmpImage.h"
-
 #include"../glut.h"
+
+//-------------------------------------
+//フィールドの生成
+//戻り値としてFealdへのsharedポインタを返す
+
+FealdSP Feald::Create()
+{
+	FealdSP feald(new Feald());
+
+	return feald;
+}
 
 //------------------------
 //コースの頂点データの生成
@@ -180,23 +190,18 @@ void Feald::Draw()
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, oka::ImageManager::GetInstance()->GetHandle("FealdTex"));
 
-		glPushMatrix();
-		{
-			auto v = m_vertex.begin();
-			glVertexPointer(3, GL_FLOAT, 0, &(*v));
+		auto v = m_vertex.begin();
+		glVertexPointer(3, GL_FLOAT, 0, &(*v));
 
-			auto n = m_normal.begin();
-			glNormalPointer(GL_FLOAT, 0, &(*n));
+		auto n = m_normal.begin();
+		glNormalPointer(GL_FLOAT, 0, &(*n));
 
-			auto t = m_tex.begin();
-			glTexCoordPointer(2, GL_FLOAT, 0, &(*t));
+		auto t = m_tex.begin();
+		glTexCoordPointer(2, GL_FLOAT, 0, &(*t));
 
-			auto i = m_index.begin();
+		auto i = m_index.begin();
 
-			glDrawElements(GL_TRIANGLES, m_indeces, GL_UNSIGNED_SHORT, &(*i));
-
-		}
-		glPopMatrix();
+		glDrawElements(GL_TRIANGLES, m_indeces, GL_UNSIGNED_SHORT, &(*i));
 	}
 	glPopAttrib();
 }
@@ -210,7 +215,6 @@ void Feald::Update()
 
 //-------------------------------------
 //debug
-
 void Feald::DrawNormals()
 {
 	glPushAttrib(GL_ALL_ATTRIB_BITS);

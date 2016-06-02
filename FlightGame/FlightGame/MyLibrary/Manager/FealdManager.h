@@ -8,10 +8,10 @@ namespace oka
 	class FealdManager
 	{
 	public:
-		Feald* m_feald;
+		FealdSP m_feald;
 
 		static FealdManager* GetInstance();
-		void AddFeald(Feald *_feald);
+		void AddFeald(FealdSP _feald);
 		static void Destroy();
 
 		FealdManager():

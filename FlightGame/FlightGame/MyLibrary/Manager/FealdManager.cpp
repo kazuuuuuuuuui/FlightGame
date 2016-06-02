@@ -43,9 +43,9 @@ namespace oka
 
 
 	//------------------
-	//キャラクターの追加
+	//フィールドの追加
 
-	void FealdManager::AddFeald(Feald *_feald)
+	void FealdManager::AddFeald(FealdSP _feald)
 	{
 		if (nullptr == m_feald)
 		{

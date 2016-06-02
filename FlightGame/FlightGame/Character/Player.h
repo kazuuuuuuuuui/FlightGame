@@ -4,9 +4,13 @@
 #include"Character.h"
 #include"../MyLibrary/Manager/JoysticManager.h"
 
+class Player;
+typedef std::shared_ptr<Player> PlayerSP;
+
 class Player :public Character
 {
 public:
+	static PlayerSP Create(glm::vec3 _pos);
 	void Control();
 	void Accel();
 	void Shot();

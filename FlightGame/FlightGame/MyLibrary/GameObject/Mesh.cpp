@@ -4,13 +4,29 @@
 
 namespace oka
 {
-	Mesh::Mesh(Model *_model,unsigned int _texture)
+	//-------------------------------------
+	//コンストラクタ
+
+	Mesh::Mesh(ModelSP _model,unsigned int _texture)
 	{
 		m_isLighting = true;
 		m_isBlend = false;
 		m_model = _model;
 		m_texture = _texture;
 	}
+
+	//-------------------------------------
+	//生成
+
+	MeshSP Mesh::Create(ModelSP _model, unsigned int _texture)
+	{
+		MeshSP mesh(new Mesh(_model, _texture));
+
+		return mesh;
+	}
+
+	//-------------------------------------
+	//描画
 
 	void Mesh::Draw()
 	{

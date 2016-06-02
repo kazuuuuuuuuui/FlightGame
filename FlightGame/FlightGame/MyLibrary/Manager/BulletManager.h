@@ -12,10 +12,10 @@ namespace oka
 	class BulletManager
 	{
 	public:
-		std::list<Bullet*>m_bullets;
+		std::list<BulletSP>m_bullets;
 
 		void Updata();
-		void AddBullet(Bullet* _bullet);
+		void Add(BulletSP _bullet);
 		void CheckBullets();
 
 		static BulletManager* GetInstance();

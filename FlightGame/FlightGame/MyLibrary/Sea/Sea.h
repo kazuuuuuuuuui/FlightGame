@@ -6,11 +6,15 @@
 
 namespace oka
 {
+	class Sea;
+	typedef std::shared_ptr<Sea> SeaSP;
+
 	class Sea :public GameObject
 	{
 	public:
-		Mesh *m_sea[3];
+		MeshSP m_sea[3];
 
+		static SeaSP Create();
 		void Draw();
 		void Update();
 

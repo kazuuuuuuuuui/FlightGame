@@ -11,10 +11,10 @@ namespace oka
 	class ModelManager 
 	{
 	public:
-		std::map<std::string, Model*>m_models;
+		std::map<std::string, ModelSP>m_models;
 
 		void Updata() {};
-		void AddModel(std::string _str, Model *_object);
+		void Add(std::string _str, ModelSP _model);
 
 		static ModelManager* GetInstance();
 		static void Destroy();

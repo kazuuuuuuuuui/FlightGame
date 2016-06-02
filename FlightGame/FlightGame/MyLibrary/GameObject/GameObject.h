@@ -1,7 +1,7 @@
 #ifndef _OKA_GAMEOBJECT_H_
 #define _OKA_GAMEOBJECT_H_
 
-#include<vector>
+#include<memory>
 #include"Transform.h"
 #include"../../glm/vec2.hpp"
 
@@ -9,6 +9,10 @@
 
 namespace oka
 {
+	//GameObjectへのスマートポインタを定義化
+	class GameObject;
+	typedef std::shared_ptr<GameObject> GameObjectSP;
+
 	class GameObject 
 	{
 	public:
@@ -22,7 +26,7 @@ namespace oka
 		Transform m_transform;
 
 		virtual void Draw() {};
-		virtual void Update() {};
+		virtual void Update();
 		bool IsActive()const;
 
 		GameObject() :

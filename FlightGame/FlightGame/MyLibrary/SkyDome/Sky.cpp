@@ -7,11 +7,14 @@
 
 namespace oka
 {
+	//-------------------------------------
+	//コンストラクタ
+
 	Sky::Sky()
 	{
-		Model *sky = oka::ModelManager::GetInstance()->m_models["Sky"];
+		ModelSP sky = oka::ModelManager::GetInstance()->m_models["Sky"];
 		unsigned int tex = (oka::ImageManager::GetInstance()->GetHandle("Sky"));
-		m_sky = new oka::Mesh(sky, tex);
+		m_sky = oka::Mesh::Create(sky, tex);
 
 		//位置と向きとスケール調整
 		m_sky->m_isLighting = false;
@@ -20,8 +23,18 @@ namespace oka
 		const float angle = MyMath::ToRadian(90.0f);
 		const glm::vec3 axis = glm::vec3(1, 0, 0);
 		m_sky->m_transform.m_rotate = MyMath::Rotate(angle, axis);
-		
 		m_sky->m_transform.m_scale = glm::vec3(300.0f, 300.0f, 300.0f);
-		GameManager::GetInstance()->AddGameObject("Sky", m_sky);
+		GameManager::GetInstance()->Add("Sky", m_sky);
 	}
+
+	//-------------------------------------
+	//生成
+
+	SkySP Sky::Create()
+	{
+		SkySP sky(new Sky());
+
+		return sky;
+	}
+
 }

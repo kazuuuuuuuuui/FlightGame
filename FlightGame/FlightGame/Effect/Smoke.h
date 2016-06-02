@@ -5,11 +5,14 @@
 #include"Effect.h"
 #include"Particle.h"
 
+class Smoke;
+typedef std::shared_ptr<Smoke> SmokeSP;
+
 class Smoke :public oka::Effect
 {
 public:
-	std::list<Particle*>m_particles;
-	static Smoke* Create(glm::vec3 _pos,const unsigned int _particleNum);
+	std::list<ParticleSP>m_particles;
+	static SmokeSP Create(glm::vec3 _pos,const unsigned int _particleNum);
 
 	void Draw();
 	void Update();

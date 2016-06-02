@@ -17,9 +17,9 @@ Smoke::Smoke(glm::vec3 _pos)
 //パーティクルの枚数を指定する
 //戻り値として生成した煙を返す
 
-Smoke* Smoke::Create(glm::vec3 _pos,const unsigned int _particleNum)
+SmokeSP Smoke::Create(glm::vec3 _pos,const unsigned int _particleNum)
 {
-	Smoke *smoke = new Smoke(_pos);
+	SmokeSP smoke(new Smoke(_pos));
 
 	for (unsigned int i = 0; i < _particleNum; i++)
 	{
@@ -28,7 +28,7 @@ Smoke* Smoke::Create(glm::vec3 _pos,const unsigned int _particleNum)
 		color.y = 50.0f / 255.0f;
 		color.z = 50.0f / 255.0f;
 
-		Particle *particle = new Particle(color);
+		ParticleSP particle(new Particle(color));
 
 		glm::vec3 speed;
 		speed.x = ((float)rand() / RAND_MAX - 0.5f)*0.05f;
@@ -94,7 +94,6 @@ void Smoke::Update()
 		}
 		else
 		{
-			delete (*itr);
 			itr = m_particles.erase(itr);
 			continue;
 		}

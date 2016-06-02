@@ -6,12 +6,15 @@
 
 namespace oka
 {
+	class Sky;
+	typedef std::shared_ptr<Sky> SkySP;
 
 	class Sky :public GameObject
 	{
 	public:
-		Mesh *m_sky;
+		MeshSP m_sky;
 
+		static SkySP Create();
 		void Draw() {};
 		void Update() {};
 

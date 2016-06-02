@@ -1,10 +1,14 @@
 #ifndef OKA_MODEL_H_
 #define OKA_MODEL_H_
 
+#include<vector>
 #include"../GameObject/GameObject.h"
 
 namespace oka
 {
+	class Model;
+	typedef std::shared_ptr<Model> ModelSP;
+
 	class Model
 	{
 	public:
@@ -32,7 +36,7 @@ namespace oka
 		//uvèÓïÒ
 		std::vector<glm::vec2>m_tex;
 
-		static Model* LoadXFile(const char *_xFileName);
+		static ModelSP LoadXFile(const char *_xFileName);
 
 	};
 

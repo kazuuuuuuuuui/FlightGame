@@ -7,14 +7,17 @@
 
 namespace oka
 {
+	//-------------------------------------
+	//コンストラクタ
+
 	Sea::Sea()
 	{
-		Model *sea = oka::ModelManager::GetInstance()->m_models["Sea"];
-		unsigned int tex = (oka::ImageManager::GetInstance()->GetHandle("Sea"));
+		ModelSP sea = oka::ModelManager::GetInstance()->m_models["Sea"];
+		unsigned int tex = oka::ImageManager::GetInstance()->GetHandle("Sea");
 
 		for (int i = 0; i < 3; i++)
 		{
-			m_sea[i] = new oka::Mesh(sea, tex);
+			m_sea[i] = oka::Mesh::Create(sea, tex);
 
 			//位置と向きとスケール調整
 			m_sea[i]->m_isBlend = true;
@@ -26,10 +29,22 @@ namespace oka
 			m_sea[i]->m_transform.m_rotate = MyMath::Rotate(angle, axis);
 
 			m_sea[i]->m_transform.m_scale = glm::vec3(500.0f, 500.0f, 500.0f);
-			GameManager::GetInstance()->AddGameObject("Sea", m_sea[i]);
+			GameManager::GetInstance()->Add("Sea", m_sea[i]);
 		}
 	}
 
+	//-------------------------------------
+	//生成
+
+	SeaSP Sea::Create()
+	{
+		SeaSP sea(new Sea());
+
+		return sea;
+	}
+
+	//-------------------------------------
+	//更新
 
 	void Sea::Update()
 	{

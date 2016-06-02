@@ -25,15 +25,15 @@ Character::Character()
 	m_transform.m_scale = glm::vec3(0.3f, 0.6f, 0.3f);
 
 	//体部分
-	oka::Model *body = oka::ModelManager::GetInstance()->m_models["Body"];
+	oka::ModelSP body = oka::ModelManager::GetInstance()->m_models["Body"];
 	unsigned int tex = (oka::ImageManager::GetInstance()->GetHandle("FlyTex"));
-	m_body = new oka::Mesh(body, tex);
-	oka::GameManager::GetInstance()->AddGameObject("Body", m_body);
+	m_body = oka::Mesh::Create(body, tex);
+	oka::GameManager::GetInstance()->Add("Body", m_body);
 
 	//プロペラ部分
-	oka::Model *propeller = oka::ModelManager::GetInstance()->m_models["Propeller"];
-	m_propeller = new oka::Mesh(propeller, tex);
-	oka::GameManager::GetInstance()->AddGameObject("Propeller", m_propeller);
+	oka::ModelSP propeller = oka::ModelManager::GetInstance()->m_models["Propeller"];
+	m_propeller = oka::Mesh::Create(propeller, tex);
+	oka::GameManager::GetInstance()->Add("Propeller", m_propeller);
 
 	m_controller = new oka::Contoroller();
 	oka::JoysticManager::GetInstance()->AddController(m_controller);
@@ -135,8 +135,8 @@ glm::vec3 pos = m_transform.m_position;
 
 			//爆発エフェクト
 			const unsigned int num = 15;
-			oka::GameManager::GetInstance()->AddGameObject("Smoke", Smoke::Create(m_transform.m_position, num));
-			oka::GameManager::GetInstance()->AddGameObject("Fire", Fire::Create(m_transform.m_position));
+			oka::GameManager::GetInstance()->Add("Smoke", Smoke::Create(m_transform.m_position, num));
+			oka::GameManager::GetInstance()->Add("Fire", Fire::Create(m_transform.m_position));
 		}
 	}
 }
@@ -223,9 +223,9 @@ void Character::Shot(unsigned short _downKeys)
 
 		glm::mat4 mat = m_transform.m_rotate;
 
-		Bullet *bullet = Bullet::Create(pos, mat, speed);
-		oka::BulletManager::GetInstance()->AddBullet(bullet);
-		oka::GameManager::GetInstance()->AddGameObject("Bullet", bullet);
+		BulletSP bullet = Bullet::Create(pos, mat, speed);
+		oka::BulletManager::GetInstance()->Add(bullet);
+		oka::GameManager::GetInstance()->Add("Bullet", bullet);
 	}
 }
 

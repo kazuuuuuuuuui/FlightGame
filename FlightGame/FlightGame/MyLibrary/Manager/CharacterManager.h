@@ -9,11 +9,11 @@ namespace oka
 	class CharacterManager
 	{
 	public:
-		std::list<Character*> m_characters;
+		std::list<CharacterSP> m_characters;
 
 		void Update();
 		static CharacterManager* GetInstance();
-		void AddCharacter(Character *_character);
+		void AddCharacter(CharacterSP _character);
 		void CheckCharacter();
 		static void Destroy();
 

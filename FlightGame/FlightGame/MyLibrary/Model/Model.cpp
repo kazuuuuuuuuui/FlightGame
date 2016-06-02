@@ -10,9 +10,9 @@ namespace oka
 	//-------------------------------------
 	//xファイルから3Dモデルを読み込み
 	
-	Model* Model::LoadXFile(const char *_xFileName)
+	ModelSP Model::LoadXFile(const char *_xFileName)
 	{
-		Model *model = new Model();
+		ModelSP model(new Model());
 
 		FILE *fp = fopen(_xFileName, "r");
 		char buf[256];

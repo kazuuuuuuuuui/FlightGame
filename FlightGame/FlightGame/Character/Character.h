@@ -7,11 +7,14 @@
 #include"../MyLibrary/Input/Controller.h"
 #include"../Bullet/Bullet.h"
 
+class Character;
+typedef std::shared_ptr<Character> CharacterSP;
+
 class Character :public oka::GameObject
 {
 public:
-	oka::Mesh *m_body;
-	oka::Mesh *m_propeller;
+	oka::MeshSP m_body;
+	oka::MeshSP m_propeller;
 	
 	oka::Contoroller *m_controller;
 

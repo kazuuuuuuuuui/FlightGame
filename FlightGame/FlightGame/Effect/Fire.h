@@ -5,13 +5,16 @@
 #include"Effect.h"
 #include"Particle.h"
 
+class Fire;
+typedef std::shared_ptr<Fire> FireSP;
+
 class Fire :public oka::Effect
 {
 public:
 	static const int m_particleNum;
-	std::list<Particle*>m_particles;
+	std::list<ParticleSP>m_particles;
 
-	static Fire* Create(glm::vec3 _pos);
+	static FireSP Create(glm::vec3 _pos);
 
 	void Draw();
 	void Update();

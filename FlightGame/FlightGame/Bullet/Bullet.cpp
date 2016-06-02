@@ -18,9 +18,9 @@ Bullet::~Bullet()
 //-------------------------------------
 //弾の生成
 
-Bullet* Bullet::Create(glm::vec3 _pos, glm::mat4 _rotate, glm::vec3 _speed)
+BulletSP Bullet::Create(glm::vec3 _pos, glm::mat4 _rotate, glm::vec3 _speed)
 {
-	Bullet *bullet = new Bullet();
+	BulletSP bullet(new Bullet());
 	bullet->m_transform.m_position = _pos;
 	bullet->m_transform.m_rotate = _rotate;
 	bullet->m_speed = _speed;
@@ -72,15 +72,15 @@ void Bullet::Update()
 	m_transform.m_position += m_speed;
 
 //debug
-glm::vec3 pos = m_transform.m_position;
-printf("x:%f,y:%f,z:%f\n", pos.x, pos.y, pos.z);
+//glm::vec3 pos = m_transform.m_position;
+//printf("x:%f,y:%f,z:%f\n", pos.x, pos.y, pos.z);
 
 	//フィールド内にいるか
 	if (IsGroundOut())
 	{
 //debug
-printf("出てるうううううううううううう\n");
-m_isActive = false;
+//printf("出てるうううううううううううう\n");
+//m_isActive = false;
 	}
 	else
 	{

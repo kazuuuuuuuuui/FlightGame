@@ -1,15 +1,87 @@
 #define _USE_MATH_DEFINES
 #include<math.h>
 #include"Enemy.h"
+#include"../MyLibrary/Manager/GameManager.h"
+#include"../MyLibrary/Manager/BulletManager.h"
+#include"../MyLibrary/Manager/CharacterManager.h"
 #include"../glm/gtx/transform.hpp"
+#include"../glm/gtx/intersect.hpp"
 #include"../glut.h"
+
+//-------------------------------------
+//ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+
+Enemy::Enemy(glm::vec3 _pos)
+{
+	const float x_max = 256.0f;
+	m_aimPos.x = ((float)rand() / RAND_MAX)*x_max;
+
+	const float bottom = 20.0f;
+	m_aimPos.y = bottom + ((float)rand() / RAND_MAX)*10.0f;
+
+	const float z_max = -256.0f;
+	m_aimPos.z = ((float)rand() / RAND_MAX)*z_max;
+
+
+	m_transform.m_position = _pos;
+}
+
+//-------------------------------------
+//“G‚Ì¶¬
+
+EnemySP Enemy::Create(glm::vec3 _pos)
+{
+	EnemySP enemy(new Enemy(_pos));
+
+	return enemy;
+}
 
 //-------------------------------------
 //“G‚ÌAI
 
 void Enemy::Control()
 {
-	m_speed.z = -0.1f;
+	//•Ï‚¦‚½‚¢
+	const auto characterTop = oka::CharacterManager::GetInstance()->m_characters.begin();
+
+	const glm::vec3 pos = m_transform.m_position;
+	const glm::vec3 dir = m_transform.m_myToVec;
+	const glm::vec3 aimPos = (*characterTop)->m_transform.m_position;
+	const float rad = 100.0f;
+	float distance;
+
+
+	//printf("%d\n", m_flame);
+
+	if (glm::intersectRaySphere(pos, dir, aimPos, rad, distance))
+	{
+
+		//5•b‚É1‰ñ’e”­ŽË
+		if (0 == (m_flame % (60 * 5)))
+		{
+			printf("aaa\n");
+			//glm::vec3 pos;
+			//const float distance = 2.0f;//Ž©‹@‚Æ’e”­ŽË“_‚ÌŠÔŠu
+			//pos = m_transform.m_position + m_transform.m_myToVec*distance;
+
+			//glm::vec3 speed;
+			//const float value = 1.0f;//’e‚ÌƒXƒs[ƒh•âŠ®’l
+			//speed = m_transform.m_myToVec * value;
+
+			//glm::mat4 mat = m_transform.m_rotate;
+
+			//BulletSP bullet = Bullet::Create(pos, mat, speed);
+			//oka::BulletManager::GetInstance()->Add(bullet);
+			//oka::GameManager::GetInstance()->Add("Bullet", bullet);
+		}
+	}
+	//debug
+	else
+	{
+		//printf("x:%f,y:%f,z:%f\n", aimPos.x, aimPos.y, aimPos.z);
+	}
+
+
 
 	
 	/*glm::vec3 v = m_aimPos - m_transform.m_position;
@@ -28,7 +100,7 @@ void Enemy::Control()
 //printf("x:%f,y:%f,z:%f\n", m_transform.m_position.x, m_transform.m_position.y, m_transform.m_position.z);
 
 	//debug
-	DrawAimPos();
+	//DrawAimPos();
 }
 
 //-------------------------------------

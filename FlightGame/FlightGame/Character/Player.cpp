@@ -16,6 +16,17 @@
 
 #include"../glut.h"
 
+
+//-------------------------------------
+//自機の生成
+
+PlayerSP Player::Create(glm::vec3 _pos)
+{
+	PlayerSP player(new Player(_pos));
+
+	return player;
+}
+
 //-------------------------------------
 //キーボードでの操作
 
@@ -100,9 +111,9 @@ void Player::Shot()
 
 		glm::mat4 mat = m_transform.m_rotate;
 	
-		Bullet *bullet = Bullet::Create(pos, mat, speed);
-		oka::BulletManager::GetInstance()->AddBullet(bullet);
-		oka::GameManager::GetInstance()->AddGameObject("Bullet", bullet);
+		BulletSP bullet = Bullet::Create(pos, mat, speed);
+		oka::BulletManager::GetInstance()->Add(bullet);
+		oka::GameManager::GetInstance()->Add("Bullet", bullet);
 	}
 }
 

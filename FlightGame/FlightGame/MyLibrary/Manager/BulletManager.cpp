@@ -43,7 +43,7 @@ namespace oka
 	//-------------------------------------
 	//’e‚Ì’Ç‰Á
 
-	void BulletManager::AddBullet(Bullet* _bullet)
+	void BulletManager::Add(BulletSP _bullet)
 	{
 		m_bullets.push_back(_bullet);
 	}

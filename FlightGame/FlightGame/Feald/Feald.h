@@ -1,7 +1,12 @@
 #ifndef FEALD_H_
 #define FEALD_H_
 
+#include<vector>
 #include"../MyLibrary/GameObject/GameObject.h"
+
+//Fealdへのスマートポインタを定義化
+class Feald;
+typedef std::shared_ptr<Feald> FealdSP;
 
 class Feald :public oka::GameObject 
 {
@@ -9,33 +14,21 @@ public:
 	const int m_width;
 	const int m_height;
 
-	//頂点数
 	unsigned int m_vertices;
-
-	//インデックス数
 	unsigned int m_indeces;
-
-	//頂点情報
 	std::vector<glm::vec3>m_vertex;
-
-	//インデックス情報
 	std::vector<unsigned short>m_index;
-
-	//法線情報
 	std::vector<glm::vec3>m_normal;
-
-	//uv情報
 	std::vector<glm::vec2>m_tex;
 
-	void Draw();
-	void Update();
-
+	static FealdSP Create();
 	void SetVertex();
 	void SetIndex();
 	void SetNormal();
 	void SetTex();
 	void SetHeight(const char *_fileName);
-
+	void Draw();
+	void Update();
 
 	//debug
 	void DrawNormals();
@@ -58,7 +51,6 @@ public:
 
 		//頂点の高さ設定
 		SetHeight("heightmap.bmp");
-		//SetHeight("test.bmp");
 
 		//法線データ
 		SetNormal();
