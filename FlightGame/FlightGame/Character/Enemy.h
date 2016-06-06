@@ -12,12 +12,11 @@ public:
 	glm::vec3 m_aimPos;//ñ⁄ïWì_ÇÃç¿ïW
 
 	static EnemySP Create(glm::vec3 _pos);
+	virtual void Update();
 	virtual void Control();
-	void ResetAimPos();
+	void Shot();
 
-	//debug
-	void DrawAimPos();
-	void DrawToAimVec();
+	void ResetAimPos();
 
 	Enemy(glm::vec3 _pos);
 	~Enemy() 

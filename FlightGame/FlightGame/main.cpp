@@ -65,15 +65,10 @@ void keyboardUp(unsigned char key, int x, int y)
 
 void display()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glEnable(GL_NORMALIZE);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	glEnable(GL_DEPTH_TEST);
 	
-	//debug
-	glPolygonMode(GL_FRONT_AND_BACK, g_mode);
+	
+//debug
+glPolygonMode(GL_FRONT_AND_BACK, g_mode);
 
 	oka::GameManager::GetInstance()->Updata();
 	oka::JoysticManager::GetInstance()->Update();
@@ -90,7 +85,7 @@ void display()
 
 void timer(int value) 
 {
-	//fps();
+	fps();
 
 	glutPostRedisplay();
 	glutTimerFunc(1000 / 60, timer, 0);

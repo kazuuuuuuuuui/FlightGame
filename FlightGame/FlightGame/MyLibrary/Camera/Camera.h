@@ -8,7 +8,6 @@ namespace oka
 	class Camera
 	{
 	private:
-		glm::vec3 m_position;
 		glm::vec3 m_target;
 		glm::vec3 m_up;
 		glm::mat4 m_viewMatrix;
@@ -18,6 +17,8 @@ namespace oka
 		float m_zFar;
 
 	public:
+		Transform m_transform;
+
 		Camera();
 		~Camera() {};
 

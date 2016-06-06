@@ -14,22 +14,19 @@ class Character :public oka::GameObject
 {
 public:
 	oka::MeshSP m_body;
-	oka::MeshSP m_propeller;
-	
-	oka::Contoroller *m_controller;
+	oka::MeshSP m_propeller;	
 
+	glm::vec2 m_onRadarPos;
 	bool m_isHitAttack;
 	unsigned int m_hp;
 
 	glm::vec3 m_speed;
 	glm::vec3 m_accel;
 
-	void Update();
+	virtual void Update() = 0;
 	virtual void Control() = 0;
-	virtual void Control(unsigned short _pressedKey, unsigned int _downKeys, float _sThumbLX, float _sThumbLY);
-	void Accel(unsigned short _pressedKey);
-	void Shot(unsigned short _downKeys);
 	
+	void SetOnRadarPos();
 	bool IsGroundOut()const;
 	bool IsIntersectGround()const;
 	bool IsDead()const;

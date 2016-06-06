@@ -13,7 +13,7 @@ namespace oka
 
 	Camera::Camera():
 		m_fovy(60.0),m_aspect(1.0),m_zNear(0.1),m_zFar(1000.0),
-		m_position(0.0f, 0.0f, 0.0f),m_target(0.0f, 0.0f, 0.0f),m_up(0.0f, 1.0f, 0.0f)
+		m_target(0.0f, 0.0f, 0.0f),m_up(0.0f, 1.0f, 0.0f)
 	{}
 
 	//-------------------------------------
@@ -44,12 +44,12 @@ namespace oka
 
 	void Camera::SetViewMatrix(const glm::vec3 _position, const glm::vec3 _target, const glm::vec3 _up)
 	{
-		m_position = _position;
+		m_transform.m_position = _position;
 		m_target = _target;
 		m_up = _up;
 		
 		m_viewMatrix = glm::lookAt(
-			glm::vec3(m_position.x, m_position.y, m_position.z),
+			glm::vec3(m_transform.m_position.x, m_transform.m_position.y, m_transform.m_position.z),
 			glm::vec3(m_target.x, m_target.y, m_target.z),
 			glm::vec3(m_up.x, m_up.y, m_up.z));
 	}

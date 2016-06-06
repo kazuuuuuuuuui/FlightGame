@@ -7,7 +7,8 @@ namespace oka
 	//-------------------------------------
 	//コンストラクタ
 
-	CharacterManager::CharacterManager()
+	CharacterManager::CharacterManager():
+		m_player(nullptr)
 	{
 		printf("キャラクターマネージャー生成\n");
 		printf("\n");
@@ -58,7 +59,20 @@ namespace oka
 
 	void CharacterManager::Update()
 	{
-		CheckCharacter();
+		CheckPlayer();
+		CheckCharacters();
+	}
+
+	//-------------------------------------
+	//プレイヤーを参照するためのポインタに
+	//
+
+	void CharacterManager::SetPlayer(PlayerSP _player)
+	{
+		if (nullptr == m_player)
+		{
+			m_player = _player;
+		}
 	}
 
 	//------------------
@@ -69,10 +83,28 @@ namespace oka
 		m_characters.push_back(_character);
 	}
 
+	//-------------------------------------
+	//
+
+	void CharacterManager::CheckPlayer()
+	{
+		if (nullptr != m_player)
+		{
+			if (m_player->IsActive())
+			{
+
+			}
+			else
+			{
+				m_player = nullptr;
+			}
+		}
+	}
+
 	//--------------------------------------------
 	//
 
-	void CharacterManager::CheckCharacter()
+	void CharacterManager::CheckCharacters()
 	{
 		auto itr = m_characters.begin();
 		while (itr != m_characters.end())

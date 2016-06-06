@@ -2,22 +2,23 @@
 #define SMOKE_H_
 
 #include<list>
-#include"Effect.h"
+#include"../MyLibrary/GameObject/GameObject.h"
 #include"Particle.h"
+#include"EffectInfo.h"
 
 class Smoke;
 typedef std::shared_ptr<Smoke> SmokeSP;
 
-class Smoke :public oka::Effect
+class Smoke :public oka::GameObject
 {
 public:
 	std::list<ParticleSP>m_particles;
-	static SmokeSP Create(glm::vec3 _pos,const unsigned int _particleNum);
+	static SmokeSP Create(EffectInfo _info);
 
 	void Draw();
 	void Update();
 
-	Smoke(glm::vec3 _pos);
+	Smoke(EffectInfo _info);
 };
 
 #endif

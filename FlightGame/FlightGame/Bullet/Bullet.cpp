@@ -1,18 +1,32 @@
 #include"Bullet.h"
+#include"../MyLibrary/Manager/GameManager.h"
 #include"../MyLibrary/Manager/CharacterManager.h"
 #include"../MyLibrary/Manager/FealdManager.h"
+#include"../MyLibrary/../Effect/Smoke.h"
 #include"../glut.h"
 
-Bullet::Bullet()
+//-------------------------------------
+//コンストラクタ
+
+Bullet::Bullet(glm::vec3 _pos, glm::mat4 _rotate, glm::vec3 _speed)
 {
 	//debug
-	printf("弾が生成されました\n");
+	//printf("弾が生成されました\n");
+
+	m_originPos = _pos;
+	m_transform.m_position = _pos;
+	m_transform.m_rotate = _rotate;
+	m_speed = _speed;
+
 }
+
+//-------------------------------------
+//デストラクタ
 
 Bullet::~Bullet()
 {
 	//debug
-	printf("弾が削除されました\n");
+	//printf("弾が削除されました\n");
 }
 
 //-------------------------------------
@@ -20,10 +34,7 @@ Bullet::~Bullet()
 
 BulletSP Bullet::Create(glm::vec3 _pos, glm::mat4 _rotate, glm::vec3 _speed)
 {
-	BulletSP bullet(new Bullet());
-	bullet->m_transform.m_position = _pos;
-	bullet->m_transform.m_rotate = _rotate;
-	bullet->m_speed = _speed;
+	BulletSP bullet(new Bullet(_pos, _rotate, _speed));
 
 	return bullet;
 }
@@ -33,35 +44,14 @@ BulletSP Bullet::Create(glm::vec3 _pos, glm::mat4 _rotate, glm::vec3 _speed)
 
 void Bullet::Draw()
 {
-	//glPushAttrib(GL_ALL_ATTRIB_BITS);
-	//{
-	//	glEnableClientState(GL_VERTEX_ARRAY);
-	//	glEnableClientState(GL_NORMAL_ARRAY);
+	glPushMatrix();
+	{
+		//行列適応
+		glMultMatrixf((GLfloat*)&m_transform.m_matrix);
 
-		glPushMatrix();
-		{
-			//行列適応
-			glMultMatrixf((GLfloat*)&m_transform.m_matrix);
-
-			glutSolidCube(0.5);
-			//glutSolidCube(1);
-
-			/*auto v = m_model.m_vertex.begin();
-			glVertexPointer(3, GL_FLOAT, 0, &(*v));
-
-			auto n = m_model.m_normal.begin();
-			glNormalPointer(GL_FLOAT, 0, &(*n));
-
-			auto i = m_model.m_index.begin();
-
-			glDrawElements(GL_TRIANGLES, m_model.m_indeces * 3, GL_UNSIGNED_SHORT, &(*i));*/
-
-		}
-		glPopMatrix();
-
-	//}
-	//glPopAttrib();
-
+		glutSolidCube(0.2);
+	}
+	glPopMatrix();
 }
 
 //-------------------------------------
@@ -71,22 +61,22 @@ void Bullet::Update()
 {
 	m_transform.m_position += m_speed;
 
-//debug
-//glm::vec3 pos = m_transform.m_position;
-//printf("x:%f,y:%f,z:%f\n", pos.x, pos.y, pos.z);
+	//ある程度の距離離れたら非活性にする
+	const float distance = 500;
+//printf("%f\n", glm::length(m_transform.m_position - m_originPos));
+
+	if (glm::length(m_transform.m_position - m_originPos) >= distance )
+	{
+		m_isActive = false;
+	}
 
 	//フィールド内にいるか
-	if (IsGroundOut())
-	{
-//debug
-//printf("出てるうううううううううううう\n");
-//m_isActive = false;
-	}
-	else
+	if (!IsGroundOut())
 	{
 		if (IsIntersectGround())
 		{
-			m_isActive = false;
+			//oka::GameManager::GetInstance()->Add("Smoke", Smoke::Create(m_transform.m_position));
+			//m_isActive = false;
 		}
 	}
 
@@ -94,10 +84,10 @@ void Bullet::Update()
 	auto itr = oka::CharacterManager::GetInstance()->m_characters.begin();
 	auto end = oka::CharacterManager::GetInstance()->m_characters.end();
 
-	while(itr != end)
+	while (itr != end)
 	{
 		const glm::vec3 pos = (*itr)->m_transform.m_position;
-		
+
 		if (IsHit(pos))
 		{
 			(*itr)->m_isHitAttack = true;
@@ -105,7 +95,7 @@ void Bullet::Update()
 		}
 
 		itr++;
-	}
+	}	
 }
 
 //-------------------------------------

@@ -5,18 +5,38 @@
 #include"../glm/gtc/matrix_transform.hpp"
 #include"../glut.h"
 
+//-------------------------------------
+//コンストラクタ
+
+Particle::Particle(float _alpha, glm::vec3 _pos,glm::vec3 _color, glm::vec3 _speed)
+{
+	m_alpha = _alpha;
+	m_transform.m_position = _pos;
+	m_color = _color;
+	m_speed = _speed;
+}
+
+
+ParticleSP Particle::Create(float _alpha, glm::vec3 _pos,glm::vec3 _color, glm::vec3 _speed)
+{
+	ParticleSP particle(new Particle(_alpha, _pos, _color, _speed));
+
+	return particle;
+}
+
 void Particle::Draw()
 {
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	{
 		glDisable(GL_LIGHTING);
-		glDisable(GL_DEPTH_TEST);
+		glDepthMask(GL_FALSE);
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
+		static const unsigned int tex = oka::ImageManager::GetInstance()->GetHandle("Smoke");
 		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, oka::ImageManager::GetInstance()->GetHandle("Smoke"));
+		glBindTexture(GL_TEXTURE_2D, tex);
 
 		glPushMatrix();
 		{
@@ -32,35 +52,20 @@ void Particle::Draw()
 			glBegin(GL_QUADS);
 			{
 				glTexCoord2f(0.f, 1.f);
-				glVertex2f(-1.f, -1.f);
+				glVertex2f(-0.5f, -0.5f);
 
 				glTexCoord2f(0.f, 0.f);
-				glVertex2f(-1.f, 1.f);
+				glVertex2f(-0.5f, 0.5f);
 
 				glTexCoord2f(1.f, 0.f);
-				glVertex2f(1.f, 1.f);
+				glVertex2f(0.5f, 0.5f);
 
 				glTexCoord2f(1.f, 1.f);
-				glVertex2f(1.f, -1.f);
+				glVertex2f(0.5f, -0.5f);
 			}
 			glEnd();
 		}
 		glPopMatrix();
 	}
 	glPopAttrib();
-}
-
-void Particle::Update()
-{
-	/*glm::mat4 translate = glm::mat4::Translate(m_transform.GetPosition());
-	
-	BillboardMatrix = glm::inverse(g_camera->GetViewMatrix());
-	BillboardMatrix[3][0] = 0;
-	BillboardMatrix[3][1] = 0;
-	BillboardMatrix[3][2] = 0;
-
-	glm::mat4 scale = glm::mat4::Scale(m_transform.GetScale());*/
-
-	//m_matrix = translate * BillboardMatrix * scale;
-
 }

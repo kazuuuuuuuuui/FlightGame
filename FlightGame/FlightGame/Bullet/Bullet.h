@@ -9,6 +9,7 @@ typedef std::shared_ptr<Bullet> BulletSP;
 class Bullet :public oka::GameObject
 {
 public:
+	glm::vec3 m_originPos;
 	glm::vec3 m_speed;
 
 	static BulletSP Create(glm::vec3 _pos, glm::mat4 _rotate, glm::vec3 _speed);
@@ -19,7 +20,7 @@ public:
 	bool IsIntersectGround()const;
 
 		
-	Bullet();
+	Bullet(glm::vec3 _pos, glm::mat4 _rotate, glm::vec3 _speed);
 	~Bullet();
 
 };

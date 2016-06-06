@@ -3,22 +3,25 @@
 
 #include<list>
 #include"../../Character/Character.h"
+#include"../../Character/Player.h"
 
 namespace oka
 {
 	class CharacterManager
 	{
 	public:
+		PlayerSP m_player;
 		std::list<CharacterSP> m_characters;
 
 		void Update();
 		static CharacterManager* GetInstance();
+		void SetPlayer(PlayerSP _player);
 		void AddCharacter(CharacterSP _character);
-		void CheckCharacter();
+		void CheckPlayer();
+		void CheckCharacters();
 		static void Destroy();
 
 		CharacterManager();
-
 		~CharacterManager();
 
 	private:

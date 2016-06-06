@@ -39,22 +39,7 @@ namespace oka
 		}
 	}
 
-	//-------------------------------------
-	//ˆø”‚Æ‚µ‚ÄŽó‚¯Žæ‚Á‚½key‚ªmap‚É“o˜^‚³‚ê‚Ä‚¢‚é‚©
-	//ŒŸõ‚µ“o˜^‚³‚ê‚Ä‚¢‚ê‚Î‚»‚Ìkey‚É‘Î‰ž‚·‚éƒnƒ“ƒhƒ‹‚ð•Ô‚·
-
-	unsigned int SoundManager::GetHandle(const std::string _str)const
-	{
-		if (m_sounds.find(_str) == m_sounds.end())
-		{
-			//—vC³
-			return 0;
-		}
-		else
-		{
-			return m_sounds.find(_str)->second;
-		}
-	}
+	
 
 
 	//-------------------------------------
@@ -113,8 +98,14 @@ namespace oka
 
 	void SoundManager::ChangeVolume(const std::string _str,const float _value)
 	{
-		alSourcef(m_sounds[_str], AL_GAIN, _value);
-
+		if (m_sounds.find(_str) == m_sounds.end())
+		{
+			assert(0);
+		}
+		else
+		{
+			alSourcef(m_sounds[_str], AL_GAIN, _value);
+		}
 	}
 
 	//-------------------------------------

@@ -4,6 +4,9 @@
 #include"../MyLibrary/Manager/GameManager.h"
 #include"../MyLibrary/Manager/BulletManager.h"
 #include"../MyLibrary/Manager/CharacterManager.h"
+#include"../MyLibrary/Manager/SoundManager.h"
+#include"../Effect/Fire.h"
+#include"../Effect/Smoke.h"
 #include"../glm/gtx/transform.hpp"
 #include"../glm/gtx/intersect.hpp"
 #include"../glut.h"
@@ -37,52 +40,143 @@ EnemySP Enemy::Create(glm::vec3 _pos)
 }
 
 //-------------------------------------
+//更新
+
+void Enemy::Update()
+{
+	//座標更新
+	m_speed += m_accel;
+	m_transform.m_position += m_speed;
+
+	//慣性
+	m_speed *= 0.965f;
+
+	//ボディ
+	m_body->m_transform = m_transform;
+
+	//オフセット計算
+	glm::mat4 offSet;
+
+	const glm::mat4 translate = glm::translate(glm::vec3(0.0f, 0.3f, -5.2f));
+
+	//static float angle = 0.0f;
+	//angle += oka::MyMath::ToRadian(2.0f);
+	//const glm::vec3 axis = glm::vec3(0, 1, 0);
+	//const glm::mat4 rotate = glm::rotate(angle, axis);
+
+	const glm::mat4 scale = glm::scale(glm::vec3(2, 2, 2));
+
+	offSet = translate*scale;
+
+	//プロペラ
+	m_propeller->m_transform = m_transform;
+	m_propeller->m_transform.m_matrix = m_transform.m_matrix * offSet;
+
+
+	Control();
+
+
+	if (m_isHitAttack)
+	{
+		//書き換え
+		m_hp -= 100;
+	}
+
+	m_isHitAttack = false;
+
+
+	//debug
+	glm::vec3 pos = m_transform.m_position;
+	//printf("x:%f,y:%f,z:%f\n", pos.x, pos.y, pos.z);
+
+
+
+	//フィールドとの判定
+	if (IsGroundOut())
+	{
+		//debug
+		//printf("出てるよおおおおおおおおおお\n");
+	}
+	else
+	{
+		SetOnRadarPos();
+
+		if (IsIntersectGround())
+		{
+			//debug
+			//printf("地面に当たってるよおおおおおおおお\n");
+			m_hp = 0;
+		}
+	}
+
+	//死亡判定
+	if (m_isActive)
+	{
+		if (IsDead())
+		{
+			m_isActive = false;
+			m_body->m_isActive = false;
+			m_propeller->m_isActive = false;
+
+			//爆発音
+			oka::SoundManager::GetInstance()->Play("Explode");
+
+			//爆発エフェクト
+			//oka::GameManager::GetInstance()->Add("Smoke", Smoke::Create(m_transform.m_position));
+			//oka::GameManager::GetInstance()->Add("Fire", Fire::Create(m_transform.m_position));
+		}
+	}
+}
+
+//-------------------------------------
+//弾による攻撃
+
+void Enemy::Shot()
+{
+	const glm::vec3 v = m_transform.m_position - oka::CharacterManager::GetInstance()->m_player->m_transform.m_position;
+	float volume = glm::length(v);
+	volume = 20.0f / volume;
+
+//debug
+printf("%f\n", volume);
+
+	oka::SoundManager::GetInstance()->ChangeVolume("Shot", volume);
+	oka::SoundManager::GetInstance()->Play("Shot");
+
+	glm::vec3 pos;
+	const float distance = 2.0f;//自機と弾発射点の間隔
+	pos = m_transform.m_position + m_transform.m_myToVec*distance;
+
+	glm::vec3 speed;
+	const float value = 5.0f;//弾のスピード補完値
+	speed = m_transform.m_myToVec * value;
+
+	glm::mat4 mat = m_transform.m_rotate;
+
+	BulletSP bullet = Bullet::Create(pos, mat, speed);
+	oka::BulletManager::GetInstance()->Add(bullet);
+	oka::GameManager::GetInstance()->Add("Bullet", bullet);
+}
+
+//-------------------------------------
 //敵のAI
 
 void Enemy::Control()
 {
-	//変えたい
-	const auto characterTop = oka::CharacterManager::GetInstance()->m_characters.begin();
-
 	const glm::vec3 pos = m_transform.m_position;
 	const glm::vec3 dir = m_transform.m_myToVec;
-	const glm::vec3 aimPos = (*characterTop)->m_transform.m_position;
+	const glm::vec3 aimPos = oka::CharacterManager::GetInstance()->m_player->m_transform.m_position;
 	const float rad = 100.0f;
 	float distance;
 
-
-	//printf("%d\n", m_flame);
-
 	if (glm::intersectRaySphere(pos, dir, aimPos, rad, distance))
 	{
-
-		//5秒に1回弾発射
-		if (0 == (m_flame % (60 * 5)))
+		//20Fに1回弾発射
+		if (0 == (m_flame % 10))
 		{
-			printf("aaa\n");
-			//glm::vec3 pos;
-			//const float distance = 2.0f;//自機と弾発射点の間隔
-			//pos = m_transform.m_position + m_transform.m_myToVec*distance;
-
-			//glm::vec3 speed;
-			//const float value = 1.0f;//弾のスピード補完値
-			//speed = m_transform.m_myToVec * value;
-
-			//glm::mat4 mat = m_transform.m_rotate;
-
-			//BulletSP bullet = Bullet::Create(pos, mat, speed);
-			//oka::BulletManager::GetInstance()->Add(bullet);
-			//oka::GameManager::GetInstance()->Add("Bullet", bullet);
+			Shot();
 		}
 	}
-	//debug
-	else
-	{
-		//printf("x:%f,y:%f,z:%f\n", aimPos.x, aimPos.y, aimPos.z);
-	}
-
-
-
 	
 	/*glm::vec3 v = m_aimPos - m_transform.m_position;
 
@@ -92,15 +186,10 @@ void Enemy::Control()
 	}
 
 	v = glm::normalize(v);
-	v *= 0.01f;
-	m_accel = v;*/
-
-	
-
+	v *= 0.01f;*/
+	//m_accel = v;
 //printf("x:%f,y:%f,z:%f\n", m_transform.m_position.x, m_transform.m_position.y, m_transform.m_position.z);
 
-	//debug
-	//DrawAimPos();
 }
 
 //-------------------------------------
@@ -116,55 +205,4 @@ void Enemy::ResetAimPos()
 
 	const float z_max = -256.0f;
 	m_aimPos.z = ((float)rand() / RAND_MAX)*z_max;
-}
-
-
-//-------------------------------------
-//debug
-
-//-------------------------------------
-//目指している座標点可視化
-
-void Enemy::DrawAimPos()
-{
-	glPushAttrib(GL_ALL_ATTRIB_BITS);
-	{
-		glDisable(GL_LIGHTING);
-
-		glColor3f(1.0f, 0.0f, 0.0f);
-
-		glPushMatrix();
-		{
-			glTranslatef(m_aimPos.x, m_aimPos.y, m_aimPos.z);
-			glutSolidCube(1);
-		}
-		glPopMatrix();
-
-	}
-	glPopAttrib();
-}
-
-//-------------------------------------
-//目指している座標点への方向ベクトル可視化
-
-void Enemy::DrawToAimVec()
-{
-	glPushAttrib(GL_ALL_ATTRIB_BITS);
-	{
-		glDisable(GL_LIGHTING);
-
-		glLineWidth(3.0f);
-		glColor3f(1.0f, 1.0f, 0.0f);
-
-		glBegin(GL_LINES);
-		{
-			glm::vec3 root = m_transform.m_position;
-			glVertex3f(root.x, root.y, root.z);
-
-			glm::vec3 aim = m_aimPos;
-			glVertex3f(aim.x, aim.y, aim.z);
-		}
-		glEnd();
-	}
-	glPopAttrib();
 }
