@@ -18,6 +18,7 @@ namespace oka
 
 		void Updata();
 		void Add(std::string _str, GameObjectSP _object);
+		//GameObjectSP GetObject(std::string _str);
 		void CheckGameObject();
 
 		static GameManager* GetInstance();

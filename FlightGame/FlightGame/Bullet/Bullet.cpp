@@ -1,8 +1,5 @@
 #include"Bullet.h"
-#include"../MyLibrary/Manager/GameManager.h"
 #include"../MyLibrary/Manager/CharacterManager.h"
-#include"../MyLibrary/Manager/FealdManager.h"
-#include"../MyLibrary/../Effect/Smoke.h"
 #include"../glut.h"
 
 //-------------------------------------
@@ -96,76 +93,4 @@ void Bullet::Update()
 
 		itr++;
 	}	
-}
-
-//-------------------------------------
-//弾とキャラクターとの当たり判定
-//引数としてキャラクター座標をもらってくる
-
-bool Bullet::IsHit(glm::vec3 _pos)const
-{
-	glm::vec3 v;
-	v = m_transform.m_position - _pos;
-
-	//弾とキャラクターとの距離
-	const float value = 2.0f;
-	float distance = glm::length(v);
-
-	if (distance <= value)
-	{
-		return true;
-	}
-
-	return false;
-
-}
-
-//-------------------------------------
-//地形部分内にいるか外にいるかの判定
-
-bool Bullet::IsGroundOut()const
-{
-	//x
-	const float width = oka::FealdManager::GetInstance()->m_feald->m_width;
-	const float x = m_transform.m_position.x;
-
-	if (x < 0 || width < x)
-	{
-		return  true;
-	}
-
-	//z
-	const float height = oka::FealdManager::GetInstance()->m_feald->m_height;
-	const float z = m_transform.m_position.z;
-
-	if (z < -height || 0 < z)
-	{
-		return  true;
-	}
-
-	return false;
-}
-
-//-------------------------------------
-//弾と地形との接触判定
-
-bool Bullet::IsIntersectGround()const
-{
-	const int x = m_transform.m_position.x;
-	const float y = m_transform.m_position.y;
-	const int z = -m_transform.m_position.z;
-
-	const int width = oka::FealdManager::GetInstance()->m_feald->m_width;
-
-	const float height = oka::FealdManager::GetInstance()->m_feald->m_vertex[z * width + x].y;
-
-	//debug
-	//printf("h:%f\n", height);
-
-	if (y <= height)
-	{
-		return true;
-	}
-
-	return false;
 }

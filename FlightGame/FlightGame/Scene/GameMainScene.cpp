@@ -97,6 +97,7 @@ GameMainScene::GameMainScene()
 	oka::ImageManager::GetInstance()->SetHandle("FealdTex", oka::LoadImage3f("grand.bmp"));
 	oka::ImageManager::GetInstance()->SetHandle("Smoke", oka::LoadImage4f("smoke.bmp"));
 	oka::ImageManager::GetInstance()->SetHandle("Target", oka::LoadImage4f("target.bmp"));
+	oka::ImageManager::GetInstance()->SetHandle("RockOn", oka::LoadImage4f("rockOn.bmp"));
 	oka::ImageManager::GetInstance()->SetHandle("FlyTex", oka::LoadImage3f("flyTex.bmp"));
 	oka::ImageManager::GetInstance()->SetHandle("Sky", oka::LoadImage3f("sky.bmp"));
 	oka::ImageManager::GetInstance()->SetHandle("Sea", oka::LoadImage4f("sea.bmp"));
@@ -132,13 +133,13 @@ GameMainScene::GameMainScene()
 	
 
 	//test
-	EnemySP enemy = Enemy::Create(glm::vec3(30.0f, 30.0f, -100.0f));
+	EnemySP enemy = Enemy::Create(glm::vec3(30.0f, 30.0f, -50.0f));
 	oka::CharacterManager::GetInstance()->AddCharacter(enemy);
 	oka::GameManager::GetInstance()->Add("Enemy", enemy);
 	
-	/*EnemySP enemy2 = Enemy::Create(glm::vec3(50.0f, 30.0f, -80.0f));
+	EnemySP enemy2 = Enemy::Create(glm::vec3(80.0f, 30.0f, -80.0f));
 	oka::CharacterManager::GetInstance()->AddCharacter(enemy2);
-	oka::GameManager::GetInstance()->Add("Enemy", enemy2);*/
+	oka::GameManager::GetInstance()->Add("Enemy", enemy2);
 
 	//
 	/*EffectInfo info;
@@ -232,9 +233,6 @@ void GameMainScene::Render()
 
 	//•Ï‚¦‚½‚¢
 	oka::CharacterManager::GetInstance()->m_player->DrawTarget();
-
-
-
 
 	//•¶Žš
 	const float left = 0.0f;

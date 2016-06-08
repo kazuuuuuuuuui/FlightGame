@@ -55,6 +55,20 @@ namespace oka
 		m_gameObjects.insert(std::make_pair(_str, _object));
 	}
 
+	//-------------------------------------
+	//mapに登録されているオブジェクトを返す
+
+	/*GameObjectSP GameManager::GetObject(std::string _str)
+	{
+		if (m_images.find(_str) == m_images.end())
+		{
+			m_images.insert(std::make_pair(_str, _handle));
+		}
+		else
+		{
+			assert()
+		}	
+	}*/
 
 	//--------------------------------------------
 	//ゲームに現れるオブジェクトのメモリ解放と削除

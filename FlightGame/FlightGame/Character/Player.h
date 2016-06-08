@@ -21,20 +21,15 @@ public:
 	void Shot();
 	void Shot(unsigned short _downKeys);
 
+	//test
+	void HomingShot(unsigned short _downKeys);
+
+	bool IsNear(glm::vec3 _pos)const;
 	void DrawTarget();
-
-	Player(glm::vec3 _pos)
-	{
-		m_controller = new oka::Contoroller();
-		oka::JoysticManager::GetInstance()->AddController(m_controller);
-
-		m_transform.m_position = _pos;
-	}
-
-	~Player()
-	{
-printf("Playeríœ\n");
-	}
+	std::tuple<bool,glm::vec3> SetTarget();
+	
+	Player(glm::vec3 _pos);
+	~Player();
 };
 
 #endif

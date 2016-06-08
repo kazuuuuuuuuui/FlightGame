@@ -29,6 +29,7 @@ Enemy::Enemy(glm::vec3 _pos)
 	m_transform.m_position = _pos;
 }
 
+
 //-------------------------------------
 //“G‚Ì¶¬
 
@@ -138,7 +139,7 @@ void Enemy::Shot()
 	volume = 20.0f / volume;
 
 //debug
-printf("%f\n", volume);
+//printf("%f\n", volume);
 
 	oka::SoundManager::GetInstance()->ChangeVolume("Shot", volume);
 	oka::SoundManager::GetInstance()->Play("Shot");
@@ -154,7 +155,7 @@ printf("%f\n", volume);
 	glm::mat4 mat = m_transform.m_rotate;
 
 	BulletSP bullet = Bullet::Create(pos, mat, speed);
-	oka::BulletManager::GetInstance()->Add(bullet);
+	oka::BulletManager::GetInstance()->AddBullet(bullet);
 	oka::GameManager::GetInstance()->Add("Bullet", bullet);
 }
 
@@ -166,7 +167,7 @@ void Enemy::Control()
 	const glm::vec3 pos = m_transform.m_position;
 	const glm::vec3 dir = m_transform.m_myToVec;
 	const glm::vec3 aimPos = oka::CharacterManager::GetInstance()->m_player->m_transform.m_position;
-	const float rad = 100.0f;
+	const float rad = 50.0f;
 	float distance;
 
 	if (glm::intersectRaySphere(pos, dir, aimPos, rad, distance))

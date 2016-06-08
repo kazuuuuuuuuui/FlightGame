@@ -4,7 +4,7 @@
 #include<stdio.h>
 #include<string>
 #include<list>
-#include"../../Bullet/Bullet.h"
+#include"../../Bullet/BaseBullet.h"
 
 namespace oka
 {
@@ -12,10 +12,10 @@ namespace oka
 	class BulletManager
 	{
 	public:
-		std::list<BulletSP>m_bullets;
+		std::list<BaseBulletSP>m_bullets;
 
 		void Updata();
-		void Add(BulletSP _bullet);
+		void AddBullet(BaseBulletSP _bullet);
 		void CheckBullets();
 
 		static BulletManager* GetInstance();

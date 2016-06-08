@@ -5,6 +5,7 @@
 #include"../MyLibrary/Input/Keyboard.h"
 #include"../MyLibrary/Input/Controller.h"
 #include"../MyLibrary/Manager/GameManager.h"
+#include"..//MyLibrary/Manager/CharacterManager.h"
 #include"../MyLibrary/Manager/ImageManager.h"
 #include"../MyLibrary/Manager/SoundManager.h"
 #include"../MyLibrary/Manager/EffectManager.h"
@@ -15,8 +16,33 @@
 #include"../Effect/Smoke.h"
 #include"../Effect/Fire.h"
 #include"../glm/gtx/transform.hpp"
+#include"../glm/gtx/intersect.hpp"
+
+
+#include"../Bullet/HomingBullet.h"
+
+
 #include"../glut.h"
 
+
+//-------------------------------------
+//コンストラクタ
+
+Player::Player(glm::vec3 _pos)
+{
+	m_controller = new oka::Contoroller();
+	oka::JoysticManager::GetInstance()->AddController(m_controller);
+
+	m_transform.m_position = _pos;
+}
+
+//-------------------------------------
+//デストラクタ
+
+Player::~Player()
+{
+
+}
 
 //-------------------------------------
 //自機の生成
@@ -84,9 +110,8 @@ void Player::Update()
 
 	m_isHitAttack = false;
 
-
 	//debug
-	glm::vec3 pos = m_transform.m_position;
+	//glm::vec3 pos = m_transform.m_position;
 	//printf("x:%f,y:%f,z:%f\n", pos.x, pos.y, pos.z);
 
 
@@ -94,8 +119,6 @@ void Player::Update()
 	//フィールドとの判定
 	if (IsGroundOut())
 	{
-		//debug
-		//printf("出てるよおおおおおおおおおお\n");
 	}
 	else
 	{
@@ -103,8 +126,6 @@ void Player::Update()
 
 		if (IsIntersectGround())
 		{
-			//debug
-			//printf("地面に当たってるよおおおおおおおお\n");
 			m_hp = 0;
 		}
 	}
@@ -177,6 +198,7 @@ void Player::Control(unsigned short _pressedKey, unsigned int _downKeys, float _
 {
 	Accel(_pressedKey);
 	Shot(_downKeys);
+	HomingShot(_downKeys);
 
 	const float value = oka::MyMath::ToRadian(1.0f);
 
@@ -279,7 +301,7 @@ void Player::Shot()
 		glm::mat4 mat = m_transform.m_rotate;
 	
 		BulletSP bullet = Bullet::Create(pos, mat, speed);
-		oka::BulletManager::GetInstance()->Add(bullet);
+		oka::BulletManager::GetInstance()->AddBullet(bullet);
 		oka::GameManager::GetInstance()->Add("Bullet", bullet);
 	}
 }
@@ -305,11 +327,76 @@ void Player::Shot(unsigned short _downKeys)
 		glm::mat4 mat = m_transform.m_rotate;
 
 		BulletSP bullet = Bullet::Create(pos, mat, speed);
-		oka::BulletManager::GetInstance()->Add(bullet);
+		oka::BulletManager::GetInstance()->AddBullet(bullet);
 		oka::GameManager::GetInstance()->Add("Bullet", bullet);
 	}
 }
 
+//-------------------------------------
+//ホーミング弾による攻撃
+
+void Player::HomingShot(unsigned short _downKeys)
+{
+	if (_downKeys & XINPUT_GAMEPAD_RIGHT_SHOULDER)
+	{
+		oka::SoundManager::GetInstance()->ChangeVolume("Shot", 1.0f);
+		oka::SoundManager::GetInstance()->Play("Shot");
+
+		glm::vec3 pos;
+		const float distance = 2.0f;//自機と弾発射点の間隔
+		pos = m_transform.m_position + m_transform.m_myToVec*distance;
+
+		glm::vec3 speed;
+		const float value = 1.0f;//弾のスピード補完値
+		speed = m_transform.m_myToVec * value;
+
+		glm::mat4 mat = m_transform.m_rotate;
+
+		HomingBulletSP homingBullet = HomingBullet::Create(pos, mat, speed);
+		oka::BulletManager::GetInstance()->AddBullet(homingBullet);
+		oka::GameManager::GetInstance()->Add("HomingBullet", homingBullet);
+	}
+}
+
+//-------------------------------------
+//的の描画位置決定
+
+std::tuple<bool, glm::vec3> Player::SetTarget()
+{
+	const glm::vec3 pos = m_transform.m_position;
+	const glm::vec3 dir = m_transform.m_myToVec;
+	const float rad = 50.0f;
+	float distance;
+
+	auto itr = oka::CharacterManager::GetInstance()->m_characters.begin();//敵から
+	itr++;
+	auto end = oka::CharacterManager::GetInstance()->m_characters.end();
+
+	while (itr != end)
+	{
+		const glm::vec3 aimPos = (*itr)->m_transform.m_position;
+
+		if (IsNear(aimPos))
+		{
+			printf("aaaaaaaa\n");
+
+			if (glm::intersectRaySphere(pos, dir, aimPos, rad, distance))
+			{
+				return std::make_tuple(true, aimPos);
+			}
+
+		}
+
+		itr++;
+	}
+
+
+	const float value = 30.0f;//キャラクターとの間隔補完値		
+	const glm::vec3 toVec = m_transform.m_myToVec*value;
+	const glm::vec3 v = pos + toVec;
+
+	return std::make_tuple(false, v);
+}
 
 //-------------------------------------
 //弾の行先を定める為の的の描画
@@ -324,20 +411,29 @@ void Player::DrawTarget()
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		const unsigned int tex = oka::ImageManager::GetInstance()->GetHandle("Target");
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, tex);
-
 		//的の縦横
 		const float width = 3.0f;
 		const float height = 3.0f;
 
 		//描画場所
-		const float value = 30.0f;//キャラクターとの間隔補完値
 		glm::vec3 v;
-		const glm::vec3 pos = m_transform.m_position;
-		const glm::vec3 toVec = m_transform.m_myToVec*value;
-		v = pos + toVec;
+		unsigned int tex;
+
+		bool flag;
+		glm::vec3 pos;
+		std::tie(flag, v) = SetTarget();
+
+		if (flag)
+		{
+			tex = oka::ImageManager::GetInstance()->GetHandle("RockOn");
+		}
+		else
+		{
+			tex = oka::ImageManager::GetInstance()->GetHandle("Target");
+		}
+
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, tex);
 
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -361,4 +457,23 @@ void Player::DrawTarget()
 	}
 	glPopAttrib();
 
+}
+
+//-------------------------------------
+//ある一定範囲内に引数の座標が存在するかを判別する
+
+bool Player::IsNear(glm::vec3 _pos)const
+{
+	const glm::vec3 pos = _pos - m_transform.m_position;
+	const float distance = glm::length(pos);
+
+	const float value = 80.0f;
+
+	if (distance < value)
+	{
+		return true;
+	}
+
+
+	return false;
 }
