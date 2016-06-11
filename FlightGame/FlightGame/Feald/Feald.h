@@ -29,10 +29,6 @@ public:
 	void SetHeight(const char *_fileName);
 	void Draw();
 	void Update();
-
-	//debug
-	void DrawNormals();
-
 	
 	Feald() :
 	//•ÏX—\’è

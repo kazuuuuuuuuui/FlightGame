@@ -1,5 +1,4 @@
 #include"Particle.h"
-#include"../MyLibrary/Manager/ImageManager.h"
 #include"../MyLibrary/Camera/Camera.h"
 #include"../glm/glm.hpp"
 #include"../glm/gtc/matrix_transform.hpp"
@@ -12,6 +11,7 @@ Particle::Particle(float _alpha, glm::vec3 _pos,glm::vec3 _color, glm::vec3 _spe
 {
 	m_alpha = _alpha;
 	m_transform.m_position = _pos;
+	m_transform.m_scale = glm::vec3(0.0f, 0.0f, 0.0f);
 	m_color = _color;
 	m_speed = _speed;
 }
@@ -19,7 +19,7 @@ Particle::Particle(float _alpha, glm::vec3 _pos,glm::vec3 _color, glm::vec3 _spe
 
 ParticleSP Particle::Create(float _alpha, glm::vec3 _pos,glm::vec3 _color, glm::vec3 _speed)
 {
-	ParticleSP particle(new Particle(_alpha, _pos, _color, _speed));
+	ParticleSP particle(new Particle(_alpha, _pos,_color, _speed));
 
 	return particle;
 }
@@ -28,16 +28,6 @@ void Particle::Draw()
 {
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	{
-		glDisable(GL_LIGHTING);
-		glDepthMask(GL_FALSE);
-
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-
-		static const unsigned int tex = oka::ImageManager::GetInstance()->GetHandle("Smoke");
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, tex);
-
 		glPushMatrix();
 		{
 			glTranslatef(m_transform.m_position.x, m_transform.m_position.y, m_transform.m_position.z);

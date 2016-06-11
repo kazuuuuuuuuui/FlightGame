@@ -29,6 +29,7 @@ public:
 	void SetOnRadarPos();
 	bool IsGroundOut()const;
 	bool IsIntersectGround()const;
+	bool IsIntersectSea()const;
 	bool IsDead()const;
 
 	Character();

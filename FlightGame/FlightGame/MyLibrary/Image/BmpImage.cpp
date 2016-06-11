@@ -90,7 +90,7 @@ namespace oka
 	//-------------------------------------
 	//bmp画像からアルファ値付きのテクスチャ作成
 
-	unsigned int LoadImage4f(const char *_filename)
+	unsigned int LoadImage4f(const char *_filename,bool _grayscale)
 	{
 		FILE *fp;
 		fp = fopen(_filename, "rb");
@@ -105,9 +105,6 @@ namespace oka
 
 		int imageSize3f = bih.biWidth * bih.biHeight * sizeof(RGB);
 		RGB *pixels3f = (RGB*)malloc(imageSize3f);
-
-		int imageSize4f = bih.biWidth * bih.biHeight * sizeof(RGBA);
-		RGBA *pixels4f = (RGBA*)malloc(imageSize4f);
 
 		fread(pixels3f, imageSize3f, 1, fp);
 		fclose(fp);
@@ -131,21 +128,31 @@ namespace oka
 			}
 		}
 
+		int imageSize4f = bih.biWidth * bih.biHeight * sizeof(RGBA);
+		RGBA *pixels4f = (RGBA*)malloc(imageSize4f);
 
 		for (int i = 0; i < bih.biWidth * bih.biHeight; i++)
 		{
-			pixels4f[i].r = pixels3f[i].r;
-			pixels4f[i].g = pixels3f[i].g;
-			pixels4f[i].b = pixels3f[i].b;
-
-			//白ならアルファ値0とする
-			if (pixels4f[i].r == 255 && pixels4f[i].g == 255 && pixels4f[i].b == 255)
+			if (_grayscale)
 			{
-				pixels4f[i].a = 0;
+				pixels4f[i].r = 0xff;
+				pixels4f[i].g = 0xff;
+				pixels4f[i].b = 0xff;
+				pixels4f[i].a = pixels3f[i].r;
 			}
 			else
 			{
-				pixels4f[i].a = 255;
+				pixels4f[i].r = pixels3f[i].r;
+				pixels4f[i].g = pixels3f[i].g;
+				pixels4f[i].b = pixels3f[i].b;
+
+				pixels4f[i].a = 0xff;
+
+				//白ならアルファ値0とする
+				if (pixels4f[i].r == 255 && pixels4f[i].g == 255 && pixels4f[i].b == 255)
+				{
+					pixels4f[i].a = 0;
+				}
 			}
 		}
 

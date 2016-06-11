@@ -28,7 +28,8 @@
 //-------------------------------------
 //コンストラクタ
 
-Player::Player(glm::vec3 _pos)
+Player::Player(glm::vec3 _pos):
+	m_targetPos(glm::vec3(0.0f, 0.0f, 0.0f))
 {
 	m_controller = new oka::Contoroller();
 	oka::JoysticManager::GetInstance()->AddController(m_controller);
@@ -59,6 +60,9 @@ PlayerSP Player::Create(glm::vec3 _pos)
 
 void Player::Update()
 {
+//debug
+//printf("x:%fy:%fz:%f\n", m_transform.m_position.x, m_transform.m_position.y, m_transform.m_position.z);
+
 	//座標更新
 	m_speed += m_accel;
 	m_transform.m_position += m_speed;
@@ -108,17 +112,13 @@ void Player::Update()
 		//m_hp -= 100;
 	}
 
-	m_isHitAttack = false;
-
-	//debug
-	//glm::vec3 pos = m_transform.m_position;
-	//printf("x:%f,y:%f,z:%f\n", pos.x, pos.y, pos.z);
-
-
-
-	//フィールドとの判定
 	if (IsGroundOut())
 	{
+		if(IsIntersectSea())
+		{
+//debug
+printf("海の中あああああああ\n");
+		}
 	}
 	else
 	{
@@ -126,7 +126,8 @@ void Player::Update()
 
 		if (IsIntersectGround())
 		{
-			m_hp = 0;
+//debug
+printf("当たってるううううう\n");
 		}
 	}
 
@@ -337,25 +338,21 @@ void Player::Shot(unsigned short _downKeys)
 
 void Player::HomingShot(unsigned short _downKeys)
 {
-	if (_downKeys & XINPUT_GAMEPAD_RIGHT_SHOULDER)
-	{
-		oka::SoundManager::GetInstance()->ChangeVolume("Shot", 1.0f);
-		oka::SoundManager::GetInstance()->Play("Shot");
+	//if (_downKeys & XINPUT_GAMEPAD_B)
+	//{
+	//	const float distance = 2.0f;//自機と弾発射点の間隔
+	//	const glm::vec3 pos = m_transform.m_position + m_transform.m_myToVec*distance;
 
-		glm::vec3 pos;
-		const float distance = 2.0f;//自機と弾発射点の間隔
-		pos = m_transform.m_position + m_transform.m_myToVec*distance;
+	//	glm::vec3 speed;
+	//	const float value = 4.0f;//弾のスピード補完値
+	//	speed = m_transform.m_myToVec * value;
+	//
+	//	const glm::mat4 mat = m_transform.m_rotate;
 
-		glm::vec3 speed;
-		const float value = 1.0f;//弾のスピード補完値
-		speed = m_transform.m_myToVec * value;
-
-		glm::mat4 mat = m_transform.m_rotate;
-
-		HomingBulletSP homingBullet = HomingBullet::Create(pos, mat, speed);
-		oka::BulletManager::GetInstance()->AddBullet(homingBullet);
-		oka::GameManager::GetInstance()->Add("HomingBullet", homingBullet);
-	}
+	//	HomingBulletSP homingBullet = HomingBullet::Create(m_targetPos, pos, mat, speed);
+	//	oka::BulletManager::GetInstance()->AddBullet(homingBullet);
+	//	oka::GameManager::GetInstance()->Add("HomingBullet", homingBullet);
+	//}
 }
 
 //-------------------------------------
@@ -378,15 +375,11 @@ std::tuple<bool, glm::vec3> Player::SetTarget()
 
 		if (IsNear(aimPos))
 		{
-			printf("aaaaaaaa\n");
-
 			if (glm::intersectRaySphere(pos, dir, aimPos, rad, distance))
 			{
 				return std::make_tuple(true, aimPos);
 			}
-
 		}
-
 		itr++;
 	}
 
@@ -406,7 +399,6 @@ void Player::DrawTarget()
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	{
 		glDisable(GL_LIGHTING);
-		glDepthMask(GL_FALSE);
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -416,12 +408,10 @@ void Player::DrawTarget()
 		const float height = 3.0f;
 
 		//描画場所
-		glm::vec3 v;
 		unsigned int tex;
 
 		bool flag;
-		glm::vec3 pos;
-		std::tie(flag, v) = SetTarget();
+		std::tie(flag, m_targetPos) = SetTarget();
 
 		if (flag)
 		{
@@ -431,6 +421,8 @@ void Player::DrawTarget()
 		{
 			tex = oka::ImageManager::GetInstance()->GetHandle("Target");
 		}
+		//debug
+//printf("x:%fy:%fz:%f\n", m_targetPos.x, m_targetPos.y, m_targetPos.z);
 
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, tex);
@@ -439,8 +431,7 @@ void Player::DrawTarget()
 
 		glPushMatrix();
 		{
-			glTranslatef(v.x, v.y, v.z);
-
+			glTranslatef(m_targetPos.x, m_targetPos.y, m_targetPos.z);
 			glMultMatrixf((GLfloat*)&BillboardMatrix);
 			
 			glBegin(GL_QUADS);

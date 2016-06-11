@@ -60,33 +60,12 @@ void Feald::SetIndex()
 
 //-------------------------------------
 //法線の計算
-//三角ポリゴン2枚を1組として外積計算
+//
 
 void Feald::SetNormal()
 {
 	for (unsigned int i = 0; i < m_indeces ;i+=3)
 	{
-		//glm::vec3 v0 = m_vertex[m_index[i]];
-		//glm::vec3 v1 = m_vertex[m_index[i + 1]];
-		//glm::vec3 v2 = m_vertex[m_index[i + 2]];
-
-//printf("v0 x:%f y:%f z:%f\n", m_vertex[m_index[i]].x, m_vertex[m_index[i]].y, m_vertex[m_index[i]].z);
-//printf("v1 x:%f y:%f z:%f\n", m_vertex[m_index[i+1]].x, m_vertex[m_index[i + 1]].y, m_vertex[m_index[i + 1]].z);
-//printf("v2 x:%f y:%f z:%f\n", m_vertex[m_index[i + 2]].x, m_vertex[m_index[i + 2]].y, m_vertex[m_index[i + 2]].z);
-
-		//glm::vec3 v01 = v1 - v0;
-		//glm::vec3 v02 = v2 - v0;
-
-//printf("v01 x:%f y:%f z:%f\n", v01.x, v01.y, v01.z);
-//printf("v02 x:%f y:%f z:%f\n", v02.x, v02.y, v02.z);
-
-		//glm::vec3 normal= glm::cross(v01, v02);
-
-//printf("normal x:%f y:%f z:%f\n", normal.x, normal.y, normal.z);
-
-//printf("\n");
-
-		//normal = glm::normalize(normal);
 		glm::vec3 normal = glm::vec3(0, 1, 0);
 		
 		m_normal.push_back(normal);
@@ -183,71 +162,35 @@ void Feald::Draw()
 {
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	{
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glEnableClientState(GL_NORMAL_ARRAY);
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glPushMatrix();
+		{
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glEnableClientState(GL_NORMAL_ARRAY);
+			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, oka::ImageManager::GetInstance()->GetHandle("FealdTex"));
+			glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, oka::ImageManager::GetInstance()->GetHandle("FealdTex"));
 
-		auto v = m_vertex.begin();
-		glVertexPointer(3, GL_FLOAT, 0, &(*v));
+			auto v = m_vertex.begin();
+			glVertexPointer(3, GL_FLOAT, 0, &(*v));
 
-		auto n = m_normal.begin();
-		glNormalPointer(GL_FLOAT, 0, &(*n));
+			auto n = m_normal.begin();
+			glNormalPointer(GL_FLOAT, 0, &(*n));
 
-		auto t = m_tex.begin();
-		glTexCoordPointer(2, GL_FLOAT, 0, &(*t));
+			auto t = m_tex.begin();
+			glTexCoordPointer(2, GL_FLOAT, 0, &(*t));
 
-		auto i = m_index.begin();
+			auto i = m_index.begin();
 
-		glDrawElements(GL_TRIANGLES, m_indeces, GL_UNSIGNED_SHORT, &(*i));
+			glDrawElements(GL_TRIANGLES, m_indeces, GL_UNSIGNED_SHORT, &(*i));
+
+			glPopMatrix();
+		}
 	}
 	glPopAttrib();
 }
 
 void Feald::Update()
 {
-	//debug
-	//DrawNormals();
-}
 
-
-//-------------------------------------
-//debug
-void Feald::DrawNormals()
-{
-	glPushAttrib(GL_ALL_ATTRIB_BITS);
-	{
-		glDisable(GL_LIGHTING);
-
-		glm::vec3 root;
-		glm::vec3 aim;
-
-		for (unsigned int i = 0; i < m_indeces; i += 3)
-		{
-			root = (m_vertex[m_index[i]] + m_vertex[m_index[i + 1]] + m_vertex[m_index[i + 2]]) / 3.0f;
-
-			//法線根元
-			glPointSize(5);
-			glColor3f(0, 0, 1);
-			glBegin(GL_POINTS);
-			{
-				glVertex3f(root.x, root.y, root.z);
-			}
-			glEnd();
-
-
-			aim = root + m_normal[i];
-
-			//法線
-			glBegin(GL_LINES);
-			{
-				glVertex3f(root.x, root.y, root.z);
-				glVertex3f(aim.x, aim.y, aim.z);
-			}
-			glEnd();
-		}
-	}
-	glPopAttrib();
 }

@@ -1,4 +1,5 @@
 #include"Smoke.h"
+#include"../MyLibrary/Manager/ImageManager.h"
 #include"../glut.h"
 
 //-------------------------------------
@@ -11,18 +12,23 @@ Smoke::Smoke(EffectInfo _info)
 
 	for (unsigned int i = 0; i < _info.particleNum;i++)
 	{
-		float alpha = 0.5f + ((float)rand() / RAND_MAX)*0.5f;
+		float alpha = 0.5f+((float)rand() / RAND_MAX)*0.5f;
 		glm::vec3 pos = _info.basePos;
 		glm::vec3 color = _info.color;
 		glm::vec3 speed;
-		speed.x = ((float)rand() / RAND_MAX - 0.5f)*0.02f;
-		speed.y = (((float)rand() / RAND_MAX)) *0.02f;
-		speed.z = ((float)rand() / RAND_MAX - 0.5f)*0.02f;
+		speed.x = 0;
+		speed.y = (((float)rand() / RAND_MAX)) *0.05f;
+		speed.z = 0;
  
 		ParticleSP particle(new Particle(alpha, pos, color, speed));
 		m_particles.push_back(particle);
 	}
 
+}
+
+Smoke::~Smoke()
+{
+	//printf("煙が削除されました\n");
 }
 
 //-------------------------------------
@@ -42,13 +48,27 @@ SmokeSP Smoke::Create(EffectInfo _info)
 
 void Smoke::Draw()
 {
-	auto itr = m_particles.begin();
-	auto end = m_particles.end();
-
-	for (; itr != end; itr++)
+	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	{
-		(*itr)->Draw();
+		glDisable(GL_LIGHTING);
+		glDepthMask(GL_FALSE);
+
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_BLEND);
+
+		static const unsigned int tex = oka::ImageManager::GetInstance()->GetHandle("Smoke");
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, tex);
+
+		auto itr = m_particles.begin();
+		auto end = m_particles.end();
+
+		for (; itr != end; itr++)
+		{
+			(*itr)->Draw();
+		}
 	}
+	glPopAttrib();
 }
 
 //-------------------------------------
@@ -59,11 +79,20 @@ void Smoke::Update()
 	//パーティクルの更新
 	for (auto itr = m_particles.begin(); itr != m_particles.end(); itr++)
 	{
-		(*itr)->m_alpha -= 0.0005f;
+		(*itr)->m_alpha -= 0.001f;
+		//debug
+		//printf("%f\n", (*itr)->m_alpha);
 
-		(*itr)->m_transform.m_scale = (m_transform.m_scale + (*itr)->m_alpha*10.0f);
+		if ((*itr)->m_alpha <= 0.0f)
+		{
+			(*itr)->m_isActive = false;
+		}
+
+		(*itr)->m_transform.m_scale += (*itr)->m_alpha*0.1f;
 		(*itr)->m_transform.m_position = ((*itr)->m_transform.m_position + (*itr)->m_speed*(*itr)->m_alpha);
 	}
+
+
 
 	//後で変更
 	auto itr = m_particles.begin();

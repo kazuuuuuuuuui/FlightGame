@@ -19,7 +19,6 @@ public:
 	void Update() {};
 
 	Particle(float _alpha, glm::vec3 _pos,glm::vec3 m_color,glm::vec3 _speed);
-
 };
 
 #endif

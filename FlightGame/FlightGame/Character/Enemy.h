@@ -22,7 +22,7 @@ public:
 	~Enemy() 
 	{
 		//debug
-		printf("Enemy‚ğíœ‚µ‚Ü‚µ‚½\n");
+		//printf("Enemy‚ğíœ‚µ‚Ü‚µ‚½\n");
 	};
 };
 

@@ -19,6 +19,7 @@ public:
 	void Update();
 
 	Smoke(EffectInfo _info);
+	~Smoke();
 };
 
 #endif

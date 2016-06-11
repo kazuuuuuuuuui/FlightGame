@@ -65,7 +65,13 @@ void keyboardUp(unsigned char key, int x, int y)
 
 void display()
 {
-	
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+	glEnable(GL_NORMALIZE);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
 	
 //debug
 glPolygonMode(GL_FRONT_AND_BACK, g_mode);

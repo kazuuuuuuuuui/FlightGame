@@ -23,7 +23,7 @@ namespace oka
 		const float angle = MyMath::ToRadian(90.0f);
 		const glm::vec3 axis = glm::vec3(1, 0, 0);
 		m_sky->m_transform.m_rotate = MyMath::Rotate(angle, axis);
-		m_sky->m_transform.m_scale = glm::vec3(300.0f, 300.0f, 300.0f);
+		m_sky->m_transform.m_scale = glm::vec3(500.0f, 500.0f, 500.0f);
 		GameManager::GetInstance()->Add("Sky", m_sky);
 	}
 

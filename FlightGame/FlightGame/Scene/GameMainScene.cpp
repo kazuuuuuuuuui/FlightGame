@@ -95,13 +95,15 @@ GameMainScene::GameMainScene()
 
 	//debug
 	oka::ImageManager::GetInstance()->SetHandle("FealdTex", oka::LoadImage3f("grand.bmp"));
-	oka::ImageManager::GetInstance()->SetHandle("Smoke", oka::LoadImage4f("smoke.bmp"));
-	oka::ImageManager::GetInstance()->SetHandle("Target", oka::LoadImage4f("target.bmp"));
-	oka::ImageManager::GetInstance()->SetHandle("RockOn", oka::LoadImage4f("rockOn.bmp"));
+	oka::ImageManager::GetInstance()->SetHandle("Smoke", oka::LoadImage4f("smoke.bmp",true));
+	oka::ImageManager::GetInstance()->SetHandle("Target", oka::LoadImage4f("target.bmp",false));
+	oka::ImageManager::GetInstance()->SetHandle("RockOn", oka::LoadImage4f("rockOn.bmp", false));
 	oka::ImageManager::GetInstance()->SetHandle("FlyTex", oka::LoadImage3f("flyTex.bmp"));
 	oka::ImageManager::GetInstance()->SetHandle("Sky", oka::LoadImage3f("sky.bmp"));
-	oka::ImageManager::GetInstance()->SetHandle("Sea", oka::LoadImage4f("sea.bmp"));
-	oka::ImageManager::GetInstance()->SetHandle("Radar", oka::LoadImage4f("radar.bmp"));
+	oka::ImageManager::GetInstance()->SetHandle("Sea", oka::LoadImage4f("sea.bmp", false));
+	oka::ImageManager::GetInstance()->SetHandle("Radar", oka::LoadImage4f("radar.bmp", false));
+	oka::ImageManager::GetInstance()->SetHandle("Bullet", oka::LoadImage4f("bullet.bmp", false));
+
 
 	//音データ
 	oka::SoundManager::GetInstance()->AddSound("Shot", oka::Sound::LoadWavFile("Shot.wav"));
@@ -118,7 +120,7 @@ GameMainScene::GameMainScene()
 	oka::GameManager::GetInstance()->Add("Feald", feald);
 	oka::FealdManager::GetInstance()->AddFeald(feald);
 
-	//空
+	////空
 	oka::SkySP sky = oka::Sky::Create();
 	oka::GameManager::GetInstance()->Add("Sky", sky);
 
@@ -126,31 +128,23 @@ GameMainScene::GameMainScene()
 	oka::GameManager::GetInstance()->Add("Sea", oka::Sea::Create());
 
 	//キャラクターの登録
-	PlayerSP player = Player::Create(glm::vec3(0.0f, 30.0f, 0.0f));
+	PlayerSP player = Player::Create(glm::vec3(0.0f, 30.0f, -20.0f));
 	oka::CharacterManager::GetInstance()->SetPlayer(player);
 	oka::CharacterManager::GetInstance()->AddCharacter(player);
 	oka::GameManager::GetInstance()->Add("Player", player);
 	
 
 	//test
-	EnemySP enemy = Enemy::Create(glm::vec3(30.0f, 30.0f, -50.0f));
+	
+	EnemySP enemy = Enemy::Create(glm::vec3(20.0f, 30.0f, -10.0f));
 	oka::CharacterManager::GetInstance()->AddCharacter(enemy);
 	oka::GameManager::GetInstance()->Add("Enemy", enemy);
 	
-	EnemySP enemy2 = Enemy::Create(glm::vec3(80.0f, 30.0f, -80.0f));
+	/*EnemySP enemy2 = Enemy::Create(glm::vec3(80.0f, 30.0f, -80.0f));
 	oka::CharacterManager::GetInstance()->AddCharacter(enemy2);
-	oka::GameManager::GetInstance()->Add("Enemy", enemy2);
+	oka::GameManager::GetInstance()->Add("Enemy", enemy2);*/
 
 	//
-	/*EffectInfo info;
-	info.basePos = glm::vec3(0, 30.0f, -50.0f);
-	info.particleNum = 10;
-	info.color = glm::vec3(50.0f / 255.0f, 50.0f / 255.0f, 50.0f / 255.0f);
-	info.scale = glm::vec3(1, 1, 1);		
-
-	SmokeSP smoke = Smoke::Create(info);
-	oka::GameManager::GetInstance()->Add("Smoke", smoke);*/
-
 };
 
 
@@ -186,20 +180,13 @@ void GameMainScene::Update()
 }
 
 void GameMainScene::Render()
-{
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-
-	glEnable(GL_NORMALIZE);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	
+{	
+	//カメラの注視点
+	glm::vec3 target = oka::CharacterManager::GetInstance()->m_player->m_transform.m_position;
 	glm::vec3 toVec = oka::CharacterManager::GetInstance()->m_player->m_transform.m_myToVec;
 	glm::vec3 upVec = oka::CharacterManager::GetInstance()->m_player->m_transform.m_myUpVec;
 
-	//カメラの注視点
-	glm::vec3 target = oka::CharacterManager::GetInstance()->m_player->m_transform.m_position;
+
 
 	//カメラの座標
 	glm::vec3 pos;
@@ -231,10 +218,25 @@ void GameMainScene::Render()
 		itr++;
 	}
 
+	glPushAttrib(GL_ALL_ATTRIB_BITS);
+	{
+		glDisable(GL_LIGHTING);
+
+		glLineWidth(3);
+		glColor3f(1, 1, 0);
+		glBegin(GL_LINES);
+		{
+			glVertex3f(-200, 2.0f, 0);
+			glVertex3f(-200, 2.0f,-455);
+		}
+		glEnd();
+	}
+	glPopAttrib();
+
 	//変えたい
 	oka::CharacterManager::GetInstance()->m_player->DrawTarget();
 
-	//文字
+	
 	const float left = 0.0f;
 	const float right = (float)oka::Screen::GetInstance()->GetWidth();
 	const float bottom = 0.0f;

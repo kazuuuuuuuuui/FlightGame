@@ -22,7 +22,7 @@ namespace oka
 	//
 
 	unsigned int LoadImage3f(const char *_fileName);
-	unsigned int LoadImage4f(const char *_filename);
+	unsigned int LoadImage4f(const char *_filename, bool _grayscale);
 
 }
 

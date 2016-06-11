@@ -1,5 +1,9 @@
 #include"Bullet.h"
+#include"../MyLibrary/Manager/GameManager.h"
 #include"../MyLibrary/Manager/CharacterManager.h"
+#include"../MyLibrary/Manager/ImageManager.h"
+#include"../Effect/EffectInfo.h"
+#include"../Effect/Smoke.h"
 #include"../glut.h"
 
 //-------------------------------------
@@ -41,14 +45,19 @@ BulletSP Bullet::Create(glm::vec3 _pos, glm::mat4 _rotate, glm::vec3 _speed)
 
 void Bullet::Draw()
 {
-	glPushMatrix();
+	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	{
-		//s—ñ“K‰ž
-		glMultMatrixf((GLfloat*)&m_transform.m_matrix);
+		glPushMatrix();
+		{
+			glMultMatrixf((GLfloat*)&m_transform.m_matrix);
 
-		glutSolidCube(0.2);
+			glScalef(1, 1, 10);
+
+			glutSolidSphere(0.2, 10, 10);
+		}
+		glPopMatrix();
 	}
-	glPopMatrix();
+	glPopAttrib();
 }
 
 //-------------------------------------
@@ -60,8 +69,6 @@ void Bullet::Update()
 
 	//‚ ‚é’ö“x‚Ì‹——£—£‚ê‚½‚ç”ñŠˆ«‚É‚·‚é
 	const float distance = 500;
-//printf("%f\n", glm::length(m_transform.m_position - m_originPos));
-
 	if (glm::length(m_transform.m_position - m_originPos) >= distance )
 	{
 		m_isActive = false;
@@ -72,8 +79,15 @@ void Bullet::Update()
 	{
 		if (IsIntersectGround())
 		{
-			//oka::GameManager::GetInstance()->Add("Smoke", Smoke::Create(m_transform.m_position));
-			//m_isActive = false;
+			EffectInfo info;
+			info.basePos = m_transform.m_position;
+			info.particleNum = 1;
+			info.color = glm::vec3(211.0f / 255.0f, 183.0f / 255.0f, 138.0f / 255.0f);
+
+			SmokeSP smoke = Smoke::Create(info);
+			oka::GameManager::GetInstance()->Add("Smoke", smoke);
+
+			m_isActive = false;
 		}
 	}
 

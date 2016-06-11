@@ -1,6 +1,7 @@
 #define _USE_MATH_DEFINES
 #include<math.h>
 #include"Enemy.h"
+#include"../MyLibrary/Math/MyMath.h"
 #include"../MyLibrary/Manager/GameManager.h"
 #include"../MyLibrary/Manager/BulletManager.h"
 #include"../MyLibrary/Manager/CharacterManager.h"
@@ -45,6 +46,9 @@ EnemySP Enemy::Create(glm::vec3 _pos)
 
 void Enemy::Update()
 {
+	static float speed = -0.1f;
+	m_speed.z = speed;
+
 	//座標更新
 	m_speed += m_accel;
 	m_transform.m_position += m_speed;
@@ -60,11 +64,6 @@ void Enemy::Update()
 
 	const glm::mat4 translate = glm::translate(glm::vec3(0.0f, 0.3f, -5.2f));
 
-	//static float angle = 0.0f;
-	//angle += oka::MyMath::ToRadian(2.0f);
-	//const glm::vec3 axis = glm::vec3(0, 1, 0);
-	//const glm::mat4 rotate = glm::rotate(angle, axis);
-
 	const glm::mat4 scale = glm::scale(glm::vec3(2, 2, 2));
 
 	offSet = translate*scale;
@@ -79,24 +78,32 @@ void Enemy::Update()
 
 	if (m_isHitAttack)
 	{
-		//書き換え
-		m_hp -= 100;
+		m_transform.m_rotate *= oka::MyMath::Rotate(oka::MyMath::ToRadian(3.0f), m_transform.m_myToVec);
+		
+		m_speed.y = -0.1f;
+
+		if (0 == (m_flame % 40))
+		{
+			EffectInfo info;
+			info.basePos = m_transform.m_position;
+			info.particleNum = 2;
+			info.color = glm::vec3(50.0f / 255.0f, 50.0f / 255.0f, 50.0f / 255.0f);
+
+			SmokeSP smoke = Smoke::Create(info);
+			oka::GameManager::GetInstance()->Add("Smoke", smoke);
+		}
 	}
 
-	m_isHitAttack = false;
-
-
 	//debug
-	glm::vec3 pos = m_transform.m_position;
+	//glm::vec3 pos = m_transform.m_position;
 	//printf("x:%f,y:%f,z:%f\n", pos.x, pos.y, pos.z);
 
-
-
-	//フィールドとの判定
 	if (IsGroundOut())
 	{
-		//debug
-		//printf("出てるよおおおおおおおおおお\n");
+		if (IsIntersectSea())
+		{
+			m_hp = 0;
+		}
 	}
 	else
 	{
@@ -104,8 +111,6 @@ void Enemy::Update()
 
 		if (IsIntersectGround())
 		{
-			//debug
-			//printf("地面に当たってるよおおおおおおおお\n");
 			m_hp = 0;
 		}
 	}
@@ -123,8 +128,13 @@ void Enemy::Update()
 			oka::SoundManager::GetInstance()->Play("Explode");
 
 			//爆発エフェクト
-			//oka::GameManager::GetInstance()->Add("Smoke", Smoke::Create(m_transform.m_position));
-			//oka::GameManager::GetInstance()->Add("Fire", Fire::Create(m_transform.m_position));
+			EffectInfo info;
+			info.basePos = m_transform.m_position;
+			info.particleNum = 10;
+			info.color = glm::vec3(0, 0, 0);
+
+			SmokeSP smoke = Smoke::Create(info);
+			oka::GameManager::GetInstance()->Add("Smoke", smoke);
 		}
 	}
 }
@@ -137,9 +147,6 @@ void Enemy::Shot()
 	const glm::vec3 v = m_transform.m_position - oka::CharacterManager::GetInstance()->m_player->m_transform.m_position;
 	float volume = glm::length(v);
 	volume = 20.0f / volume;
-
-//debug
-//printf("%f\n", volume);
 
 	oka::SoundManager::GetInstance()->ChangeVolume("Shot", volume);
 	oka::SoundManager::GetInstance()->Play("Shot");
@@ -178,19 +185,6 @@ void Enemy::Control()
 			Shot();
 		}
 	}
-	
-	/*glm::vec3 v = m_aimPos - m_transform.m_position;
-
-	if (glm::length(v) <= 5.0f)
-	{
-		ResetAimPos();
-	}
-
-	v = glm::normalize(v);
-	v *= 0.01f;*/
-	//m_accel = v;
-//printf("x:%f,y:%f,z:%f\n", m_transform.m_position.x, m_transform.m_position.y, m_transform.m_position.z);
-
 }
 
 //-------------------------------------

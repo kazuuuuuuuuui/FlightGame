@@ -23,6 +23,7 @@ public:
 
 	//test
 	void HomingShot(unsigned short _downKeys);
+	glm::vec3 m_targetPos;
 
 	bool IsNear(glm::vec3 _pos)const;
 	void DrawTarget();

@@ -10,8 +10,6 @@
 #include"../MyLibrary/Manager/ModelManager.h"
 #include"../MyLibrary/Manager/BulletManager.h"
 #include"../MyLibrary/Manager/FealdManager.h"
-//#include"../MyLibrary/Input/Keyboard.h"
-//#include"Player.h"
 #include"../glut.h"
 
 
@@ -97,10 +95,24 @@ bool Character::IsIntersectGround()const
 
 	const float height = oka::FealdManager::GetInstance()->m_feald->m_vertex[z * width + x].y;
 
-//debug
-//printf("h:%f\n", height);
-
 	if ( y <= height)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+//-------------------------------------
+//ŠC‚Æ‚ÌÕ“Ë”»’è
+//ŠC‚ÌŠC”²(yÀ•W0)‚Æ
+//Ž©g‚ÌyÀ•W’l‚Å”äŠr‚·‚é
+
+bool Character::IsIntersectSea()const
+{
+	const float y = m_transform.m_position.y;
+
+	if (y <=0)
 	{
 		return true;
 	}
