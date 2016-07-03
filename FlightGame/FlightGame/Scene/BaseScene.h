@@ -8,7 +8,7 @@ public:
 	virtual void Render() = 0;
 
 	BaseScene() {};
-	~BaseScene() {};
+	virtual ~BaseScene() {};
 };
 
 #endif

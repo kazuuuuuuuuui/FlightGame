@@ -1,17 +1,19 @@
 #include"CharacterManager.h"
+#include"../../MyLibrary/Manager/GameManager.h"
+#include"../../Character/Enemy.h"
 
 namespace oka
 {
 	CharacterManager* CharacterManager::m_instance = nullptr;
+	const unsigned int CharacterManager::m_maxEnemyNum = 10;//一度に出現する敵の数
 
 	//-------------------------------------
 	//コンストラクタ
 
 	CharacterManager::CharacterManager():
+		m_flame(0),
 		m_player(nullptr)
 	{
-		printf("キャラクターマネージャー生成\n");
-		printf("\n");
 
 	}
 
@@ -21,46 +23,23 @@ namespace oka
 
 	CharacterManager::~CharacterManager()
 	{
-		//debug
-		printf("キャラクターマネージャー削除\n");
-		printf("\n");
-
 		m_characters.clear();
-
 	};
 
-
 	//-------------------------------------
-	//シングルトンにするためインスタンスがない場合のみnewし
-	//既にインスタンスがある場合はそのインスタンスをそのまま返す
-
-	CharacterManager* CharacterManager::GetInstance()
-	{
-		if (nullptr == m_instance)
-		{
-			m_instance = new CharacterManager();
-		}
-
-		return m_instance;
-	}
-
-
-	//-------------------------------------
-	//自身がnullptrでない場合自分自身を破棄する
-
-	void CharacterManager::Destroy()
-	{
-		if (m_instance)
-		{
-			delete m_instance;
-			m_instance = nullptr;
-		}
-	}
+	//更新
 
 	void CharacterManager::Update()
 	{
+		m_flame++;
+
 		CheckPlayer();
 		CheckCharacters();
+
+		if (0 == m_flame % (60 * 3))
+		{
+			Respawn();
+		}
 	}
 
 	//-------------------------------------
@@ -84,7 +63,7 @@ namespace oka
 	}
 
 	//-------------------------------------
-	//
+	//プレイヤーの活性状態を確認する
 
 	void CharacterManager::CheckPlayer()
 	{
@@ -92,7 +71,7 @@ namespace oka
 		{
 			if (m_player->IsActive())
 			{
-
+			
 			}
 			else
 			{
@@ -102,7 +81,7 @@ namespace oka
 	}
 
 	//--------------------------------------------
-	//
+	//キャラクターの活性状態を確認する
 
 	void CharacterManager::CheckCharacters()
 	{
@@ -121,6 +100,22 @@ namespace oka
 
 			itr++;
 
+		}
+	}
+
+	//-------------------------------------
+	//フレームに1回既定の敵の出現数に満たなければ
+	//再出現させる
+
+	void CharacterManager::Respawn()
+	{
+		const unsigned int enemyNum = m_characters.size() + 1;
+
+		if (enemyNum < m_maxEnemyNum)
+		{
+			EnemySP enemy = Enemy::Create();
+			m_characters.push_back(enemy);
+			oka::GameManager::GetInstance()->Add("Enemy", enemy);
 		}
 	}
 

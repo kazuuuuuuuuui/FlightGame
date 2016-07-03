@@ -5,26 +5,71 @@ namespace oka
 {
 	JoysticManager* JoysticManager::m_instance = nullptr;
 
-	//-------------------------------------------------------------------------------------------------------
-	//ジョイスティックのインスタンス取得
+	//-------------------------------------
+	//コンストラクタ
 
-	JoysticManager* JoysticManager::GetInstance()
+	JoysticManager::JoysticManager()
 	{
-		if (nullptr == m_instance)
-		{
-			m_instance = new JoysticManager();
-		}
 
-		return m_instance;
 	}
+
+	//-------------------------------------
+	//デストラクタ
+
+	JoysticManager::~JoysticManager()
+	{
+		m_contoroller.clear();
+	}
+
+	////-------------------------------------------------------------------------------------------------------
+	////ジョイスティックのインスタンス取得
+
+	//JoysticManager* JoysticManager::GetInstance()
+	//{
+	//	if (nullptr == m_instance)
+	//	{
+	//		m_instance = new JoysticManager();
+	//	}
+
+	//	return m_instance;
+	//}
+
+	////-------------------------------------
+	////自身がnullptrでない場合自分自身を破棄する
+
+	//void JoysticManager::Destroy()
+	//{
+	//	if (m_instance)
+	//	{
+	//		delete m_instance;
+	//		m_instance = nullptr;
+	//	}
+	//}
 
 
 	//-------------------------------------
 	//コントローラを管理しているベクターに入れる
 
-	void JoysticManager::AddController(Contoroller *_controller)
+	void JoysticManager::SetController(Contoroller *_controller)
 	{
 		m_contoroller.push_back(_controller);
+	}
+
+	//-------------------------------------
+	//引数として受け取った数番目の
+	//コントローラーへのポインタを返す
+	//参照先がnullptrならばassert
+
+	Contoroller* JoysticManager::GetController(unsigned int _num)const
+	{
+		if (nullptr == m_contoroller[_num])
+		{
+			return nullptr;
+		}
+		else
+		{
+			return m_contoroller[_num];
+		}
 	}
 
 	
@@ -49,7 +94,4 @@ namespace oka
 		}
 
 	}
-
-
-
 }

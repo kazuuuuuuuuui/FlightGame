@@ -2,17 +2,14 @@
 #define PLAYER_H_
 
 #include"Character.h"
-#include"../MyLibrary/Manager/JoysticManager.h"
 
 class Player;
 typedef std::shared_ptr<Player> PlayerSP;
 
 class Player :public Character
 {
-public:
-	oka::Contoroller *m_controller;
-
-	static PlayerSP Create(glm::vec3 _pos);
+public:	
+	static PlayerSP Create();
 	virtual void Update();
 	void Control();
 	void Control(unsigned short _pressedKey, unsigned int _downKeys, float _sThumbLX, float _sThumbLY);
@@ -20,17 +17,25 @@ public:
 	void Accel(unsigned short _pressedKey);
 	void Shot();
 	void Shot(unsigned short _downKeys);
-
-	//test
 	void HomingShot(unsigned short _downKeys);
-	glm::vec3 m_targetPos;
-
-	bool IsNear(glm::vec3 _pos)const;
+	void DrawRadarPos()override;
+	void DrawMyScore()const;
 	void DrawTarget();
-	std::tuple<bool,glm::vec3> SetTarget();
+	unsigned int GetMyScore()const;
+	void PlusMyScore();
+	std::tuple<bool,glm::vec3*> SetTarget();
 	
-	Player(glm::vec3 _pos);
+	Player();
 	~Player();
+
+private:
+	unsigned int m_score;
+	oka::Contoroller *m_controller;
+	bool m_isRockOn;
+	glm::vec3 *m_target;
+	
+
+
 };
 
 #endif

@@ -13,12 +13,10 @@ typedef std::shared_ptr<Character> CharacterSP;
 class Character :public oka::GameObject
 {
 public:
-	oka::MeshSP m_body;
-	oka::MeshSP m_propeller;	
+	oka::MeshSP m_body;	
+	bool m_isHitAttack;
 
 	glm::vec2 m_onRadarPos;
-	bool m_isHitAttack;
-	unsigned int m_hp;
 
 	glm::vec3 m_speed;
 	glm::vec3 m_accel;
@@ -27,10 +25,12 @@ public:
 	virtual void Control() = 0;
 	
 	void SetOnRadarPos();
+	virtual void DrawRadarPos();
+	//bool IsFealdOut()const;
 	bool IsGroundOut()const;
 	bool IsIntersectGround()const;
 	bool IsIntersectSea()const;
-	bool IsDead()const;
+	bool IsNear(glm::vec3 _pos,float _distance)const;
 
 	Character();
 };

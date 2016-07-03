@@ -20,8 +20,12 @@ namespace oka
 	private:
 		static SceneManager* m_instance;
 
-		void GameMain(float _delta);
-		void Pause(float _delta);
+		void Title(float _delta);
+		void Game(float _delta);
+		void TimeUp(float _delta);
+		void GameOver(float _delta);
+		void Result(float _delta);
+		void End(float _delta);
 			 
 		SceneManager();		
 

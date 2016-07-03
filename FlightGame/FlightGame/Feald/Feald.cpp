@@ -7,6 +7,38 @@
 #include"../MyLibrary/Image/BmpImage.h"
 #include"../glut.h"
 
+Feald::Feald() :
+	m_width(256),
+	m_height(256),
+	m_leftBottom(glm::vec3(-200.0f, 2.0f, 180.0f)),
+	m_rightBottom(glm::vec3(400.0f, 2.0f, 180.0f)),
+	m_leftTop(glm::vec3(-200.0f, 2.0f, -450.0f)),
+	m_rightTop(glm::vec3(400.0f, 2.0f, -450.0f))
+{
+	//頂点データ
+	SetVertex();
+
+	//インデックスデータ
+	SetIndex();
+
+	//頂点の高さ設定
+	SetHeight("heightmap.bmp");
+
+	//法線データ
+	SetNormal();
+
+	//uvデータ
+	SetTex();
+
+};
+
+Feald::~Feald()
+{
+	//debug
+	printf("フィールドが削除されました\n");
+	printf("\n");
+};
+
 //-------------------------------------
 //フィールドの生成
 //戻り値としてFealdへのsharedポインタを返す
@@ -44,13 +76,13 @@ void Feald::SetIndex()
 	{
 		for (int x = 0; x < (m_width - 1); x++)
 		{
-			m_index.push_back(0 + x + m_height * z);//0
-			m_index.push_back(1 + x + m_height * z);//1
-			m_index.push_back(m_width + x + m_height * z);//256
+			m_index.push_back(0 + x + m_height * z);
+			m_index.push_back(1 + x + m_height * z);
+			m_index.push_back(m_width + x + m_height * z);
 		
-			m_index.push_back(1 + x + m_height * z);//1
-			m_index.push_back((m_width + 1) + x + m_height * z);//257
-			m_index.push_back(m_width + x + m_height * z);//256
+			m_index.push_back(1 + x + m_height * z);
+			m_index.push_back((m_width + 1) + x + m_height * z);
+			m_index.push_back(m_width + x + m_height * z);
 		}
 	}
 
@@ -59,8 +91,7 @@ void Feald::SetIndex()
 }
 
 //-------------------------------------
-//法線の計算
-//
+//法線の設定
 
 void Feald::SetNormal()
 {
@@ -145,7 +176,7 @@ void Feald::SetHeight(const char *_fileName)
 			height /= 255.0f;//0.0～1.0f;
 
 			//最高座標点
-			const int max = 15.0f;
+			const int max = 20.0f;
 			height *= max;//0.0～max
 
 			m_vertex[z*bih.biWidth + x].y = height;
@@ -188,9 +219,4 @@ void Feald::Draw()
 		}
 	}
 	glPopAttrib();
-}
-
-void Feald::Update()
-{
-
 }

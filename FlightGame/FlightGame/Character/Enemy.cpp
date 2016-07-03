@@ -1,44 +1,83 @@
 #define _USE_MATH_DEFINES
 #include<math.h>
+#include<random>
 #include"Enemy.h"
 #include"../MyLibrary/Math/MyMath.h"
 #include"../MyLibrary/Manager/GameManager.h"
 #include"../MyLibrary/Manager/BulletManager.h"
 #include"../MyLibrary/Manager/CharacterManager.h"
 #include"../MyLibrary/Manager/SoundManager.h"
+#include"../MyLibrary/Manager/FealdManager.h"
 #include"../Effect/Fire.h"
 #include"../Effect/Smoke.h"
 #include"../glm/gtx/transform.hpp"
 #include"../glm/gtx/intersect.hpp"
 #include"../glut.h"
 
+
+glm::quat RotationBetweenVectors(glm::vec3 start, glm::vec3 dest) 
+{
+	start = glm::normalize(start);
+	dest = glm::normalize(dest);
+
+	glm::vec3 rotationAxis = glm::cross(start, dest);
+	float angle = glm::length(rotationAxis);
+
+	//回転軸がないときは何もしない
+	if (angle < 0.1f)
+	{
+		return glm::angleAxis(0.0f, glm::vec3(0.0f, 1.0f, 0.0f));//何もしないので回転軸は何でもいい
+	}
+	
+	return glm::angleAxis(angle, glm::normalize(rotationAxis));
+}
+
 //-------------------------------------
 //コンストラクタ
 
-Enemy::Enemy(glm::vec3 _pos)
+Enemy::Enemy()
 {
-	const float x_max = 256.0f;
-	m_aimPos.x = ((float)rand() / RAND_MAX)*x_max;
+	static float left = oka::FealdManager::GetInstance()->m_feald->m_leftBottom.x;
+	static float right = oka::FealdManager::GetInstance()->m_feald->m_rightBottom.x;
+	static float front = oka::FealdManager::GetInstance()->m_feald->m_leftBottom.z;
+	static float back = oka::FealdManager::GetInstance()->m_feald->m_rightTop.z;
 
-	const float bottom = 20.0f;
-	m_aimPos.y = bottom + ((float)rand() / RAND_MAX)*10.0f;
+	std::random_device rnd;
+	std::mt19937 mt(rnd());	
+	std::uniform_int_distribution<> x(left, right);
+	std::uniform_int_distribution<> y(50, 100);
+	std::uniform_int_distribution<> z(back, front);
 
-	const float z_max = -256.0f;
-	m_aimPos.z = ((float)rand() / RAND_MAX)*z_max;
+	m_transform.m_position.x = x(mt);
+	m_transform.m_position.y = y(mt);
+	m_transform.m_position.z = z(mt);
 
+	//m_transform.m_position = glm::vec3(0.0f, 30.0f, 0.0f);
 
-	m_transform.m_position = _pos;
+	//m_aimPos = glm::vec3(0.0f, 100.0f, -100.0f);
+
+	m_aimPos = m_transform.m_position;
 }
-
 
 //-------------------------------------
 //敵の生成
 
-EnemySP Enemy::Create(glm::vec3 _pos)
+EnemySP Enemy::Create()
 {
-	EnemySP enemy(new Enemy(_pos));
+	EnemySP enemy(new Enemy());
 
 	return enemy;
+}
+
+void Enemy::Draw()
+{
+	/*glPushMatrix();
+	{
+		glTranslatef(m_aimPos.x, m_aimPos.y, m_aimPos.z);
+
+		glutSolidTeapot(1);
+	}
+	glPopMatrix();*/
 }
 
 //-------------------------------------
@@ -46,97 +85,99 @@ EnemySP Enemy::Create(glm::vec3 _pos)
 
 void Enemy::Update()
 {
-	static float speed = -0.1f;
-	m_speed.z = speed;
-
 	//座標更新
-	m_speed += m_accel;
+	m_speed = m_transform.m_myToVec*0.2f + m_accel;
 	m_transform.m_position += m_speed;
 
+	SetOnRadarPos();
+
 	//慣性
-	m_speed *= 0.965f;
+	//m_accel *= 0.98f;
+	//m_speed *= 0.98f;
+
+	const float length = glm::length(m_aimPos - m_transform.m_position);
+	
+	if (length < 10.0f)
+	{
+		ResetAimPos();
+	}
 
 	//ボディ
 	m_body->m_transform = m_transform;
 
-	//オフセット計算
-	glm::mat4 offSet;
-
-	const glm::mat4 translate = glm::translate(glm::vec3(0.0f, 0.3f, -5.2f));
-
-	const glm::mat4 scale = glm::scale(glm::vec3(2, 2, 2));
-
-	offSet = translate*scale;
-
-	//プロペラ
-	m_propeller->m_transform = m_transform;
-	m_propeller->m_transform.m_matrix = m_transform.m_matrix * offSet;
-
-
 	Control();
-
 
 	if (m_isHitAttack)
 	{
-		m_transform.m_rotate *= oka::MyMath::Rotate(oka::MyMath::ToRadian(3.0f), m_transform.m_myToVec);
-		
-		m_speed.y = -0.1f;
-
-		if (0 == (m_flame % 40))
-		{
-			EffectInfo info;
-			info.basePos = m_transform.m_position;
-			info.particleNum = 2;
-			info.color = glm::vec3(50.0f / 255.0f, 50.0f / 255.0f, 50.0f / 255.0f);
-
-			SmokeSP smoke = Smoke::Create(info);
-			oka::GameManager::GetInstance()->Add("Smoke", smoke);
-		}
+		Fall();
 	}
-
-	//debug
-	//glm::vec3 pos = m_transform.m_position;
-	//printf("x:%f,y:%f,z:%f\n", pos.x, pos.y, pos.z);
 
 	if (IsGroundOut())
 	{
 		if (IsIntersectSea())
 		{
-			m_hp = 0;
+			m_isActive = false;
+			m_body->m_isActive = false;
 		}
 	}
 	else
 	{
-		SetOnRadarPos();
-
 		if (IsIntersectGround())
 		{
-			m_hp = 0;
+			m_isActive = false;
+			m_body->m_isActive = false;
 		}
 	}
 
 	//死亡判定
-	if (m_isActive)
+	if (!m_isActive)
 	{
-		if (IsDead())
+		//爆発音
+		oka::SoundManager::GetInstance()->Play("Explode");
+
+		//爆発エフェクト
+		EffectInfo smokeInfo;
+		smokeInfo.basePos = m_transform.m_position;
+		smokeInfo.particleNum = 5;
+		smokeInfo.color = glm::vec3(0, 0, 0);
+		SmokeSP smoke = Smoke::Create(smokeInfo);
+		oka::GameManager::GetInstance()->Add("Smoke", smoke);
+
+		EffectInfo fireInfo;
+		fireInfo.basePos = m_transform.m_position;;
+		fireInfo.particleNum = 20;
+		fireInfo.color = glm::vec3(1.0f, 0.5f, 0.25f);
+		FireSP fire = Fire::Create(fireInfo);
+		oka::GameManager::GetInstance()->Add("Fire", fire);
+
+		oka::CharacterManager::GetInstance()->m_player->PlusMyScore();
+
+	}
+}
+
+//-------------------------------------
+//前方にplayerがいるか判定する
+//引数としてplayerの座標をもらう
+
+bool Enemy::IsFrontPlayer(glm::vec3 pos)const
+{
+	static float dis = 80.0f;
+
+	if (IsNear(pos, dis))
+	{
+		const glm::vec3 pos = m_transform.m_position;
+		const glm::vec3 dir = m_transform.m_myToVec;
+		const glm::vec3 aimPos = oka::CharacterManager::GetInstance()->m_player->m_transform.m_position;
+		const float rad = 100.0f;
+		float distance;
+
+		if (glm::intersectRaySphere(pos, dir, aimPos, rad, distance))
 		{
-			m_isActive = false;
-			m_body->m_isActive = false;
-			m_propeller->m_isActive = false;
-
-			//爆発音
-			oka::SoundManager::GetInstance()->Play("Explode");
-
-			//爆発エフェクト
-			EffectInfo info;
-			info.basePos = m_transform.m_position;
-			info.particleNum = 10;
-			info.color = glm::vec3(0, 0, 0);
-
-			SmokeSP smoke = Smoke::Create(info);
-			oka::GameManager::GetInstance()->Add("Smoke", smoke);
+			return true;
 		}
 	}
+	
+	return false;
 }
 
 //-------------------------------------
@@ -144,26 +185,33 @@ void Enemy::Update()
 
 void Enemy::Shot()
 {
-	const glm::vec3 v = m_transform.m_position - oka::CharacterManager::GetInstance()->m_player->m_transform.m_position;
-	float volume = glm::length(v);
-	volume = 20.0f / volume;
+	if ( false == m_isHitAttack)
+	{
 
-	oka::SoundManager::GetInstance()->ChangeVolume("Shot", volume);
-	oka::SoundManager::GetInstance()->Play("Shot");
+		if (0 == (m_flame % 10))
+		{
+			const glm::vec3 v = m_transform.m_position - oka::CharacterManager::GetInstance()->m_player->m_transform.m_position;
+			float volume = glm::length(v);
+			volume = 20.0f / volume;
 
-	glm::vec3 pos;
-	const float distance = 2.0f;//自機と弾発射点の間隔
-	pos = m_transform.m_position + m_transform.m_myToVec*distance;
+			oka::SoundManager::GetInstance()->ChangeVolume("Shot", volume);
+			oka::SoundManager::GetInstance()->Play("Shot");
 
-	glm::vec3 speed;
-	const float value = 5.0f;//弾のスピード補完値
-	speed = m_transform.m_myToVec * value;
+			glm::vec3 pos;
+			const float distance = 2.0f;//自機と弾発射点の間隔
+			pos = m_transform.m_position + m_transform.m_myToVec*distance;
 
-	glm::mat4 mat = m_transform.m_rotate;
+			glm::vec3 speed;
+			const float value = 5.0f;//弾のスピード補完値
+			speed = m_transform.m_myToVec * value;
 
-	BulletSP bullet = Bullet::Create(pos, mat, speed);
-	oka::BulletManager::GetInstance()->AddBullet(bullet);
-	oka::GameManager::GetInstance()->Add("Bullet", bullet);
+			glm::tquat<float> quat = m_transform.m_rotate;
+
+			BulletSP bullet = Bullet::Create(pos, quat, speed);
+			oka::BulletManager::GetInstance()->AddBullet(bullet);
+			oka::GameManager::GetInstance()->Add("Bullet", bullet);
+		}
+	}
 }
 
 //-------------------------------------
@@ -171,20 +219,171 @@ void Enemy::Shot()
 
 void Enemy::Control()
 {
-	const glm::vec3 pos = m_transform.m_position;
-	const glm::vec3 dir = m_transform.m_myToVec;
-	const glm::vec3 aimPos = oka::CharacterManager::GetInstance()->m_player->m_transform.m_position;
-	const float rad = 50.0f;
-	float distance;
+	/*glm::vec3 v = m_transform.m_position + m_transform.m_myToVec;
 
-	if (glm::intersectRaySphere(pos, dir, aimPos, rad, distance))
+	float dy = m_aimPos.y - v.y;
+	dy = abs(dy);
+
+	float dz = m_aimPos.z - v.z;
+	dz = abs(dz);
+	
+	float angle = atan2f(dy, dz);
+	angle = glm::degrees(angle);
+printf("%f\n", angle);
+
+	if (angle > 5.0f)
 	{
-		//20Fに1回弾発射
-		if (0 == (m_flame % 10))
+		m_Controller.m_stickDown = true;
+	}
+	else
+	{
+		m_Controller.m_stickDown = false;
+	}*/
+
+
+	//const float value = oka::MyMath::ToRadian(0.8f);
+	//glm::tquat<float> quat;
+
+	//Roll
+	/*if (_pressedKey & XINPUT_GAMEPAD_RIGHT_SHOULDER)
+	{
+		quat = oka::MyMath::Rotate(-value, glm::vec3(0, 1, 0));
+
+		m_transform.m_rotate *= quat;
+
+	}
+	else if (_pressedKey & XINPUT_GAMEPAD_LEFT_SHOULDER)
+	{
+		quat = oka::MyMath::Rotate(value, glm::vec3(0, 1, 0));
+
+		m_transform.m_rotate *= quat;
+	}*/
+
+	//Yaw
+	/*if (_sThumbLX > 0.5f)
+	{
+		quat = oka::MyMath::Rotate(value, glm::vec3(0, 0, -1));
+
+		m_transform.m_rotate *= quat;
+
+	}
+	else if (_sThumbLX < -0.5f) {
+		quat = oka::MyMath::Rotate(-value, glm::vec3(0, 0, -1));
+
+		m_transform.m_rotate *= quat;
+	}*/
+
+	//Pitch
+	/*if (m_Controller.m_stickUp)
+	{
+		quat = oka::MyMath::Rotate(-value, glm::vec3(1, 0, 0));
+
+		m_transform.m_rotate *= quat;
+	}
+	else if (m_Controller.m_stickDown)
+	{
+		quat = oka::MyMath::Rotate(value, glm::vec3(1, 0, 0));
+
+		m_transform.m_rotate *= quat;
+	}*/
+
+
+
+	if (nullptr != oka::CharacterManager::GetInstance()->m_player)
+	{
+		const glm::vec3 pos = oka::CharacterManager::GetInstance()->m_player->m_transform.m_position;
+
+		if (IsFrontPlayer(pos))
 		{
+			Chase();
 			Shot();
 		}
+		else
+		{
+			Patrol();
+		}
 	}
+	else
+	{
+		Patrol();
+	}
+}
+
+//-------------------------------------
+//移動スピードの設定
+//被弾していないときのみ更新する
+
+void Enemy::Patrol()
+{
+	if (false == m_isHitAttack)
+	{
+		glm::vec3 accel = m_aimPos - m_transform.m_position;
+		accel = glm::normalize(accel);
+
+		m_accel = accel*0.02f;
+		
+		glm::vec3 start = m_transform.m_myToVec;
+		glm::vec3 dest = accel;
+
+		glm::tquat<float>quat = RotationBetweenVectors(start, dest);
+		m_transform.m_rotate = quat * m_transform.m_rotate;
+	}
+}
+
+//-------------------------------------
+//playerの追跡
+
+void Enemy::Chase()
+{
+	const glm::vec3 aimPos = oka::CharacterManager::GetInstance()->m_player->m_transform.m_position;
+	glm::vec3 v = aimPos - m_transform.m_position;
+
+	float length = glm::length(v);
+	const float distance = 30.0f;
+
+	v = glm::normalize(v);
+
+	//近すぎたら止まる
+	if (length < distance)
+	{
+		m_accel = glm::vec3(0.0f, 0.0f, 0.0f);
+	}
+	else
+	{
+		v *= 0.05f;
+		m_accel = v;	
+	}
+
+	glm::vec3 start = m_transform.m_myToVec;
+	glm::vec3 dest = v;
+
+	glm::tquat<float>quat = RotationBetweenVectors(start, dest);
+	m_transform.m_rotate = quat * m_transform.m_rotate;
+}
+
+//-------------------------------------
+//弾と接触した際の墜落処理
+
+void Enemy::Fall()
+{
+	const glm::tquat<float> quat = oka::MyMath::Rotate(oka::MyMath::ToRadian(3.0f), glm::vec3(0, 0, -1));
+	m_transform.m_rotate *= quat;
+
+	//m_accel = glm::vec3(0.0f, 0.0f, 0.0f);
+
+	m_transform.m_position.y -= 0.5f;
+
+	if (0 == (m_flame % 5))
+	{
+		EffectInfo info;
+		info.basePos = m_transform.m_position;
+		info.particleNum = 1;
+		info.color = glm::vec3(50.0f / 255.0f, 50.0f / 255.0f, 50.0f / 255.0f);
+
+		SmokeSP smoke = Smoke::Create(info);
+		oka::GameManager::GetInstance()->Add("Smoke", smoke);
+	}
+
 }
 
 //-------------------------------------
@@ -192,12 +391,18 @@ void Enemy::Control()
 
 void Enemy::ResetAimPos()
 {
-	const float x_max = 256.0f;
-	m_aimPos.x = ((float)rand() / RAND_MAX)*x_max;
+	static float left = oka::FealdManager::GetInstance()->m_feald->m_leftBottom.x;
+	static float right = oka::FealdManager::GetInstance()->m_feald->m_rightBottom.x;
+	static float front = oka::FealdManager::GetInstance()->m_feald->m_leftBottom.z;
+	static float back = oka::FealdManager::GetInstance()->m_feald->m_rightTop.z;
 
-	const float bottom = 20.0f;
-	m_aimPos.y = bottom + ((float)rand() / RAND_MAX)*10.0f;
+	std::random_device rnd;
+	std::mt19937 mt(rnd());
+	std::uniform_int_distribution<> x(left, right);
+	std::uniform_int_distribution<> y(50, 100);
+	std::uniform_int_distribution<> z(back, front);
 
-	const float z_max = -256.0f;
-	m_aimPos.z = ((float)rand() / RAND_MAX)*z_max;
+	m_aimPos.x = x(mt);
+	m_aimPos.y = y(mt);
+	m_aimPos.z = z(mt);
 }

@@ -16,7 +16,7 @@ namespace oka
 
 		static SkySP Create();
 		void Draw() {};
-		void Update() {};
+		void Update();
 
 		Sky();
 	};

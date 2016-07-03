@@ -4,37 +4,27 @@ namespace oka
 {
 	GameManager* GameManager::m_instance = nullptr;
 
-	//------------------------------------------------------------
-	//シングルトンにするためインスタンスがない場合のみnewし
-	//既にインスタンスがある場合はそのインスタンスをそのまま返す
+	//-------------------------------------
+	//
 
-	GameManager* GameManager::GetInstance()
+	GameManager::GameManager()
 	{
-		if (nullptr == m_instance)
-		{
-			m_instance = new GameManager();
-		}
-		return m_instance;
+
 	}
 
 	//-------------------------------------
-	//自身がnullptrでない場合自分自身を破棄する
+	//デストラクタ
 
-	void GameManager::Destroy()
+	GameManager::~GameManager()
 	{
-		if (m_instance)
-		{
-			delete m_instance;
-			m_instance = nullptr;
-		}
+		m_gameObjects.clear();
 	}
-
 
 	//--------------------------------------
 	//ゲームのマネージャー更新
 	//常にオブジェクトの活性状態を判別する
 
-	void GameManager::Updata()
+	void GameManager::Update()
 	{
 		auto itr = m_gameObjects.begin();
 		while (itr != (m_gameObjects.end()))

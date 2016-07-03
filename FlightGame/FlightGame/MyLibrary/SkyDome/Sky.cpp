@@ -37,4 +37,16 @@ namespace oka
 		return sky;
 	}
 
+	//-------------------------------------
+	//çXêV
+
+	void Sky::Update()
+	{
+		float angle = oka::MyMath::ToRadian(0.01f);
+		glm::vec3 axis = glm::vec3(0.0f, 0.0f, 1.0f);
+
+		glm::tquat<float>quat = oka::MyMath::Rotate(angle, axis);
+
+		m_sky->m_transform.m_rotate *= quat;
+	}
 }

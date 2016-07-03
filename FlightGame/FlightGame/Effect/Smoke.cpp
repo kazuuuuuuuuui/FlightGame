@@ -79,7 +79,7 @@ void Smoke::Update()
 	//パーティクルの更新
 	for (auto itr = m_particles.begin(); itr != m_particles.end(); itr++)
 	{
-		(*itr)->m_alpha -= 0.001f;
+		(*itr)->m_alpha -= 0.005f;
 		//debug
 		//printf("%f\n", (*itr)->m_alpha);
 

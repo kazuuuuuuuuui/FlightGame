@@ -6,20 +6,23 @@
 namespace oka
 {
 	SoundManager* SoundManager::m_instance = nullptr;
-	
-	//--------------------------------------------
-	//シングルトンにするためにインスタンスが
-	//生成されていなければインスタンスを生成し
-	//既にインスタンスが生成されていればそのインスタンスを返す
 
-	SoundManager* SoundManager::GetInstance() 
+	//-------------------------------------
+	//コンストラクタ
+	//ALの初期化処理
+	//デバイスの取得とコンテキストの作成をする
+
+	SoundManager::SoundManager()
 	{
+	
+	}
 
-		if (nullptr == m_instance) 
-		{
-			m_instance = new SoundManager();
-		}
-		return m_instance;
+	//-------------------------------------
+	//デストラクタ
+
+	SoundManager::~SoundManager()
+	{
+		m_sounds.clear();
 	}
 
 	//-------------------------------------
@@ -33,13 +36,7 @@ namespace oka
 		{
 			m_sounds.insert(std::make_pair(_str, _sound));
 		}
-		else
-		{
-			
-		}
 	}
-
-	
 
 
 	//-------------------------------------

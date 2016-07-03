@@ -1,25 +1,29 @@
-#ifndef _OKA_JOYSTICK_MANAGER_
-#define _OKA_JOYSTICK_MANAGER_
+#ifndef JOYSTICK_MANAGER_H_
+#define JOYSTICK_MANAGER_H_
 
 #include<vector>
+#include"../../Singleton/Singleton.h"
 #include"../Input/Controller.h"
 
 namespace oka
 {
-	class JoysticManager
+	class JoysticManager : public Singleton<JoysticManager>
 	{
-	private:
-		static JoysticManager* m_instance;
-
-		JoysticManager() {};
+	friend class Singleton<JoysticManager>;
 
 	public:
-		std::vector<Contoroller*>m_contoroller;
-		void AddController(Contoroller *_Contoroller);
-		void Update();
-		static JoysticManager* GetInstance();
-	};
+		virtual void Update()override;
+		void SetController(Contoroller *_Contoroller);
+		Contoroller* GetController(unsigned int _num)const;
 
+		JoysticManager();
+		~JoysticManager();
+
+	private:
+		static JoysticManager* m_instance;
+		std::vector<Contoroller*>m_contoroller;
+
+	};
 }
 
 #endif

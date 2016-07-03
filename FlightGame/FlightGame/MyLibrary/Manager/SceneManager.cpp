@@ -1,8 +1,14 @@
 #include<stdio.h>
 #include"SceneManager.h"
+#include"CharacterManager.h"
 #include"JoysticManager.h"
-#include"../../Scene/GameMainScene.h"
-#include"../../Scene/PauseScene.h"
+#include"../MyTime/MyTime.h"
+#include"../../Scene/TitleScece.h"
+#include"../../Scene/GameScene.h"
+#include"../../Scene/TimeUpScene.h"
+#include"../../Scene/GameOverScene.h"
+#include"../../Scene/ResultScene.h"
+#include"../../Scene/EndScene.h"
 
 namespace oka
 {
@@ -15,7 +21,7 @@ namespace oka
 	{
 		m_nowScene = nullptr;
 		m_prevScene = nullptr;
-		m_sequence.Change(&SceneManager::GameMain);
+		m_sequence.Change(&SceneManager::Title);
 	}
 
 
@@ -43,49 +49,46 @@ namespace oka
 	//--------------
 	//タイトルシーン
 
-	//void SceneManager::Title(float _delta)
-	//{
-	//	if (0.0f == m_sequence.GetTime())
-	//	{	
-	//		printf("/********************************/\n");
-	//
-	//		m_nowScene = new TitleScene();
-	//		
-	//		printf("タイトルシーンが初期化されました\n");
-	//		printf("\n");
+	void SceneManager::Title(float _delta)
+	{
+		if (0.0f == m_sequence.GetTime())
+		{		
+			m_nowScene = new TitleScene();
+			
+			printf("タイトルシーンが初期化されました\n");
+			printf("\n");
 
-	//		oka::SoundManager::GetInstance()->Play("TitleBGM");
+		}
 
-	//	}
+		m_nowScene->Update();
+		m_nowScene->Render();
 
-	//	m_nowScene->Update();
-	//	m_nowScene->Render();
+		if (oka::JoysticManager::GetInstance()->GetController(0)->m_downkey & XINPUT_GAMEPAD_A)
+		{
+			switch (TitleScene::m_titleMeny)
+			{
+			case(TitleMenu::GameStart) :
+				
+				m_prevScene = m_nowScene;
+				//delete m_nowScene;
+				m_sequence.Change(&SceneManager::Game);
 
-	//	if (oka::JoysticManager::GetInstance()->GetContoroller(0).m_downkey & XINPUT_GAMEPAD_A)
-	//	{
-	//		if (TitleScene::GameMode::exit == TitleScene::m_gameMode)
-	//		{
-	//			exit(EXIT_SUCCESS);
-	//		}
-	//		else
-	//		{
-	//			printf("コース選択シーンに移ります\n");
-	//			printf("\n");
+				break;
 
-	//			m_prevScene = m_nowScene;
-	//			delete m_nowScene;
+			case(TitleMenu::Exit) :
 
-	//			m_sequence.Change(&SceneManager::CourseSelect);
-	//			oka::SoundManager::GetInstance()->Play("modeDecision");
-	//		}
-	//	}
+				exit(0);
 
-	//}
+				break;
+			};
+		}
+
+	}
 
 	//-------------------------------------
 	//ゲームシーン
 
-	void SceneManager::GameMain(float delta)
+	void SceneManager::Game(float delta)
 	{
 		if (0.0f == m_sequence.GetTime())
 		{			
@@ -99,32 +102,40 @@ namespace oka
 		m_nowScene->Update();
 		m_nowScene->Render();
 
-		//ポーズシーンに移行
-		const unsigned int downkey = JoysticManager::GetInstance()->m_contoroller[0]->m_downkey;
-		if (downkey & XINPUT_GAMEPAD_START)
+		//ゲームオーバーシーンに移行
+		if (nullptr == oka::CharacterManager::GetInstance()->m_player)
 		{
-			printf("ポーズシーンに移ります\n");
+			printf("ゲームオーバーシーンに移ります\n");
 			printf("\n");
 
 			m_prevScene = m_nowScene;
 
-			m_sequence.Change(&SceneManager::Pause);
+			m_sequence.Change(&SceneManager::GameOver);
+		}
+
+		//タイムアップシーンに移行
+		if (0 == oka::MyTime::GetInstance()->GetFlame())
+		{
+			printf("タイムアップシーンに移ります\n");
+			printf("\n");
+
+			//m_prevScene = m_nowScene;
+
+			//m_sequence.Change(&SceneManager::TimeUp);
 		}
 	}
 
 	//-------------------------------------
-	//ゲーム中のポーズシーン
-	void SceneManager::Pause(float _delta)
+	//タイムアップシーン
+
+	void SceneManager::TimeUp(float _delta)
 	{
 		if (0.0f == m_sequence.GetTime())
 		{
-			printf("/********************************/\n");
-			
-			m_nowScene = new PauseScene();
+			m_nowScene = new TimeUpScene();
 
-			printf("ポーズシーンが初期化されました\n");
+			printf("タイムアップシーンが初期化されました\n");
 			printf("\n");
-
 		}
 
 		m_prevScene->Render();
@@ -132,33 +143,79 @@ namespace oka
 		m_nowScene->Update();
 		m_nowScene->Render();
 
-		const unsigned int downkey = JoysticManager::GetInstance()->m_contoroller[0]->m_downkey;
-		if (downkey & XINPUT_GAMEPAD_A)
+		if (oka::JoysticManager::GetInstance()->GetController(0)->m_downkey & XINPUT_GAMEPAD_START)
 		{
-			if (PauseScene::Selection::BackGameMain == PauseScene::m_nowSelect)
-			{
-				printf("ゲームシーンに戻ります\n");
-				printf("\n");
+			m_prevScene = m_nowScene;
 
-				m_prevScene = m_nowScene;
-				//delete m_nowScene;
+			m_sequence.Change(&SceneManager::Result);
+		}
+	}
 
-				m_sequence.Change(&SceneManager::GameMain);
-			}
-			//else if (PauseScene::Mode::backTitle == PauseScene::m_mode)
-			//{
-			//	printf("タイトルシーンに戻ります\n");
-			//	printf("\n");
-			//	delete m_nowScene;//ポーズシーン
-			//	delete m_prevScene;//ゲームメインシーン
-			//	m_sequence.Change(&SceneManager::Title);
-			//}
-			else if(PauseScene::Selection::Exit == PauseScene::m_nowSelect)
-			{
-				exit(EXIT_SUCCESS);
-			}
+
+	//-------------------------------------
+	//ゲームオーバーシーン
+
+	void SceneManager::GameOver(float _delta)
+	{
+		if (0.0f == m_sequence.GetTime())
+		{
+			m_nowScene = new GameOverScene();
+
+			printf("ゲームオーバーシーンが初期化されました\n");
+			printf("\n");
 		}
 
+		m_prevScene->Render();
+		m_prevScene->Update();
+
+		m_nowScene->Update();
+		m_nowScene->Render();
+
+		if (oka::JoysticManager::GetInstance()->GetController(0)->m_downkey & XINPUT_GAMEPAD_START)
+		{
+			m_prevScene = m_nowScene;
+
+			m_sequence.Change(&SceneManager::End);
+		}
+	}
+
+
+	//-------------------------------------
+	//リザルトシーン
+
+	void SceneManager::Result(float _delta)
+	{
+		if (0.0f == m_sequence.GetTime())
+		{
+			m_nowScene = new ResultScene();
+		}
+
+		if (oka::JoysticManager::GetInstance()->GetController(0)->m_downkey & XINPUT_GAMEPAD_START)
+		{
+			m_prevScene = m_nowScene;
+
+			m_sequence.Change(&SceneManager::End);
+		}
+
+		m_nowScene->Update();
+		m_nowScene->Render();
+
+	}
+
+	//-------------------------------------
+	//エンドシーン
+
+	void SceneManager::End(float delta)
+	{
+		if (0.0f == m_sequence.GetTime())
+		{
+			m_nowScene = new EndScene();
+
+			delete m_prevScene;
+			delete m_nowScene;
+
+			m_sequence.Change(&SceneManager::Title);
+		}
 	}
 
 

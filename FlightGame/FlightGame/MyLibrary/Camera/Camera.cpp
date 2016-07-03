@@ -1,6 +1,5 @@
-#define _USE_MATH_DEFINES
-#include<math.h>
 #include"Camera.h"
+#include"../Math/MyMath.h"
 #include"../../glut.h"
 
 oka::Camera *g_camera = nullptr;
@@ -12,16 +11,38 @@ namespace oka
 	//デフォルトコンストラクタ
 
 	Camera::Camera():
-		m_fovy(60.0),m_aspect(1.0),m_zNear(0.1),m_zFar(1000.0),
-		m_target(0.0f, 0.0f, 0.0f),m_up(0.0f, 1.0f, 0.0f)
+		m_fovy(60.0f),m_aspect(1.0f),m_zNear(0.1f),m_zFar(1000.0f),
+		m_position(glm::vec3(0.0f, 0.0f, 0.0f)),m_target(glm::vec3(0.0f, 0.0f, 0.0f)),m_up(glm::vec3(0.0f, 1.0f, 0.0f)),
+		m_viewMatrix(glm::mat4(1.0f))
 	{}
 
 	//-------------------------------------
 	//
 
-	void Camera::Update()
+	void Camera::SetPos(glm::vec3 _pos)
 	{
+		m_position = _pos;
+	}
 
+	//-------------------------------------
+	//
+
+	void Camera::SetTarget(glm::vec3 _target)
+	{
+		m_target = _target;
+	}
+
+	//-------------------------------------
+	//
+
+	void Camera::SetUp(glm::vec3 _up)
+	{
+		m_up = _up;
+	}
+
+	glm::vec3 Camera::GetUp()const
+	{
+		return m_up;
 	}
 
 	//-------------------------------------
@@ -32,7 +53,7 @@ namespace oka
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 
-		float fov = m_fovy*(M_PI / 180);
+		float fov = oka::MyMath::ToRadian(m_fovy);
 
 		glm::mat4 mat = glm::perspective(fov, m_aspect, m_zNear, m_zFar);
 
@@ -42,14 +63,10 @@ namespace oka
 	//-------------------------------------
 	//ビュー行列の設定
 
-	void Camera::SetViewMatrix(const glm::vec3 _position, const glm::vec3 _target, const glm::vec3 _up)
+	void Camera::SetViewMatrix()
 	{
-		m_transform.m_position = _position;
-		m_target = _target;
-		m_up = _up;
-		
 		m_viewMatrix = glm::lookAt(
-			glm::vec3(m_transform.m_position.x, m_transform.m_position.y, m_transform.m_position.z),
+			glm::vec3(m_position.x, m_position.y, m_position.z),
 			glm::vec3(m_target.x, m_target.y, m_target.z),
 			glm::vec3(m_up.x, m_up.y, m_up.z));
 	}

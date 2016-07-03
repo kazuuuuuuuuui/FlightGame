@@ -5,44 +5,25 @@ namespace oka
 	FealdManager* FealdManager::m_instance = nullptr;
 
 	//-------------------------------------
-	//デストラクタ
 	//
+
+	FealdManager::FealdManager() :
+		m_feald(nullptr)
+	{
+	
+	}
+
+
+	//-------------------------------------
+	//デストラクタ
 
 	FealdManager::~FealdManager()
 	{
-
+		m_feald = nullptr;
 	};
 
 
 	//-------------------------------------
-	//シングルトンにするためインスタンスがない場合のみnewし
-	//既にインスタンスがある場合はそのインスタンスをそのまま返す
-
-	FealdManager* FealdManager::GetInstance()
-	{
-		if (nullptr == m_instance)
-		{
-			m_instance = new FealdManager();
-		}
-
-		return m_instance;
-	}
-
-
-	//-------------------------------------
-	//自身がnullptrでない場合自分自身を破棄する
-
-	void FealdManager::Destroy()
-	{
-		if (m_instance)
-		{
-			delete m_instance;
-			m_instance = nullptr;
-		}
-	}
-
-
-	//------------------
 	//フィールドの追加
 
 	void FealdManager::AddFeald(FealdSP _feald)
@@ -51,6 +32,22 @@ namespace oka
 		{
 			m_feald = _feald;
 		}
+	}
+
+	//-------------------------------------
+	//参照しているフィールドの横幅を返す
+
+	const int FealdManager::GetFealdWidth()const
+	{
+		return m_feald->m_width;
+	}
+
+	//-------------------------------------
+	//参照しているフィールドの縦幅を返す
+
+	const int FealdManager::GetFealdDepth()const
+	{
+		return m_feald->m_height;
 	}
 
 }

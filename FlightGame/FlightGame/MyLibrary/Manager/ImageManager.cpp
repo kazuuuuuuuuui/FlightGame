@@ -8,17 +8,19 @@ namespace oka
 	ImageManager* ImageManager::m_instance = nullptr;
 
 	//-------------------------------------
-	//シングルトンにするためインスタンスがない場合のみnewし
-	//既にインスタンスがある場合はそのインスタンスをそのまま返す
+	//コンストラクタ
 
-	ImageManager* ImageManager::GetInstance()
+	ImageManager::ImageManager()
 	{
-		if (nullptr == m_instance)
-		{
-			m_instance = new ImageManager();
-		}
 
-		return m_instance;
+	}
+
+	//-------------------------------------
+	//デストラクタ
+
+	ImageManager::~ImageManager()
+	{
+		m_images.clear();
 	}
 
 	//-------------------------------------
@@ -43,11 +45,11 @@ namespace oka
 	//検索し登録されていればテクスチャを削除し
 	//mapから除外する
 
-	void ImageManager::DeleteHandle(const std::string _str)
-	{
-		glDeleteTextures(1, &m_images.find(_str)->second);
-		m_images.erase(_str);
-	}
+	//void ImageManager::DeleteHandle(const std::string _str)
+	//{
+		//glDeleteTextures(1, &m_images.find(_str)->second);
+		//m_images.erase(_str);
+	//}
 
 
 	//-------------------------------------

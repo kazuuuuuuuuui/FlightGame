@@ -7,7 +7,7 @@ namespace oka
 	{
 	public:
 		static float ToRadian(const float _degree);
-		static glm::mat4 Rotate(float _angle, glm::vec3 _axis);
+		static glm::tquat<float> Rotate(float _angle, glm::vec3 _axis);
 	};
 }
 

@@ -1,6 +1,8 @@
 #include<stdio.h>
 #include"Transform.h"
 #include"../Camera/Camera.h"
+#include"../../glm/gtc/quaternion.hpp"
+#include"../../glm/gtx/quaternion.hpp"
 #include"../../glm/gtx/transform.hpp"
 #include"../../glut.h"
 
@@ -19,10 +21,12 @@ namespace oka
 		//translate
 		glm::mat4 translate = glm::translate(m_position);
 
+		glm::mat4 rotate = glm::toMat4(m_rotate);
+
 		//scale
 		glm::mat4 scale = glm::scale(m_scale);
 
-		m_matrix = translate * m_rotate * scale;
+		m_matrix = translate * rotate * scale;
 
 		SetAimVec(m_myToVec, glm::vec3(0, 0, -1));
 		SetAimVec(m_myUpVec, glm::vec3(0, 1, 0));
@@ -45,9 +49,11 @@ namespace oka
 		glm::mat4 pos;
 		pos = glm::translate(_aimVec);
 
+		glm::mat4 rot = glm::toMat4(m_rotate);
+
 		//向きベクトルを求めるための行列
 		glm::mat4 mat;
-		mat = m_rotate*pos;
+		mat = rot*pos;
 
 		_myVec.x = mat[3][0];
 		_myVec.y = mat[3][1];

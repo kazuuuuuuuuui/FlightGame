@@ -32,7 +32,6 @@ void Particle::Draw()
 		{
 			glTranslatef(m_transform.m_position.x, m_transform.m_position.y, m_transform.m_position.z);
 
-			//ビルボード回転行列適用
 			glMultMatrixf((GLfloat*)&BillboardMatrix);
 
 			glScalef(m_transform.m_scale.x, m_transform.m_scale.y, m_transform.m_scale.z);

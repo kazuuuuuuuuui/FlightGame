@@ -5,6 +5,7 @@
 #include"../MyLibrary/Input/Keyboard.h"
 #include"../MyLibrary/Input/Controller.h"
 #include"../MyLibrary/Manager/GameManager.h"
+#include"../MyLibrary/Manager/JoysticManager.h"
 #include"..//MyLibrary/Manager/CharacterManager.h"
 #include"../MyLibrary/Manager/ImageManager.h"
 #include"../MyLibrary/Manager/SoundManager.h"
@@ -18,9 +19,11 @@
 #include"../glm/gtx/transform.hpp"
 #include"../glm/gtx/intersect.hpp"
 
-
+#include"../MyLibrary/Screen/Screen.h"
 #include"../Bullet/HomingBullet.h"
 
+#include"../glm/gtc/quaternion.hpp"
+#include"../glm/gtx/quaternion.hpp"
 
 #include"../glut.h"
 
@@ -28,13 +31,14 @@
 //-------------------------------------
 //コンストラクタ
 
-Player::Player(glm::vec3 _pos):
-	m_targetPos(glm::vec3(0.0f, 0.0f, 0.0f))
+Player::Player():
+	m_isRockOn(false),
+	m_target(nullptr),
+	m_score(0)
 {
-	m_controller = new oka::Contoroller();
-	oka::JoysticManager::GetInstance()->AddController(m_controller);
+	m_controller = oka::JoysticManager::GetInstance()->GetController(0);
 
-	m_transform.m_position = _pos;
+	m_transform.m_position = glm::vec3(130.0f, 30.0f, 180.0f);
 }
 
 //-------------------------------------
@@ -48,9 +52,9 @@ Player::~Player()
 //-------------------------------------
 //自機の生成
 
-PlayerSP Player::Create(glm::vec3 _pos)
+PlayerSP Player::Create()
 {
-	PlayerSP player(new Player(_pos));
+	PlayerSP player(new Player());
 
 	return player;
 }
@@ -64,33 +68,43 @@ void Player::Update()
 //printf("x:%fy:%fz:%f\n", m_transform.m_position.x, m_transform.m_position.y, m_transform.m_position.z);
 
 	//座標更新
-	m_speed += m_accel;
+	m_speed = m_transform.m_myToVec*0.5f + m_accel;
 	m_transform.m_position += m_speed;
 
+	SetOnRadarPos();
+
 	//慣性
-	m_speed *= 0.965f;
+	m_accel *= 0.98f;
+	m_speed *= 0.98f;
 
 	//ボディ
 	m_body->m_transform = m_transform;
 
-	//オフセット計算
-	glm::mat4 offSet;
 
-	const glm::mat4 translate = glm::translate(glm::vec3(0.0f, 0.3f, -5.2f));
 
-	//static float angle = 0.0f;
-	//angle += oka::MyMath::ToRadian(2.0f);
-	//const glm::vec3 axis = glm::vec3(0, 1, 0);
-	//const glm::mat4 rotate = glm::rotate(angle, axis);
+	/*書き換える*/
+	if (m_transform.m_position.x <= -200.0f)
+	{
+		m_transform.m_position.x = -200.0f;
+	}
+	if (m_transform.m_position.x >= 400.0f)
+	{
+		m_transform.m_position.x = 400.0f;
+	}
+	if (m_transform.m_position.z >= 180.0f)
+	{
+		m_transform.m_position.z = 180.0f;
+	}
+	if (m_transform.m_position.z <= -450.0f)
+	{
+		m_transform.m_position.z = -450.0f;
+	}
+	if (m_transform.m_position.y >= 250.0f)
+	{
+		m_transform.m_position.y = 250.0f;
+	}
 
-	const glm::mat4 scale = glm::scale(glm::vec3(2, 2, 2));
-
-	offSet = translate*scale;
-
-	//プロペラ
-	m_propeller->m_transform = m_transform;
-	m_propeller->m_transform.m_matrix = m_transform.m_matrix * offSet;
-
+	/**/
 
 	if (m_controller->IsConected())
 	{
@@ -106,47 +120,53 @@ void Player::Update()
 		Control();
 	}
 
-	if (m_isHitAttack)
+	if (0 == m_flame %(60*2))
 	{
-		//書き換え
-		//m_hp -= 100;
+		m_isHitAttack = false;
 	}
+
+	std::tie(m_isRockOn, m_target) = SetTarget();
 
 	if (IsGroundOut())
 	{
 		if(IsIntersectSea())
 		{
-//debug
-printf("海の中あああああああ\n");
+			m_isActive = false;
+			m_body->m_isActive = false;
 		}
 	}
 	else
 	{
-		SetOnRadarPos();
-
 		if (IsIntersectGround())
 		{
-//debug
-printf("当たってるううううう\n");
+			m_isActive = false;
+			m_body->m_isActive = false;
 		}
 	}
 
 	//死亡判定
-	if (m_isActive)
+	if (!m_isActive)
 	{
-		if (IsDead())
-		{
-			m_isActive = false;
-			m_body->m_isActive = false;
-			m_propeller->m_isActive = false;
+		//爆発音
+		oka::SoundManager::GetInstance()->Play("Explode");
 
-			//爆発音
-			oka::SoundManager::GetInstance()->Play("Explode");
+		//爆発エフェクト
+		EffectInfo smokeInfo;
+		smokeInfo.basePos = m_transform.m_position;
+		smokeInfo.particleNum = 5;
+		smokeInfo.color = glm::vec3(0, 0, 0);
+		SmokeSP smoke = Smoke::Create(smokeInfo);
+		oka::GameManager::GetInstance()->Add("Smoke", smoke);
 
-			//爆発エフェクト
-			//oka::GameManager::GetInstance()->Add("Smoke", Smoke::Create(m_transform.m_position));
-			//oka::GameManager::GetInstance()->Add("Fire", Fire::Create(m_transform.m_position));
-		}
+		EffectInfo fireInfo;
+		fireInfo.basePos = m_transform.m_position;;
+		fireInfo.particleNum = 20;
+		fireInfo.color = glm::vec3(1.0f, 0.5f, 0.25f);
+		FireSP fire = Fire::Create(fireInfo);
+		oka::GameManager::GetInstance()->Add("Fire", fire);
+
+		oka::CharacterManager::GetInstance()->m_player->PlusMyScore();
+
 	}
 }
 
@@ -161,34 +181,34 @@ void Player::Control()
 	const float value = oka::MyMath::ToRadian(1.0f);
 
 	//Roll
-	if (oka::Keyboard::GetStates('m'))
-	{
-		m_transform.m_rotate *= oka::MyMath::Rotate(value, glm::vec3(0, 0, -1));
-	}
-	else if (oka::Keyboard::GetStates('n'))
-	{
-		m_transform.m_rotate *= oka::MyMath::Rotate(-value, glm::vec3(0, 0, -1));
-	}
+	//if (oka::Keyboard::GetStates('m'))
+	//{
+	//	m_transform.m_rotate *= oka::MyMath::Rotate(value, glm::vec3(0, 0, -1));
+	//}
+	//else if (oka::Keyboard::GetStates('n'))
+	//{
+	//	m_transform.m_rotate *= oka::MyMath::Rotate(-value, glm::vec3(0, 0, -1));
+	//}
 
-	//Yaw
-	if (oka::Keyboard::GetStates('d'))
-	{
-		m_transform.m_rotate *= oka::MyMath::Rotate(-value, glm::vec3(0, 1, 0));
-	}
-	else if (oka::Keyboard::GetStates('a'))
-	{
-		m_transform.m_rotate *= oka::MyMath::Rotate(value, glm::vec3(0, 1, 0));
-	}
+	////Yaw
+	//if (oka::Keyboard::GetStates('d'))
+	//{
+	//	m_transform.m_rotate *= oka::MyMath::Rotate(-value, glm::vec3(0, 1, 0));
+	//}
+	//else if (oka::Keyboard::GetStates('a'))
+	//{
+	//	m_transform.m_rotate *= oka::MyMath::Rotate(value, glm::vec3(0, 1, 0));
+	//}
 
-	//Pitch
-	if (oka::Keyboard::GetStates('s'))
-	{
-		m_transform.m_rotate *= oka::MyMath::Rotate(-value, glm::vec3(1, 0, 0));
-	}
-	else if (oka::Keyboard::GetStates('w'))
-	{
-		m_transform.m_rotate *= oka::MyMath::Rotate(value, glm::vec3(1, 0, 0));
-	}
+	////Pitch
+	//if (oka::Keyboard::GetStates('s'))
+	//{
+	//	m_transform.m_rotate *= oka::MyMath::Rotate(-value, glm::vec3(1, 0, 0));
+	//}
+	//else if (oka::Keyboard::GetStates('w'))
+	//{
+	//	m_transform.m_rotate *= oka::MyMath::Rotate(value, glm::vec3(1, 0, 0));
+	//}
 
 }
 
@@ -201,38 +221,50 @@ void Player::Control(unsigned short _pressedKey, unsigned int _downKeys, float _
 	Shot(_downKeys);
 	HomingShot(_downKeys);
 
-	const float value = oka::MyMath::ToRadian(1.0f);
+	const float value = oka::MyMath::ToRadian(0.8f);
+	glm::tquat<float> quat;
 
 	//Roll
-	if (_pressedKey & XINPUT_GAMEPAD_B)
+	if (_pressedKey & XINPUT_GAMEPAD_RIGHT_SHOULDER)
 	{
-	m_transform.m_rotate *= oka::MyMath::Rotate(value, glm::vec3(0, 0, -1));
+		quat = oka::MyMath::Rotate(-value, glm::vec3(0, 1, 0));
+
+		m_transform.m_rotate *= quat;
+		
 	}
-	else if (_pressedKey & XINPUT_GAMEPAD_X)
+	else if (_pressedKey & XINPUT_GAMEPAD_LEFT_SHOULDER)
 	{
-	m_transform.m_rotate *= oka::MyMath::Rotate(-value, glm::vec3(0, 0, -1));
+		quat = oka::MyMath::Rotate(value, glm::vec3(0, 1, 0));
+
+		m_transform.m_rotate *= quat;
 	}
 
 	//Yaw
 	if (_sThumbLX > 0.5f)
 	{
-		//m_transform.m_rotate *= oka::MyMath::Rotate(value / 10.0f, glm::vec3(0, 0, -1));
-		m_transform.m_rotate *= oka::MyMath::Rotate(-value, glm::vec3(0, 1, 0));
+		quat = oka::MyMath::Rotate(value, glm::vec3(0, 0, -1));
+
+		m_transform.m_rotate *= quat;
+		
 	}
-	else if (_sThumbLX < -0.5f)
-	{
-		//m_transform.m_rotate *= oka::MyMath::Rotate(-value / 10.0f, glm::vec3(0, 0, -1));
-		m_transform.m_rotate *= oka::MyMath::Rotate(value, glm::vec3(0, 1, 0));
+	else if (_sThumbLX < -0.5f){
+		quat = oka::MyMath::Rotate(-value, glm::vec3(0, 0, -1));
+
+		m_transform.m_rotate *= quat;
 	}
 
 	//Pitch
 	if (_sThumbLY > 0.5f)
 	{
-		m_transform.m_rotate *= oka::MyMath::Rotate(-value, glm::vec3(1, 0, 0));
+		quat = oka::MyMath::Rotate(-value, glm::vec3(1, 0, 0));
+
+		m_transform.m_rotate *= quat;
 	}
 	else if (_sThumbLY < -0.5f)
 	{
-		m_transform.m_rotate *= oka::MyMath::Rotate(value, glm::vec3(1, 0, 0));
+		quat = oka::MyMath::Rotate(value, glm::vec3(1, 0, 0));
+
+		m_transform.m_rotate *= quat;
 	}
 }
 
@@ -265,18 +297,9 @@ void Player::Accel(unsigned short _pressedKey)
 {
 	if (_pressedKey & XINPUT_GAMEPAD_A)
 	{
-		const float value = 0.02f;
-
-		glm::vec3 accel;
-		accel = m_transform.m_myToVec*value;
-
-		m_accel = accel;
+		const float value = 0.02f;//加速度補間値
+		m_accel += m_transform.m_myToVec*value;
 	}
-	else
-	{
-		m_accel = glm::vec3(0, 0, 0);
-	}
-
 }
 
 //-------------------------------------
@@ -299,9 +322,9 @@ void Player::Shot()
 		const float value = 4.0f;//弾のスピード補完値
 		speed = m_transform.m_myToVec * value;
 
-		glm::mat4 mat = m_transform.m_rotate;
+		glm::tquat<float>quat = m_transform.m_rotate;
 	
-		BulletSP bullet = Bullet::Create(pos, mat, speed);
+		BulletSP bullet = Bullet::Create(pos, quat, speed);
 		oka::BulletManager::GetInstance()->AddBullet(bullet);
 		oka::GameManager::GetInstance()->Add("Bullet", bullet);
 	}
@@ -312,20 +335,20 @@ void Player::Shot()
 
 void Player::Shot(unsigned short _downKeys)
 {
-	if (_downKeys & XINPUT_GAMEPAD_Y)
+	if (_downKeys & XINPUT_GAMEPAD_X)
 	{
 		oka::SoundManager::GetInstance()->ChangeVolume("Shot", 1.0f);
 		oka::SoundManager::GetInstance()->Play("Shot");
 
 		glm::vec3 pos;
-		const float distance = 2.0f;//自機と弾発射点の間隔
+		const float distance = 5.0f;//自機と弾発射点の間隔
 		pos = m_transform.m_position + m_transform.m_myToVec*distance;
 
 		glm::vec3 speed;
-		const float value = 4.0f;//弾のスピード補完値
+		const float value = 3.0f;//弾のスピード補完値
 		speed = m_transform.m_myToVec * value;
 
-		glm::mat4 mat = m_transform.m_rotate;
+		glm::tquat<float> mat = m_transform.m_rotate;
 
 		BulletSP bullet = Bullet::Create(pos, mat, speed);
 		oka::BulletManager::GetInstance()->AddBullet(bullet);
@@ -335,60 +358,58 @@ void Player::Shot(unsigned short _downKeys)
 
 //-------------------------------------
 //ホーミング弾による攻撃
+//ロックオンしていないと打てない
 
 void Player::HomingShot(unsigned short _downKeys)
 {
-	//if (_downKeys & XINPUT_GAMEPAD_B)
-	//{
-	//	const float distance = 2.0f;//自機と弾発射点の間隔
-	//	const glm::vec3 pos = m_transform.m_position + m_transform.m_myToVec*distance;
+	if (m_isRockOn && (_downKeys & XINPUT_GAMEPAD_Y))
+	{
+		oka::SoundManager::GetInstance()->Play("HomingBullet");
 
-	//	glm::vec3 speed;
-	//	const float value = 4.0f;//弾のスピード補完値
-	//	speed = m_transform.m_myToVec * value;
-	//
-	//	const glm::mat4 mat = m_transform.m_rotate;
+		//自機と弾発射点の間隔
+		const float downDis = 5.0f;
+		const float toDis = 10.0f;
+		
+		const glm::vec3 pos = m_transform.m_position + m_transform.m_myToVec*toDis - m_transform.m_myUpVec*downDis;
 
-	//	HomingBulletSP homingBullet = HomingBullet::Create(m_targetPos, pos, mat, speed);
-	//	oka::BulletManager::GetInstance()->AddBullet(homingBullet);
-	//	oka::GameManager::GetInstance()->Add("HomingBullet", homingBullet);
-	//}
+		glm::vec3 speed;
+		speed = m_transform.m_myToVec;
+	
+		const glm::tquat<float>quat = m_transform.m_rotate;
+
+		HomingBulletSP homingBullet = HomingBullet::Create(m_target, pos, quat, speed);
+		oka::BulletManager::GetInstance()->AddBullet(homingBullet);
+		oka::GameManager::GetInstance()->Add("HomingBullet", homingBullet);
+	}
 }
 
 //-------------------------------------
 //的の描画位置決定
 
-std::tuple<bool, glm::vec3> Player::SetTarget()
+std::tuple<bool, glm::vec3*> Player::SetTarget()
 {
 	const glm::vec3 pos = m_transform.m_position;
 	const glm::vec3 dir = m_transform.m_myToVec;
-	const float rad = 50.0f;
+	const float rad = 100.0f;
 	float distance;
 
-	auto itr = oka::CharacterManager::GetInstance()->m_characters.begin();//敵から
-	itr++;
+	auto itr = oka::CharacterManager::GetInstance()->m_characters.begin();
 	auto end = oka::CharacterManager::GetInstance()->m_characters.end();
 
 	while (itr != end)
 	{
-		const glm::vec3 aimPos = (*itr)->m_transform.m_position;
-
-		if (IsNear(aimPos))
+		static const float dis = 200.0f;
+		if (IsNear((*itr)->m_transform.m_position,dis))
 		{
-			if (glm::intersectRaySphere(pos, dir, aimPos, rad, distance))
+			if (glm::intersectRaySphere(pos, dir, (*itr)->m_transform.m_position, rad, distance))
 			{
-				return std::make_tuple(true, aimPos);
+				return std::make_tuple(true, &((*itr)->m_transform.m_position));
 			}
 		}
 		itr++;
 	}
 
-
-	const float value = 30.0f;//キャラクターとの間隔補完値		
-	const glm::vec3 toVec = m_transform.m_myToVec*value;
-	const glm::vec3 v = pos + toVec;
-
-	return std::make_tuple(false, v);
+	return std::make_tuple(false, nullptr);
 }
 
 //-------------------------------------
@@ -404,35 +425,40 @@ void Player::DrawTarget()
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		//的の縦横
-		const float width = 3.0f;
-		const float height = 3.0f;
-
-		//描画場所
-		unsigned int tex;
-
-		bool flag;
-		std::tie(flag, m_targetPos) = SetTarget();
-
-		if (flag)
-		{
-			tex = oka::ImageManager::GetInstance()->GetHandle("RockOn");
-		}
-		else
-		{
-			tex = oka::ImageManager::GetInstance()->GetHandle("Target");
-		}
+		static const float width = 3.0f;
+		static const float height = 3.0f;
+		
 		//debug
 //printf("x:%fy:%fz:%f\n", m_targetPos.x, m_targetPos.y, m_targetPos.z);
 
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, tex);
-
-		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-
+		//描画場所
+		unsigned int tex;
+	
 		glPushMatrix();
 		{
-			glTranslatef(m_targetPos.x, m_targetPos.y, m_targetPos.z);
+			if (m_isRockOn)
+			{
+				oka::SoundManager::GetInstance()->Play("RockOn");
+				tex = oka::ImageManager::GetInstance()->GetHandle("RockOn");
+				glTranslatef((*m_target).x, (*m_target).y, (*m_target).z);
+			}
+			else
+			{
+				oka::SoundManager::GetInstance()->Stop("RockOn");
+				tex = oka::ImageManager::GetInstance()->GetHandle("Target");
+
+				const float value = 30.0f;//キャラクターとの間隔補完値
+				const glm::vec3 pos = m_transform.m_position;
+				const glm::vec3 toVec = m_transform.m_myToVec*value;
+				const glm::vec3 v = pos + toVec;
+
+				glTranslatef(v.x, v.y, v.z);
+			}
+
 			glMultMatrixf((GLfloat*)&BillboardMatrix);
+
+			glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, tex);
 			
 			glBegin(GL_QUADS);
 			{
@@ -444,27 +470,78 @@ void Player::DrawTarget()
 			glEnd();
 		}
 		glPopMatrix();
-
 	}
 	glPopAttrib();
 
 }
 
 //-------------------------------------
-//ある一定範囲内に引数の座標が存在するかを判別する
+//自身のスコアを表示する
 
-bool Player::IsNear(glm::vec3 _pos)const
+void Player::DrawMyScore()const
 {
-	const glm::vec3 pos = _pos - m_transform.m_position;
-	const float distance = glm::length(pos);
-
-	const float value = 80.0f;
-
-	if (distance < value)
+	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	{
-		return true;
+		char buf[256];
+		
+		const int width = oka::Screen::GetInstance()->GetWidth() / 10 - 50;
+		const int height = oka::Screen::GetInstance()->GetHeight() - oka::Screen::GetInstance()->GetHeight() / 8;
+
+		sprintf_s(buf, "Hit:%d", m_score);
+
+		glColor3f(0.0f, 0.0f, 0.0f);
+		glLineWidth(2);
+
+		glPushMatrix();
+		{
+			glTranslatef(width, height, 0.0f);
+			glScalef(0.5f, 0.5f, 0.5f);
+
+			for (unsigned int i = 0; i < strlen(buf); i++)
+			{
+				glutStrokeCharacter(GLUT_STROKE_ROMAN, buf[i]);
+			}
+		}
+		glPopMatrix();
 	}
+	glPopAttrib();
+}
+
+//-------------------------------------
+//敵索上での自分の位置を描画する
+
+void Player::DrawRadarPos()
+{
+	glPushAttrib(GL_ALL_ATTRIB_BITS);
+	{
+		glDisable(GL_LIGHTING);
+		glDisable(GL_DEPTH_TEST);
+
+		glColor3f(0, 0, 1);
+		glPointSize(15);
+
+		glBegin(GL_POINTS);
+		{
+			glVertex2f(m_onRadarPos.x, m_onRadarPos.y);
+		}
+		glEnd();
+	}
+	glPopAttrib();
+}
+
+//-------------------------------------
+//自分のスコアを返す
+
+unsigned int Player::GetMyScore()const
+{
+	return m_score;
+}
 
 
-	return false;
+//-------------------------------------
+//自身の撃退数を１増加させる
+
+void Player::PlusMyScore()
+{
+	m_score++;
 }

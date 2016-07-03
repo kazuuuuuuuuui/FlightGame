@@ -11,7 +11,6 @@ namespace oka
 	class Contoroller
 	{
 	public:
-
 		XINPUT_STATE m_state;
 
 		bool m_isConnected;

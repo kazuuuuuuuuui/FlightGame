@@ -2,22 +2,22 @@
 #define OKA_FEALDMANAGER_H_
 
 #include"../../Feald/Feald.h"
+#include"../../Singleton/Singleton.h"
 
 namespace oka
 {
-	class FealdManager
+	class FealdManager :public Singleton<FealdManager>
 	{
+		friend class Singleton<FealdManager>;
+
 	public:
 		FealdSP m_feald;
 
-		static FealdManager* GetInstance();
 		void AddFeald(FealdSP _feald);
-		static void Destroy();
-
-		FealdManager():
-			m_feald(nullptr)
-		{}
-
+		const int GetFealdWidth()const;
+		const int GetFealdDepth()const;
+		
+		FealdManager();
 		~FealdManager();
 
 	private:

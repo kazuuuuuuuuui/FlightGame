@@ -4,43 +4,26 @@
 #include<stdio.h>
 #include<string>
 #include<list>
+#include"../../Singleton/Singleton.h"
 #include"../../Bullet/BaseBullet.h"
 
 namespace oka
 {
-
-	class BulletManager
+	class BulletManager :public Singleton<BulletManager>
 	{
-	public:
-		std::list<BaseBulletSP>m_bullets;
+		friend class Singleton<BulletManager>;
 
-		void Updata();
+	public:
+		virtual void Update()override;
 		void AddBullet(BaseBulletSP _bullet);
 		void CheckBullets();
 
-		static BulletManager* GetInstance();
-		static void Destroy();
-
 	private:
 		static BulletManager* m_instance;
+		std::list<BaseBulletSP>m_bullets;
 
-		BulletManager()
-		{
-			//debug
-			printf("弾マネージャーが生成されました\n");
-			printf("\n");
-
-		}
-
-		~BulletManager()
-		{
-			//debug
-			printf("弾マネージャーが削除されました\n");
-			printf("\n");
-		}
-
-
-
+		BulletManager();
+		~BulletManager();
 	};
 
 }

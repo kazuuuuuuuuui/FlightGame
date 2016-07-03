@@ -18,10 +18,10 @@ namespace oka
 	//クォータニオンから回転行列を作成し返す
 	//引数として回転角度と回転軸を受けとる
 
-	glm::mat4 MyMath::Rotate(float _angle, glm::vec3 _axis)
+	glm::tquat<float> MyMath::Rotate(float _angle, glm::vec3 _axis)
 	{
-		glm::mat4 mat;
-		glm::quat quat;
+		//glm::mat4 mat;
+		glm::tquat<float> quat;
 
 		quat.x = _axis.x * sin(_angle / 2);
 		quat.y = _axis.y * sin(_angle / 2);
@@ -29,9 +29,9 @@ namespace oka
 		quat.w = cos(_angle / 2);
 
 		//quat = glm::quat(quat);
-		mat = glm::toMat4(quat);
+		//mat = glm::toMat4(quat);
 
-		return mat;
+		return quat;
 	}
 
 

@@ -1,43 +1,24 @@
-#ifndef _OKA_MODELMANAGER_H_
-#define _OKA_MODELMANAGER_H_
+#ifndef MODELMANAGER_H_
+#define MODELMANAGER_H_
 
 #include<stdio.h>
 #include<map>
 #include<string>
 #include"../Model/Model.h"
+#include"../../Singleton/Singleton.h"
 
 namespace oka
 {
-	class ModelManager 
+	class ModelManager : public Singleton<ModelManager>
 	{
+		friend class Singleton<ModelManager>;
+
 	public:
 		std::map<std::string, ModelSP>m_models;
-
-		void Updata() {};
 		void Add(std::string _str, ModelSP _model);
-
-		static ModelManager* GetInstance();
-		static void Destroy();
 
 	private:
 		static ModelManager* m_instance;
-
-		ModelManager()
-		{
-			//debug
-			printf("モデルマネージャーが生成されました\n");
-			printf("\n");
-
-		}
-
-		~ModelManager()
-		{
-			//debug
-			printf("モデルマネージャーが削除されました\n");
-			printf("\n");
-		}
-
-
 
 	};
 }

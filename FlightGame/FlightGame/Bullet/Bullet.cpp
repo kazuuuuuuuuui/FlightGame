@@ -9,7 +9,7 @@
 //-------------------------------------
 //コンストラクタ
 
-Bullet::Bullet(glm::vec3 _pos, glm::mat4 _rotate, glm::vec3 _speed)
+Bullet::Bullet(glm::vec3 _pos, glm::tquat<float> _rotate, glm::vec3 _speed)
 {
 	//debug
 	//printf("弾が生成されました\n");
@@ -33,7 +33,7 @@ Bullet::~Bullet()
 //-------------------------------------
 //弾の生成
 
-BulletSP Bullet::Create(glm::vec3 _pos, glm::mat4 _rotate, glm::vec3 _speed)
+BulletSP Bullet::Create(glm::vec3 _pos, glm::tquat<float> _rotate, glm::vec3 _speed)
 {
 	BulletSP bullet(new Bullet(_pos, _rotate, _speed));
 
@@ -74,8 +74,15 @@ void Bullet::Update()
 		m_isActive = false;
 	}
 
-	//フィールド内にいるか
-	if (!IsGroundOut())
+
+	if (IsGroundOut())
+	{
+		if (IsIntersectSea())
+		{
+			m_isActive = false;
+		}
+	}
+	else
 	{
 		if (IsIntersectGround())
 		{
@@ -90,6 +97,7 @@ void Bullet::Update()
 			m_isActive = false;
 		}
 	}
+
 
 	//キャラクターとの当たり判定
 	auto itr = oka::CharacterManager::GetInstance()->m_characters.begin();
@@ -107,4 +115,26 @@ void Bullet::Update()
 
 		itr++;
 	}	
+}
+
+//-------------------------------------
+//弾とキャラクターとの当たり判定
+//引数としてキャラクター座標をもらってくる
+
+bool Bullet::IsHit(glm::vec3 _pos)const
+{
+	glm::vec3 v;
+	v = m_transform.m_position - _pos;
+
+	//弾とキャラクターとの距離
+	const float value = 3.0f;
+	float distance = glm::length(v);
+
+	if (distance <= value)
+	{
+		return true;
+	}
+
+	return false;
+
 }

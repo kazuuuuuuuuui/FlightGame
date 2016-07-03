@@ -4,38 +4,20 @@
 #include"MyLibrary\Manager\SceneManager.h"
 #include"MyLibrary\Manager\JoysticManager.h"
 #include"MyLibrary\Input\Controller.h"
-
-#include"MyLibrary\Sound\Sound.h"
-
 #include"MyLibrary\Input\Keyboard.h"
 #include"MyLibrary\Screen\Screen.h"
-#include"MyLibrary\Camera\Camera.h"
+#include"AL\al.h"
+#include"AL\alc.h"
 #include"glut.h"
 
-//-------------------------------------
-//fps計測用変数と関数(debug用)
-
-int g_GLframe = 0; //フレーム数
-int g_GLtimenow = 0;//経過時間
-int g_GLtimebase = 0;//計測開始時間
-
-void fps()
-{
-	g_GLframe++;
-	g_GLtimenow = glutGet(GLUT_ELAPSED_TIME);//経過時間を取得
-
-	if (g_GLtimenow - g_GLtimebase > 1000)      //１秒以上たったらfpsを出力
-	{
-		printf("fps:%f\r", g_GLframe*1000.0 / (g_GLtimenow - g_GLtimebase));
-		g_GLtimebase = g_GLtimenow;//基準時間を設定                
-		g_GLframe = 0;//フレーム数をリセット
-	}
-}
-
-
+//#pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"")
+#pragma comment(lib,"OpenAL32.lib")
 
 //debug
 GLenum g_mode = GL_FILL;
+
+//-------------------------------------
+//キーボードを押した際のコールバック関数
 
 void keyboard(unsigned char key, int x, int y)
 {
@@ -51,6 +33,9 @@ void keyboard(unsigned char key, int x, int y)
 
 	oka::Keyboard::KeyPress(key);
 }
+
+//-------------------------------------
+//キーボードを離した際のコールバック関数
 
 void keyboardUp(unsigned char key, int x, int y)
 {
@@ -72,11 +57,12 @@ void display()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
-	
+	//glEnable(GL_CULL_FACE);
+
 //debug
 glPolygonMode(GL_FRONT_AND_BACK, g_mode);
 
-	oka::GameManager::GetInstance()->Updata();
+	oka::GameManager::GetInstance()->Update();
 	oka::JoysticManager::GetInstance()->Update();
 	oka::SceneManager::GetInstance()->Update();
 
@@ -91,8 +77,6 @@ glPolygonMode(GL_FRONT_AND_BACK, g_mode);
 
 void timer(int value) 
 {
-	fps();
-
 	glutPostRedisplay();
 	glutTimerFunc(1000 / 60, timer, 0);
 }
@@ -105,6 +89,9 @@ void reshape(int _width, int _height)
 	oka::Screen::GetInstance()->SetWidth(_width);
 	oka::Screen::GetInstance()->SetHeight(_height);
 }
+
+//-------------------------------------
+//エントリーポイント
 
 int main(int argc, char *argv[])
 {
@@ -123,8 +110,16 @@ int main(int argc, char *argv[])
 	glutTimerFunc(0, timer, 0);
 
 	srand(time(NULL));
-	oka::Sound::Init();
-	g_camera = new oka::Camera();
+
+	ALCdevice *device = alcOpenDevice(NULL);
+	assert(alcGetError(device) == ALC_NO_ERROR);
+
+	ALCcontext *context;
+	context = alcCreateContext(device, NULL);
+	assert(alcGetError(device) == ALC_NO_ERROR);
+
+	alcMakeContextCurrent(context);
+	assert(alcGetError(device) == ALC_NO_ERROR);
 
 	glutMainLoop();
 }

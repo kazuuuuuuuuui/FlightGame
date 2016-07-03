@@ -1,6 +1,8 @@
 #ifndef _OKA_SCREEN_H_
 #define _OKA_SCREEN_H_
 
+#include"../../glm/glm.hpp"
+
 namespace oka
 {
 	class Screen
@@ -21,6 +23,7 @@ namespace oka
 		int GetWidth()const;
 		int GetHeight()const;
 		void SetViewport(const int _x, const int _y, const int _width, const int _height)const;
+		void SetMask(glm::vec4 _mask);
 	};
 }
 

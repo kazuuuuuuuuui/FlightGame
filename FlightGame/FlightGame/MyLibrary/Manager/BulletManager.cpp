@@ -5,37 +5,27 @@ namespace oka
 
 	BulletManager* BulletManager::m_instance = nullptr;
 
-	//------------------------------------------------------------
-	//シングルトンにするためインスタンスがない場合のみnewし
-	//既にインスタンスがある場合はそのインスタンスをそのまま返す
+	//-------------------------------------
+	//
 
-	BulletManager* BulletManager::GetInstance()
+	BulletManager::BulletManager()
 	{
-		if (nullptr == m_instance)
-		{
-			m_instance = new BulletManager();
-		}
-		return m_instance;
+
 	}
 
 	//-------------------------------------
-	//自身がnullptrでない場合自分自身を破棄する
+	//
 
-	void BulletManager::Destroy()
+	BulletManager::~BulletManager()
 	{
-		if (m_instance)
-		{
-			delete m_instance;
-			m_instance = nullptr;
-		}
+		m_bullets.clear();
 	}
-
 
 	//--------------------------------------
 	//弾マネージャー更新
 	//常にオブジェクトの活性状態を判別する
 
-	void BulletManager::Updata()
+	void BulletManager::Update()
 	{
 		CheckBullets();
 	}

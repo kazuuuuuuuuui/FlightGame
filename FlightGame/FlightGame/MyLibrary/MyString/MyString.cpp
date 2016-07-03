@@ -4,40 +4,24 @@
 
 namespace oka
 {
-	//-------------------------------------
-	//
-
-	MyString* MyString::Create(const char *_str,glm::vec2 _pos)
-	{
-		MyString* str = new MyString(_str, _pos);
-
-		return str;
-	}
-
+	
 	//-------------------------------------
 	//•`‰æ
 
-	void MyString::Draw()
+	void MyString::Draw(const char *_str, glm::vec2 _pos, glm::vec2 _scale)
 	{
-		glPushAttrib(GL_ALL_ATTRIB_BITS);
+		glPushMatrix();
 		{
-			glDisable(GL_LIGHTING);
-			glColor3f(m_color.x, m_color.y, m_color.z);
-			glLineWidth(m_lineWidth);
+			glTranslatef(_pos.x, _pos.y, 0);
+			glRotatef(0, 0.0f, 0.0f, 1.0f);
+			glScalef(_scale.x, _scale.y, 0.0f);
 
-			glPushMatrix();
+			for (unsigned int i = 0; i < strlen(_str); i++)
 			{
-				glTranslatef(m_pos.x, m_pos.y, 0);
-				glRotatef(0, 0.0f, 0.0f, 1.0f);
-				glScalef(m_scale.x, m_scale.y, m_scale.z);
-
-				for (unsigned int i = 0; i < strlen(m_string); i++)
-				{
-					glutStrokeCharacter(GLUT_STROKE_ROMAN, m_string[i]);
-				}
+				glutStrokeCharacter(GLUT_STROKE_ROMAN, _str[i]);
 			}
-			glPopMatrix();
 		}
-		glPopAttrib();
+		glPopMatrix();
+
 	}
 }

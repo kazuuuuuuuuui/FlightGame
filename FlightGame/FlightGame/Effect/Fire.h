@@ -2,24 +2,22 @@
 #define FIRE_H_
 
 #include<list>
-#include"Effect.h"
+#include"EffectInfo.h"
 #include"Particle.h"
 
 class Fire;
 typedef std::shared_ptr<Fire> FireSP;
 
-class Fire :public oka::Effect
+class Fire :public oka::GameObject
 {
 public:
-	static const int m_particleNum;
 	std::list<ParticleSP>m_particles;
-
-	static FireSP Create(glm::vec3 _pos);
+	static FireSP Create(EffectInfo _info);
 
 	void Draw();
 	void Update();
 
-	Fire(glm::vec3 _pos);
+	Fire(EffectInfo _info);
 };
 
 #endif
