@@ -26,7 +26,9 @@ namespace oka
 		~Camera() {};
 
 		void SetPos(glm::vec3 _pos);
+		glm::vec3 GetPos()const;
 		void SetTarget(glm::vec3 _target);
+		glm::vec3 GetTarget()const;
 		void SetUp(glm::vec3 _up);
 		glm::vec3 GetUp()const;
 		void Perspective();

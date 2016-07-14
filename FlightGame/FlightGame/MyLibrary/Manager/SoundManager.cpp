@@ -3,6 +3,8 @@
 #include"../../AL/al.h"
 #include"../../AL/alc.h"
 
+#pragma comment(lib,"OpenAL32.lib")
+
 namespace oka
 {
 	SoundManager* SoundManager::m_instance = nullptr;

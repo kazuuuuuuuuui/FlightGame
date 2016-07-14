@@ -2,7 +2,6 @@
 #define FIRE_H_
 
 #include<list>
-#include"EffectInfo.h"
 #include"Particle.h"
 
 class Fire;
@@ -12,12 +11,12 @@ class Fire :public oka::GameObject
 {
 public:
 	std::list<ParticleSP>m_particles;
-	static FireSP Create(EffectInfo _info);
+	static FireSP Create(glm::vec3 _basePos,unsigned int _particleNum,glm::vec3 _color);
 
-	void Draw();
-	void Update();
+	void Draw()override;
+	void Update()override;
 
-	Fire(EffectInfo _info);
+	Fire(glm::vec3 _basePos, unsigned int _particleNum, glm::vec3 _color);
 };
 
 #endif

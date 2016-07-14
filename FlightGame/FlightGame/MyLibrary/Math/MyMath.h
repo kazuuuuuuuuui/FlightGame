@@ -6,8 +6,9 @@ namespace oka
 	class MyMath 
 	{
 	public:
-		static float ToRadian(const float _degree);
 		static glm::tquat<float> Rotate(float _angle, glm::vec3 _axis);
+		static glm::quat RotationBetweenVectors(glm::vec3 start, glm::vec3 dest);
+
 	};
 }
 

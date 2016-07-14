@@ -2,7 +2,6 @@
 #include"../MyLibrary/Manager/GameManager.h"
 #include"../MyLibrary/Manager/CharacterManager.h"
 #include"../MyLibrary/Manager/ImageManager.h"
-#include"../Effect/EffectInfo.h"
 #include"../Effect/Smoke.h"
 #include"../glut.h"
 
@@ -11,9 +10,6 @@
 
 Bullet::Bullet(glm::vec3 _pos, glm::tquat<float> _rotate, glm::vec3 _speed)
 {
-	//debug
-	//printf("弾が生成されました\n");
-
 	m_originPos = _pos;
 	m_transform.m_position = _pos;
 	m_transform.m_rotate = _rotate;
@@ -26,8 +22,7 @@ Bullet::Bullet(glm::vec3 _pos, glm::tquat<float> _rotate, glm::vec3 _speed)
 
 Bullet::~Bullet()
 {
-	//debug
-	//printf("弾が削除されました\n");
+	
 }
 
 //-------------------------------------
@@ -47,13 +42,16 @@ void Bullet::Draw()
 {
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	{
+		float diffuse[] = { 255.0f / 255.0f,255.0f / 255.0f,0.0f / 255.0f,1.0f };
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
+		
 		glPushMatrix();
 		{
 			glMultMatrixf((GLfloat*)&m_transform.m_matrix);
 
-			glScalef(1, 1, 10);
+			glScalef(0.1f, 0.1f, 2.0f);
 
-			glutSolidSphere(0.2, 10, 10);
+			glutSolidSphere(1.0, 10, 10);
 		}
 		glPopMatrix();
 	}
@@ -86,22 +84,16 @@ void Bullet::Update()
 	{
 		if (IsIntersectGround())
 		{
-			EffectInfo info;
-			info.basePos = m_transform.m_position;
-			info.particleNum = 1;
-			info.color = glm::vec3(211.0f / 255.0f, 183.0f / 255.0f, 138.0f / 255.0f);
-
-			SmokeSP smoke = Smoke::Create(info);
+			SmokeSP smoke = Smoke::Create(m_transform.m_position, 1, glm::vec3(211.0f / 255.0f, 183.0f / 255.0f, 138.0f / 255.0f));
 			oka::GameManager::GetInstance()->Add("Smoke", smoke);
 
 			m_isActive = false;
 		}
 	}
 
-
 	//キャラクターとの当たり判定
-	auto itr = oka::CharacterManager::GetInstance()->m_characters.begin();
-	auto end = oka::CharacterManager::GetInstance()->m_characters.end();
+	auto itr = oka::CharacterManager::GetInstance()->GetCharacters()->begin();
+	auto end = oka::CharacterManager::GetInstance()->GetCharacters()->end();
 
 	while (itr != end)
 	{
@@ -109,32 +101,10 @@ void Bullet::Update()
 
 		if (IsHit(pos))
 		{
-			(*itr)->m_isHitAttack = true;
+			(*itr)->SetIsHitAttack(true);
 			m_isActive = false;
 		}
 
 		itr++;
 	}	
-}
-
-//-------------------------------------
-//弾とキャラクターとの当たり判定
-//引数としてキャラクター座標をもらってくる
-
-bool Bullet::IsHit(glm::vec3 _pos)const
-{
-	glm::vec3 v;
-	v = m_transform.m_position - _pos;
-
-	//弾とキャラクターとの距離
-	const float value = 3.0f;
-	float distance = glm::length(v);
-
-	if (distance <= value)
-	{
-		return true;
-	}
-
-	return false;
-
 }

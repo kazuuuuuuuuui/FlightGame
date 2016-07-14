@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<time.h>
+#include"Singleton\BaseSingleton.h"
 #include"MyLibrary\Manager\GameManager.h"
 #include"MyLibrary\Manager\SceneManager.h"
 #include"MyLibrary\Manager\JoysticManager.h"
@@ -11,26 +12,12 @@
 #include"glut.h"
 
 //#pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"")
-#pragma comment(lib,"OpenAL32.lib")
-
-//debug
-GLenum g_mode = GL_FILL;
 
 //-------------------------------------
 //キーボードを押した際のコールバック関数
 
 void keyboard(unsigned char key, int x, int y)
 {
-	//debug
-	if ('l' == key)
-	{
-		g_mode = GL_LINE;
-	}
-	else if ('f' == key)
-	{
-		g_mode = GL_FILL;
-	}
-
 	oka::Keyboard::KeyPress(key);
 }
 
@@ -39,9 +26,6 @@ void keyboard(unsigned char key, int x, int y)
 
 void keyboardUp(unsigned char key, int x, int y)
 {
-	//debug
-	//printf("keyboardUp: key:%c x:%d y:%d\n", key, x, y);
-
 	oka::Keyboard::KeyUp(key);
 }
 
@@ -57,19 +41,16 @@ void display()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
-	//glEnable(GL_CULL_FACE);
 
-//debug
-glPolygonMode(GL_FRONT_AND_BACK, g_mode);
+	//BaseSingleton::Update();
 
 	oka::GameManager::GetInstance()->Update();
 	oka::JoysticManager::GetInstance()->Update();
 	oka::SceneManager::GetInstance()->Update();
-
+	
 	oka::Keyboard::GetPrevStates();
 
 	glFlush();
-
 }
 
 //----------------------------------------

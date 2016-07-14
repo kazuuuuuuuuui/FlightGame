@@ -18,11 +18,11 @@
 
 Character::Character()
 {
-	m_transform.m_scale = glm::vec3(0.3f, 0.6f, 0.3f);
+	m_transform.m_scale = glm::vec3(2.0f, 2.0f, 2.0f);
 
-	//‘Ì•”•ª
-	oka::ModelSP body = oka::ModelManager::GetInstance()->m_models["Body"];
+	oka::ModelSP body = oka::ModelManager::GetInstance()->GetModel("Body");
 	unsigned int tex = (oka::ImageManager::GetInstance()->GetHandle("FlyTex"));
+
 	m_body = oka::Mesh::Create(body, tex);
 	oka::GameManager::GetInstance()->Add("Body", m_body);
 
@@ -33,6 +33,22 @@ Character::Character()
 	m_speed = glm::vec3(0.0f, 0.0f, 0.0f);
 	m_accel = glm::vec3(0.0f, 0.0f, 0.0f);
 };
+
+//-------------------------------------
+//UŒ‚‚ðŽó‚¯‚Ä‚¢‚é‚©‚Ìƒtƒ‰ƒO‚ð•Ï‰»‚³‚¹‚é
+
+void Character::SetIsHitAttack(bool _isHitAttack)
+{
+	m_isHitAttack = _isHitAttack;
+}
+
+//-------------------------------------
+//UŒ‚‚ðŽó‚¯‚Ä‚¢‚é‚©‚Ìƒtƒ‰ƒO‚ð•Ô‚·
+
+bool Character::GetIsHitAttack()const
+{
+	return m_isHitAttack;
+}
 
 //-------------------------------------
 //“Gõã‚Å‚Ç‚±‚ÉˆÊ’u‚µ‚Ä‚¢‚é‚©ŒvŽZ‚·‚é
@@ -91,7 +107,7 @@ void Character::DrawRadarPos()
 bool Character::IsGroundOut()const
 {
 	//x
-	const float width = oka::FealdManager::GetInstance()->m_feald->m_width;
+	const float width = oka::FealdManager::GetInstance()->m_feald->GetWidth();
 	const float x = m_transform.m_position.x;
 
 	if (x < 0 || width < x)
@@ -100,7 +116,7 @@ bool Character::IsGroundOut()const
 	}
 
 	//z
-	const float height = oka::FealdManager::GetInstance()->m_feald->m_height;
+	const float height = oka::FealdManager::GetInstance()->m_feald->GetDepth();
 	const float z = m_transform.m_position.z;
 
 	if (z < -height || 0 < z)
@@ -122,7 +138,7 @@ bool Character::IsIntersectGround()const
 	const float y = m_transform.m_position.y;
 	const int z = -m_transform.m_position.z;
 
-	const int width = oka::FealdManager::GetInstance()->m_feald->m_width;
+	const int width = oka::FealdManager::GetInstance()->m_feald->GetWidth();
 
 	const float height = oka::FealdManager::GetInstance()->m_feald->m_vertex[z * width + x].y;
 

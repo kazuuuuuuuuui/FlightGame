@@ -4,7 +4,6 @@
 #include"Character.h"
 #include"../MyLibrary/Input/VirtualController.h"
 
-
 class Enemy;
 typedef std::shared_ptr<Enemy> EnemySP;
 
@@ -21,19 +20,11 @@ public:
 	void Fall();
 	void ResetAimPos();
 
-	//test
-	void Draw();
-
 	Enemy();
-	~Enemy()
-	{
-		//debug
-		//printf("Enemy‚ğíœ‚µ‚Ü‚µ‚½\n");
-	};
 
 private:
-	VirtualController m_Controller;
 	glm::vec3 m_aimPos;
+	VirtualController m_controller;
 
 };
 

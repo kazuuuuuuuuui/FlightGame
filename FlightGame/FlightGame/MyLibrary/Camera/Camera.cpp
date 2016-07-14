@@ -17,7 +17,7 @@ namespace oka
 	{}
 
 	//-------------------------------------
-	//
+	//カメラの座標設定
 
 	void Camera::SetPos(glm::vec3 _pos)
 	{
@@ -25,7 +25,15 @@ namespace oka
 	}
 
 	//-------------------------------------
-	//
+	//カメラの座標取得
+
+	glm::vec3 Camera::GetPos()const
+	{
+		return m_position;
+	}
+
+	//-------------------------------------
+	//カメラの注視点設定
 
 	void Camera::SetTarget(glm::vec3 _target)
 	{
@@ -33,12 +41,23 @@ namespace oka
 	}
 
 	//-------------------------------------
-	//
+	//カメラの注視点取得
+
+	glm::vec3 Camera::GetTarget()const
+	{
+		return m_target;
+	}
+
+	//-------------------------------------
+	//カメラの上ベクトル設定
 
 	void Camera::SetUp(glm::vec3 _up)
 	{
 		m_up = _up;
 	}
+
+	//-------------------------------------
+	//カメラの上ベクトル取得
 
 	glm::vec3 Camera::GetUp()const
 	{
@@ -53,7 +72,7 @@ namespace oka
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 
-		float fov = oka::MyMath::ToRadian(m_fovy);
+		float fov = glm::radians(m_fovy);
 
 		glm::mat4 mat = glm::perspective(fov, m_aspect, m_zNear, m_zFar);
 
@@ -99,7 +118,6 @@ namespace oka
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 
-		//後で移動
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 	

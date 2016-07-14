@@ -22,6 +22,7 @@ namespace oka
 
 		void Title(float _delta);
 		void Game(float _delta);
+		void Ranking(float _delta);
 		void TimeUp(float _delta);
 		void GameOver(float _delta);
 		void Result(float _delta);

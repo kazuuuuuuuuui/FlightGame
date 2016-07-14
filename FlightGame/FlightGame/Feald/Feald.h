@@ -10,8 +10,6 @@ typedef std::shared_ptr<Feald> FealdSP;
 class Feald :public oka::GameObject 
 {
 public:
-	const int m_width;
-	const int m_height;
 	const glm::vec3 m_leftBottom;
 	const glm::vec3 m_rightBottom;
 	const glm::vec3 m_leftTop;
@@ -31,9 +29,15 @@ public:
 	void SetTex();
 	void SetHeight(const char *_fileName);
 	void Draw();
+	int GetWidth()const;
+	int GetDepth()const;
 
 	Feald();
 	~Feald();
+
+private:
+	const int m_width;
+	const int m_depth;
 
 };
 

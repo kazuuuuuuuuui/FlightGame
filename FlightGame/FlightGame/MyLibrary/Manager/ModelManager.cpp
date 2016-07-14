@@ -9,7 +9,7 @@ namespace oka
 	//keyのものが既に登録されているか検索し
 	//なければ管理しているマップに追加する
 
-	void ModelManager::Add(std::string _str, ModelSP _model)
+	void ModelManager::SetModel(std::string _str, ModelSP _model)
 	{
 		if (m_models.find(_str) == m_models.end())
 		{
@@ -17,5 +17,21 @@ namespace oka
 		}
 	}
 
+	//-------------------------------------
+	//モデルデータの取得
+	//引数としてstring型の文字列を受け取り
+	//Modelクラスのスマートポインタを返す
 
+	ModelSP ModelManager::GetModel(std::string _str)const
+	{
+		if (m_models.find(_str) == m_models.end())
+		{
+			assert(0);
+			return nullptr;
+		}
+		else
+		{
+			return m_models.find(_str)->second;
+		}
+	}
 }

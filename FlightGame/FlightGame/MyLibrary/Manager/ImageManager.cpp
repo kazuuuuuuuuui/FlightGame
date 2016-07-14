@@ -4,7 +4,6 @@
 
 namespace oka
 {
-
 	ImageManager* ImageManager::m_instance = nullptr;
 
 	//-------------------------------------
@@ -34,10 +33,6 @@ namespace oka
 		{
 			m_images.insert(std::make_pair(_str, _handle));
 		}
-		else
-		{
-			
-		}
 	}
 
 	//-------------------------------------
@@ -60,7 +55,8 @@ namespace oka
 	{
 		if (m_images.find(_str) == m_images.end())
 		{
-			return 0;
+			assert(0);
+			return -1;
 		}
 		else
 		{

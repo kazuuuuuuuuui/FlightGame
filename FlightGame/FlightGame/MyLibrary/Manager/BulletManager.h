@@ -15,7 +15,7 @@ namespace oka
 
 	public:
 		virtual void Update()override;
-		void AddBullet(BaseBulletSP _bullet);
+		void SetBullet(BaseBulletSP _bullet);
 		void CheckBullets();
 
 	private:

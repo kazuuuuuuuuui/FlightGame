@@ -14,8 +14,6 @@ namespace oka
 		FealdSP m_feald;
 
 		void AddFeald(FealdSP _feald);
-		const int GetFealdWidth()const;
-		const int GetFealdDepth()const;
 		
 		FealdManager();
 		~FealdManager();

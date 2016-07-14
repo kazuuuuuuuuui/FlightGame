@@ -5,7 +5,7 @@
 namespace oka
 {
 	CharacterManager* CharacterManager::m_instance = nullptr;
-	const unsigned int CharacterManager::m_maxEnemyNum = 10;//一度に出現する敵の数
+	const unsigned int CharacterManager::m_maxEnemyNum = 10;//フィールドに一度に出現する敵の数の上限
 
 	//-------------------------------------
 	//コンストラクタ
@@ -38,20 +38,25 @@ namespace oka
 
 		if (0 == m_flame % (60 * 3))
 		{
-			Respawn();
+			//Respawn();
 		}
 	}
 
 	//-------------------------------------
 	//プレイヤーを参照するためのポインタに
-	//
+	//自機を格納する
 
 	void CharacterManager::SetPlayer(PlayerSP _player)
 	{
-		if (nullptr == m_player)
-		{
-			m_player = _player;
-		}
+		m_player = _player;
+	}
+
+	//-------------------------------------
+	//自機へのスマートポインタを返す
+
+	PlayerSP CharacterManager::GetPlayer()const
+	{
+		return m_player;
 	}
 
 	//------------------
@@ -63,17 +68,21 @@ namespace oka
 	}
 
 	//-------------------------------------
+	//キャラクターが格納されたlistのアドレスを返す
+
+	std::list<CharacterSP>* CharacterManager::GetCharacters()
+	{
+		return &m_characters;
+	}
+
+	//-------------------------------------
 	//プレイヤーの活性状態を確認する
 
 	void CharacterManager::CheckPlayer()
 	{
 		if (nullptr != m_player)
 		{
-			if (m_player->IsActive())
-			{
-			
-			}
-			else
+			if (false == m_player->IsActive())
 			{
 				m_player = nullptr;
 			}
@@ -88,11 +97,7 @@ namespace oka
 		auto itr = m_characters.begin();
 		while (itr != m_characters.end())
 		{
-			if ((*itr)->m_isActive)
-			{
-
-			}
-			else
+			if (false == (*itr)->m_isActive)
 			{
 				itr = m_characters.erase(itr);
 				continue;
@@ -104,7 +109,7 @@ namespace oka
 	}
 
 	//-------------------------------------
-	//フレームに1回既定の敵の出現数に満たなければ
+	//既定フレームに1回既定の敵の出現数に満たなければ
 	//再出現させる
 
 	void CharacterManager::Respawn()

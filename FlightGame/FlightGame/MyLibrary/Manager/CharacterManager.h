@@ -16,12 +16,11 @@ namespace oka
 		unsigned int m_flame;
 		static const unsigned int m_maxEnemyNum;
 
-		PlayerSP m_player;
-		std::list<CharacterSP> m_characters;
-
 		virtual void Update()override;
 		void SetPlayer(PlayerSP _player);
+		PlayerSP GetPlayer()const;
 		void AddCharacter(CharacterSP _character);
+		std::list<CharacterSP>* GetCharacters();
 		void CheckPlayer();
 		void CheckCharacters();
 		void Respawn();
@@ -31,7 +30,8 @@ namespace oka
 
 	private:
 		static CharacterManager* m_instance;
-
+		PlayerSP m_player;
+		std::list<CharacterSP> m_characters;
 	};
 
 }//namespace oka

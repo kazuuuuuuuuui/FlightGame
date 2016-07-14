@@ -14,12 +14,12 @@ namespace oka
 		friend class Singleton<ModelManager>;
 
 	public:
-		std::map<std::string, ModelSP>m_models;
-		void Add(std::string _str, ModelSP _model);
+		void SetModel(std::string _str, ModelSP _model);
+		ModelSP GetModel(std::string _str)const;
 
 	private:
 		static ModelManager* m_instance;
-
+		std::map<std::string, ModelSP>m_models;
 	};
 }
 

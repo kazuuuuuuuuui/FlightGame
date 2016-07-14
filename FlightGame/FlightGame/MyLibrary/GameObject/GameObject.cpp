@@ -14,7 +14,7 @@ namespace oka
 	}
 
 	//-------------------------------------
-	//
+	//Šˆ«ó‘Ô‚ğ•Ô‚·
 
 	bool GameObject::IsActive()const
 	{

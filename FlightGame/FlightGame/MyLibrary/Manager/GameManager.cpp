@@ -25,15 +25,17 @@ namespace oka
 	//常にオブジェクトの活性状態を判別する
 
 	void GameManager::Update()
-	{
+	{	
 		auto itr = m_gameObjects.begin();
-		while (itr != (m_gameObjects.end()))
+		auto end = m_gameObjects.end();
+
+		while (itr != end)
 		{
 			itr->second->m_transform.Update();
 
 			itr++;
 		}
-		
+
 		CheckGameObject();
 	}
 
@@ -70,18 +72,15 @@ namespace oka
 		auto end = m_gameObjects.end();
 		while (itr != end)
 		{
-			if (itr->second->IsActive())
-			{
+			const bool isActive = itr->second->IsActive();
 
-			}
-			else
+			if (false == isActive)
 			{
 				itr = m_gameObjects.erase(itr);
 				continue;
 			}
 
 			itr++;
-
 		}
 	}
 }

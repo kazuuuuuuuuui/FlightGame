@@ -14,7 +14,6 @@ public:
 	static BulletSP Create(glm::vec3 _pos, glm::tquat<float> _rotate, glm::vec3 _speed);
 	virtual void Draw()override;
 	virtual void Update()override;
-	virtual bool IsHit(glm::vec3 _pos)const override;
 		
 	Bullet(glm::vec3 _pos, glm::tquat<float> _rotate, glm::vec3 _speed);
 	~Bullet();

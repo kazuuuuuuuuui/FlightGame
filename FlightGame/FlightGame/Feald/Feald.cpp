@@ -9,7 +9,7 @@
 
 Feald::Feald() :
 	m_width(256),
-	m_height(256),
+	m_depth(256),
 	m_leftBottom(glm::vec3(-200.0f, 2.0f, 180.0f)),
 	m_rightBottom(glm::vec3(400.0f, 2.0f, 180.0f)),
 	m_leftTop(glm::vec3(-200.0f, 2.0f, -450.0f)),
@@ -22,7 +22,7 @@ Feald::Feald() :
 	SetIndex();
 
 	//頂点の高さ設定
-	SetHeight("heightmap.bmp");
+	SetHeight("Image/heightmap.bmp");
 
 	//法線データ
 	SetNormal();
@@ -34,9 +34,7 @@ Feald::Feald() :
 
 Feald::~Feald()
 {
-	//debug
-	printf("フィールドが削除されました\n");
-	printf("\n");
+
 };
 
 //-------------------------------------
@@ -55,7 +53,7 @@ FealdSP Feald::Create()
 
 void Feald::SetVertex()
 {
-	for (int z = 0; z < m_height; z++)
+	for (int z = 0; z < m_depth; z++)
 	{
 		for (int x = 0; x < m_width; x++)
 		{
@@ -67,22 +65,48 @@ void Feald::SetVertex()
 
 }
 
+/*
+distance = 10.f;
+for (int i = 0; i < index_num;  i += 3);{
+v  m_vertex[m_index[i]]
+v1 m_vertex[m_index[i + 1]]
+v2 m_vertex[m_index[i + 2]]
+
+c = (v + v1 + v2) / 3;
+
+m_distance = zettaiti(p.x - c.x) + zettaiti(p.z - c.z);
+if (m_distance < distance) {
+	distance = m_distance;
+	tmp = i;
+}
+}
+
+v  m_vertex[m_index[tmp]]
+v1 m_vertex[m_index[tmp + 1]]
+v2 m_vertex[m_index[tmp + 2]]
+
+p.Upvec = vの三角形の法線;
+
+v1.y-v.y/ ( (p.x-v.x) /(v1.x-v.x))
+*/
+
+
 //-------------------------------------
 //コースのインデックスデータの生成
 
 void Feald::SetIndex()
 {
-	for (int z = 0; z < (m_height - 1); z++)
+	for (int z = 0; z < (m_depth - 1); z++)
 	{
 		for (int x = 0; x < (m_width - 1); x++)
 		{
-			m_index.push_back(0 + x + m_height * z);
-			m_index.push_back(1 + x + m_height * z);
-			m_index.push_back(m_width + x + m_height * z);
+			m_index.push_back(0 + x + m_depth * z);
+			m_index.push_back(1 + x + m_depth * z);
+			m_index.push_back(m_width + x + m_depth * z);
 		
-			m_index.push_back(1 + x + m_height * z);
-			m_index.push_back((m_width + 1) + x + m_height * z);
-			m_index.push_back(m_width + x + m_height * z);
+			m_index.push_back(1 + x + m_depth * z);
+			m_index.push_back((m_width + 1) + x + m_depth * z);
+			m_index.push_back(m_width + x + m_depth * z);
 		}
 	}
 
@@ -111,24 +135,19 @@ void Feald::SetNormal()
 
 void Feald::SetTex()
 {
-	for (int v = m_height; v > 0; v--)
+	for (int v = m_depth; v > 0; v--)
 	{
 		for (int u = 0; u < m_width; u++)
 		{
 			glm::vec2 t;
 			t.x = (u / 1.0f) / m_width;//u
-			t.y = (v / 1.0f) / m_height;//v
+			t.y = (v / 1.0f) / m_depth;//v
 
 			m_tex.push_back(t);
 
 		}
 	}
 }
-
-struct RGB
-{
-	unsigned char r, g, b;
-};
 
 //-------------------------------------
 //拡張子bmpからコースの各頂点のY座標を設定する
@@ -146,11 +165,11 @@ void Feald::SetHeight(const char *_fileName)
 	BITMAPINFOHEADER bih;
 	fread(&bih, sizeof(BITMAPINFOHEADER), 1, fp);
 
-	int imageSize = bih.biWidth * bih.biHeight * sizeof(RGB);
+	int imageSize = bih.biWidth * bih.biHeight * sizeof(oka::RGB);
 
-	RGB *pixels = (RGB*)malloc(imageSize);
+	oka::RGB *pixels = (oka::RGB*)malloc(imageSize);
 
-	pixels = (RGB*)malloc(imageSize);
+	pixels = (oka::RGB*)malloc(imageSize);
 
 	fread(pixels, imageSize, 1, fp);
 
@@ -185,6 +204,22 @@ void Feald::SetHeight(const char *_fileName)
 
 }
 
+//-------------------------------------
+//フィールドの幅を返す
+
+int Feald::GetWidth()const
+{
+	return m_width;
+}
+
+//-------------------------------------
+//フィールドの奥行を返す
+
+int Feald::GetDepth()const
+{
+	return m_depth;
+}
+
 
 //-------------------------------------
 //フィールド全体の描画
@@ -200,7 +235,7 @@ void Feald::Draw()
 			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 			glEnable(GL_TEXTURE_2D);
-			glBindTexture(GL_TEXTURE_2D, oka::ImageManager::GetInstance()->GetHandle("FealdTex"));
+			glBindTexture(GL_TEXTURE_2D, oka::ImageManager::GetInstance()->GetHandle("Grand"));
 
 			auto v = m_vertex.begin();
 			glVertexPointer(3, GL_FLOAT, 0, &(*v));

@@ -12,7 +12,7 @@ namespace oka
 
 	Sea::Sea()
 	{
-		ModelSP sea = oka::ModelManager::GetInstance()->m_models["Sea"];
+		ModelSP sea = oka::ModelManager::GetInstance()->GetModel("Sea");
 		unsigned int tex = oka::ImageManager::GetInstance()->GetHandle("Sea");
 
 		for (int i = 0; i < 3; i++)
@@ -22,9 +22,9 @@ namespace oka
 			//位置と向きとスケール調整
 			m_sea[i]->m_isBlend = true;
 
-			const glm::vec3 pos = glm::vec3(128.0f, i*0.5f, -128.0f);
+			const glm::vec3 pos = glm::vec3(128.0f, i*2.0f, -128.0f);
 			m_sea[i]->m_transform.m_position = pos;
-			const float angle = MyMath::ToRadian(90.0f);
+			const float angle = glm::radians(90.0f);
 			const glm::vec3 axis = glm::vec3(1, 0, 0);
 			m_sea[i]->m_transform.m_rotate = MyMath::Rotate(angle, axis);
 
@@ -49,7 +49,7 @@ namespace oka
 	void Sea::Update()
 	{
 			static float angle = 0.0f;
-			angle += oka::MyMath::ToRadian(1.0f);
+			angle += glm::radians(1.0f);
 
 			const float mv = sinf(angle)*0.1f;
 

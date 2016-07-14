@@ -19,11 +19,10 @@ namespace oka
 		unsigned int m_texture;
 
 		static MeshSP Create(ModelSP _model, unsigned int _texture);
-		void Draw();
-		void Update() {};
+		void Draw()override;
 
+		Mesh();
 		Mesh(ModelSP _model,unsigned int _texture);
-		~Mesh() {};
 	};
 }
 #endif

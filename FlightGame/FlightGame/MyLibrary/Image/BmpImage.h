@@ -19,7 +19,7 @@ namespace oka
 	};
 
 	//-------------------------------------
-	//
+	//ビットマップ画像の読み込み
 
 	unsigned int LoadImage3f(const char *_fileName);
 	unsigned int LoadImage4f(const char *_filename, bool _grayscale);

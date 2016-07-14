@@ -33,7 +33,7 @@ namespace oka
 	//-------------------------------------
 	//’e‚Ì’Ç‰Á
 
-	void BulletManager::AddBullet(BaseBulletSP _bullet)
+	void BulletManager::SetBullet(BaseBulletSP _bullet)
 	{
 		m_bullets.push_back(_bullet);
 	}
@@ -45,20 +45,16 @@ namespace oka
 	void BulletManager::CheckBullets()
 	{
 		auto itr = m_bullets.begin();
-		while (itr != m_bullets.end())
+		auto end = m_bullets.end();
+		while (itr != end)
 		{
-			if ((*itr)->IsActive())
-			{
-
-			}
-			else
+			if (false == (*itr)->IsActive())
 			{
 				itr = m_bullets.erase(itr);
 				continue;
 			}
 
 			itr++;
-
 		}
 	}
 

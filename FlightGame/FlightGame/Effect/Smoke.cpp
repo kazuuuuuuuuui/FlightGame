@@ -6,15 +6,15 @@
 //コンストラクタ
 //
 
-Smoke::Smoke(EffectInfo _info)
+Smoke::Smoke(glm::vec3 _basePos, unsigned int _particleNum, glm::vec3 _color)
 {
-	m_transform.m_position = _info.basePos;
+	m_transform.m_position = _basePos;
 
-	for (unsigned int i = 0; i < _info.particleNum;i++)
+	for (unsigned int i = 0; i < _particleNum;i++)
 	{
 		float alpha = 0.5f+((float)rand() / RAND_MAX)*0.5f;
-		glm::vec3 pos = _info.basePos;
-		glm::vec3 color = _info.color;
+		glm::vec3 pos = _basePos;
+		glm::vec3 color = _color;
 		glm::vec3 speed;
 		speed.x = 0;
 		speed.y = (((float)rand() / RAND_MAX)) *0.05f;
@@ -26,9 +26,12 @@ Smoke::Smoke(EffectInfo _info)
 
 }
 
+//-------------------------------------
+//デストラクタ
+
 Smoke::~Smoke()
 {
-	//printf("煙が削除されました\n");
+	
 }
 
 //-------------------------------------
@@ -36,9 +39,9 @@ Smoke::~Smoke()
 //引数として煙自体の座標と煙を形成する
 //戻り値として生成した煙を返す
 
-SmokeSP Smoke::Create(EffectInfo _info)
+SmokeSP Smoke::Create(glm::vec3 _basePos, unsigned int _particleNum, glm::vec3 _color)
 {
-	SmokeSP smoke(new Smoke(_info));
+	SmokeSP smoke(new Smoke(_basePos, _particleNum, _color));
 
 	return smoke;
 }
@@ -63,9 +66,11 @@ void Smoke::Draw()
 		auto itr = m_particles.begin();
 		auto end = m_particles.end();
 
-		for (; itr != end; itr++)
+		while (itr != end)
 		{
 			(*itr)->Draw();
+
+			itr++;
 		}
 	}
 	glPopAttrib();
@@ -80,8 +85,6 @@ void Smoke::Update()
 	for (auto itr = m_particles.begin(); itr != m_particles.end(); itr++)
 	{
 		(*itr)->m_alpha -= 0.005f;
-		//debug
-		//printf("%f\n", (*itr)->m_alpha);
 
 		if ((*itr)->m_alpha <= 0.0f)
 		{
@@ -92,9 +95,6 @@ void Smoke::Update()
 		(*itr)->m_transform.m_position = ((*itr)->m_transform.m_position + (*itr)->m_speed*(*itr)->m_alpha);
 	}
 
-
-
-	//後で変更
 	auto itr = m_particles.begin();
 	while (itr != m_particles.end())
 	{

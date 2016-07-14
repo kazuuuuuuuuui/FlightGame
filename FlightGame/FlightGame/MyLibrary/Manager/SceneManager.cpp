@@ -2,9 +2,12 @@
 #include"SceneManager.h"
 #include"CharacterManager.h"
 #include"JoysticManager.h"
-#include"../MyTime/MyTime.h"
+#include"SoundManager.h"
+#include"../Camera/Camera.h"
+#include"../Manager/TimeManager.h"
 #include"../../Scene/TitleScece.h"
 #include"../../Scene/GameScene.h"
+#include"../../Scene/RankingScene.h"
 #include"../../Scene/TimeUpScene.h"
 #include"../../Scene/GameOverScene.h"
 #include"../../Scene/ResultScene.h"
@@ -54,10 +57,6 @@ namespace oka
 		if (0.0f == m_sequence.GetTime())
 		{		
 			m_nowScene = new TitleScene();
-			
-			printf("タイトルシーンが初期化されました\n");
-			printf("\n");
-
 		}
 
 		m_nowScene->Update();
@@ -68,10 +67,18 @@ namespace oka
 			switch (TitleScene::m_titleMeny)
 			{
 			case(TitleMenu::GameStart) :
-				
+
+				oka::SoundManager::GetInstance()->Play("GameStart");
 				m_prevScene = m_nowScene;
-				//delete m_nowScene;
 				m_sequence.Change(&SceneManager::Game);
+
+				break;
+
+			case(TitleMenu::Ranking) :
+
+				oka::SoundManager::GetInstance()->Play("GameStart");
+				m_prevScene = m_nowScene;
+				m_sequence.Change(&SceneManager::Ranking);
 
 				break;
 
@@ -93,35 +100,47 @@ namespace oka
 		if (0.0f == m_sequence.GetTime())
 		{			
 			m_nowScene = new GameMainScene();
-
-			printf("ゲームシーンが初期化されました\n");
-			printf("\n");
-
+			oka::SoundManager::GetInstance()->ChangeVolume("BGM", 0.2f);
+			oka::SoundManager::GetInstance()->Play("BGM");
 		}
 
 		m_nowScene->Update();
 		m_nowScene->Render();
 
-		//ゲームオーバーシーンに移行
-		if (nullptr == oka::CharacterManager::GetInstance()->m_player)
+		if (nullptr == oka::CharacterManager::GetInstance()->GetPlayer())
 		{
-			printf("ゲームオーバーシーンに移ります\n");
-			printf("\n");
-
 			m_prevScene = m_nowScene;
 
 			m_sequence.Change(&SceneManager::GameOver);
 		}
 
 		//タイムアップシーンに移行
-		if (0 == oka::MyTime::GetInstance()->GetFlame())
+		if (0 == oka::TimeManager::GetInstance()->GetFlame())
 		{
-			printf("タイムアップシーンに移ります\n");
-			printf("\n");
+			m_prevScene = m_nowScene;
 
-			//m_prevScene = m_nowScene;
+			m_sequence.Change(&SceneManager::TimeUp);
+		}
+	}
 
-			//m_sequence.Change(&SceneManager::TimeUp);
+	//-------------------------------------
+	//ランキングシーン
+
+	void SceneManager::Ranking(float delta)
+	{
+		if (0.0f == m_sequence.GetTime())
+		{
+			m_nowScene = new RankingScene();
+		}
+
+		m_nowScene->Update();
+		m_nowScene->Render();
+
+		if (oka::JoysticManager::GetInstance()->GetController(0)->m_downkey & XINPUT_GAMEPAD_B)
+		{
+			m_prevScene = m_nowScene;
+
+			m_sequence.Change(&SceneManager::End);
 		}
 	}
 
@@ -133,9 +152,8 @@ namespace oka
 		if (0.0f == m_sequence.GetTime())
 		{
 			m_nowScene = new TimeUpScene();
-
-			printf("タイムアップシーンが初期化されました\n");
-			printf("\n");
+			oka::SoundManager::GetInstance()->Stop("BGM");
+			oka::SoundManager::GetInstance()->Stop("RockOn");
 		}
 
 		m_prevScene->Render();
@@ -160,9 +178,7 @@ namespace oka
 		if (0.0f == m_sequence.GetTime())
 		{
 			m_nowScene = new GameOverScene();
-
-			printf("ゲームオーバーシーンが初期化されました\n");
-			printf("\n");
+			oka::SoundManager::GetInstance()->Stop("BGM");
 		}
 
 		m_prevScene->Render();
@@ -190,11 +206,25 @@ namespace oka
 			m_nowScene = new ResultScene();
 		}
 
-		if (oka::JoysticManager::GetInstance()->GetController(0)->m_downkey & XINPUT_GAMEPAD_START)
+		if (oka::JoysticManager::GetInstance()->GetController(0)->m_downkey & XINPUT_GAMEPAD_A)
 		{
-			m_prevScene = m_nowScene;
+			switch (ResultScene::m_resultMeny)
+			{
+			case(ResultMenu::ReturnTitle) :
 
-			m_sequence.Change(&SceneManager::End);
+				oka::SoundManager::GetInstance()->Play("GameStart");
+				m_prevScene = m_nowScene;
+				m_sequence.Change(&SceneManager::End);
+
+				break;
+
+			case(ResultMenu::ReturnRanking) :
+
+				m_prevScene = m_nowScene;
+				m_sequence.Change(&SceneManager::Ranking);
+
+				break;
+			};
 		}
 
 		m_nowScene->Update();
@@ -210,6 +240,12 @@ namespace oka
 		if (0.0f == m_sequence.GetTime())
 		{
 			m_nowScene = new EndScene();
+
+			delete g_camera;
+			g_camera = nullptr;
+
+			BaseSingleton::AllDestroy();
+			BaseSingleton::Clear();
 
 			delete m_prevScene;
 			delete m_nowScene;

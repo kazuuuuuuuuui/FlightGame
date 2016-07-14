@@ -2,15 +2,15 @@
 #include"../MyLibrary/Manager/ImageManager.h"
 #include"../glut.h"
 
-Fire::Fire(EffectInfo _info)
+Fire::Fire(glm::vec3 _basePos, unsigned int _particleNum, glm::vec3 _color)
 {
-	m_transform.m_position = _info.basePos;
+	m_transform.m_position = _basePos;
 
-	for (unsigned int i = 0; i < _info.particleNum; i++)
+	for (unsigned int i = 0; i < _particleNum; i++)
 	{
 		float alpha = ((float)rand() / RAND_MAX);
-		glm::vec3 pos = _info.basePos;
-		glm::vec3 color = _info.color;
+		glm::vec3 pos = _basePos;
+		glm::vec3 color = _color;
 		glm::vec3 speed;
 
 		speed.x = 0;
@@ -22,9 +22,9 @@ Fire::Fire(EffectInfo _info)
 	}
 }
 
-FireSP Fire::Create(EffectInfo _info)
+FireSP Fire::Create(glm::vec3 _basePos, unsigned int _particleNum, glm::vec3 _color)
 {
-	FireSP fire(new Fire(_info));
+	FireSP fire(new Fire(_basePos, _particleNum, _color));
 
 	return fire;
 }
@@ -61,9 +61,7 @@ void Fire::Update()
 	for (auto itr = m_particles.begin(); itr != m_particles.end(); itr++)
 	{
 		(*itr)->m_alpha -= 0.005f;
-		//debug
-		//printf("%f\n", (*itr)->m_alpha);
-
+		
 		if ((*itr)->m_alpha <= 0.0f)
 		{
 			(*itr)->m_isActive = false;
@@ -73,9 +71,6 @@ void Fire::Update()
 		(*itr)->m_transform.m_position += (*itr)->m_speed;
 	}
 
-
-
-	//å„Ç≈ïœçX
 	auto itr = m_particles.begin();
 	while (itr != m_particles.end())
 	{

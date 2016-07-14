@@ -11,8 +11,7 @@ public:
 	void Render();
 
 	GameMainScene();
-
-	~GameMainScene();
+	virtual ~GameMainScene();
 };
 
 #endif

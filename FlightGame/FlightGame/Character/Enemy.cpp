@@ -8,29 +8,12 @@
 #include"../MyLibrary/Manager/CharacterManager.h"
 #include"../MyLibrary/Manager/SoundManager.h"
 #include"../MyLibrary/Manager/FealdManager.h"
+#include"../MyLibrary/Manager/ScoreManager.h"
 #include"../Effect/Fire.h"
 #include"../Effect/Smoke.h"
 #include"../glm/gtx/transform.hpp"
 #include"../glm/gtx/intersect.hpp"
 #include"../glut.h"
-
-
-glm::quat RotationBetweenVectors(glm::vec3 start, glm::vec3 dest) 
-{
-	start = glm::normalize(start);
-	dest = glm::normalize(dest);
-
-	glm::vec3 rotationAxis = glm::cross(start, dest);
-	float angle = glm::length(rotationAxis);
-
-	//回転軸がないときは何もしない
-	if (angle < 0.1f)
-	{
-		return glm::angleAxis(0.0f, glm::vec3(0.0f, 1.0f, 0.0f));//何もしないので回転軸は何でもいい
-	}
-	
-	return glm::angleAxis(angle, glm::normalize(rotationAxis));
-}
 
 //-------------------------------------
 //コンストラクタ
@@ -52,10 +35,6 @@ Enemy::Enemy()
 	m_transform.m_position.y = y(mt);
 	m_transform.m_position.z = z(mt);
 
-	//m_transform.m_position = glm::vec3(0.0f, 30.0f, 0.0f);
-
-	//m_aimPos = glm::vec3(0.0f, 100.0f, -100.0f);
-
 	m_aimPos = m_transform.m_position;
 }
 
@@ -69,31 +48,21 @@ EnemySP Enemy::Create()
 	return enemy;
 }
 
-void Enemy::Draw()
-{
-	/*glPushMatrix();
-	{
-		glTranslatef(m_aimPos.x, m_aimPos.y, m_aimPos.z);
-
-		glutSolidTeapot(1);
-	}
-	glPopMatrix();*/
-}
-
 //-------------------------------------
 //更新
 
 void Enemy::Update()
 {
 	//座標更新
-	m_speed = m_transform.m_myToVec*0.2f + m_accel;
+	//m_speed = m_transform.m_myToVec*0.1f;
+	m_speed += m_accel;
 	m_transform.m_position += m_speed;
 
 	SetOnRadarPos();
 
 	//慣性
-	//m_accel *= 0.98f;
-	//m_speed *= 0.98f;
+	m_accel *= 0.98f;
+	m_speed *= 0.98f;
 
 	const float length = glm::length(m_aimPos - m_transform.m_position);
 	
@@ -104,6 +73,39 @@ void Enemy::Update()
 
 	//ボディ
 	m_body->m_transform = m_transform;
+
+	////煙
+	//if (0 == m_flame % 3)
+	//{
+	//	EffectInfo info;
+	//	info.basePos = m_transform.m_position - m_transform.m_myUpVec*0.5f;
+	//	info.particleNum = 1;
+	//	info.color = glm::vec3(195.0f / 255.0f, 195.0f / 255.0f, 195.0f / 255.0f);
+	//	SmokeSP smoke = Smoke::Create(info);
+	//	oka::GameManager::GetInstance()->Add("Smoke", smoke);
+	//}
+
+	/*書き換える*/
+	if (m_transform.m_position.x <= -200.0f)
+	{
+		m_transform.m_position.x = -200.0f;
+	}
+	if (m_transform.m_position.x >= 400.0f)
+	{
+		m_transform.m_position.x = 400.0f;
+	}
+	if (m_transform.m_position.z >= 180.0f)
+	{
+		m_transform.m_position.z = 180.0f;
+	}
+	if (m_transform.m_position.z <= -450.0f)
+	{
+		m_transform.m_position.z = -450.0f;
+	}
+	if (m_transform.m_position.y >= 250.0f)
+	{
+		m_transform.m_position.y = 250.0f;
+	}
 
 	Control();
 
@@ -130,28 +132,19 @@ void Enemy::Update()
 	}
 
 	//死亡判定
-	if (!m_isActive)
+	if (false == m_isActive)
 	{
 		//爆発音
 		oka::SoundManager::GetInstance()->Play("Explode");
 
 		//爆発エフェクト
-		EffectInfo smokeInfo;
-		smokeInfo.basePos = m_transform.m_position;
-		smokeInfo.particleNum = 5;
-		smokeInfo.color = glm::vec3(0, 0, 0);
-		SmokeSP smoke = Smoke::Create(smokeInfo);
+		SmokeSP smoke = Smoke::Create(m_transform.m_position, 5, glm::vec3(0.0f, 0.0f, 0.0f));
 		oka::GameManager::GetInstance()->Add("Smoke", smoke);
 
-		EffectInfo fireInfo;
-		fireInfo.basePos = m_transform.m_position;;
-		fireInfo.particleNum = 20;
-		fireInfo.color = glm::vec3(1.0f, 0.5f, 0.25f);
-		FireSP fire = Fire::Create(fireInfo);
+		FireSP fire = Fire::Create(m_transform.m_position, 20, glm::vec3(1.0f, 0.5f, 0.25f));
 		oka::GameManager::GetInstance()->Add("Fire", fire);
 
-		oka::CharacterManager::GetInstance()->m_player->PlusMyScore();
-
+		oka::ScoreManager::GetInstance()->PlusScore();
 	}
 }
 
@@ -161,13 +154,13 @@ void Enemy::Update()
 
 bool Enemy::IsFrontPlayer(glm::vec3 pos)const
 {
-	static float dis = 80.0f;
+	static float dis = 50.0f;
 
 	if (IsNear(pos, dis))
 	{
 		const glm::vec3 pos = m_transform.m_position;
 		const glm::vec3 dir = m_transform.m_myToVec;
-		const glm::vec3 aimPos = oka::CharacterManager::GetInstance()->m_player->m_transform.m_position;
+		const glm::vec3 aimPos = oka::CharacterManager::GetInstance()->GetPlayer()->m_transform.m_position;
 		const float rad = 100.0f;
 		float distance;
 
@@ -187,10 +180,9 @@ void Enemy::Shot()
 {
 	if ( false == m_isHitAttack)
 	{
-
 		if (0 == (m_flame % 10))
 		{
-			const glm::vec3 v = m_transform.m_position - oka::CharacterManager::GetInstance()->m_player->m_transform.m_position;
+			const glm::vec3 v = m_transform.m_position - oka::CharacterManager::GetInstance()->GetPlayer()->m_transform.m_position;
 			float volume = glm::length(v);
 			volume = 20.0f / volume;
 
@@ -208,7 +200,7 @@ void Enemy::Shot()
 			glm::tquat<float> quat = m_transform.m_rotate;
 
 			BulletSP bullet = Bullet::Create(pos, quat, speed);
-			oka::BulletManager::GetInstance()->AddBullet(bullet);
+			oka::BulletManager::GetInstance()->SetBullet(bullet);
 			oka::GameManager::GetInstance()->Add("Bullet", bullet);
 		}
 	}
@@ -219,30 +211,33 @@ void Enemy::Shot()
 
 void Enemy::Control()
 {
-	/*glm::vec3 v = m_transform.m_position + m_transform.m_myToVec;
+	/*
+	glm::vec3 v1 = m_transform.m_myToVec;
+	glm::vec3 v2 = m_aimPos - m_transform.m_position;
+	v2 = glm::normalize(v2);
 
-	float dy = m_aimPos.y - v.y;
-	dy = abs(dy);
+	float cos = glm::dot(v1, v2);
 
-	float dz = m_aimPos.z - v.z;
-	dz = abs(dz);
-	
-	float angle = atan2f(dy, dz);
+	printf("%f\n", cos);
+
+	float angle = 0.0f;
+
+	angle = acos(cos);
 	angle = glm::degrees(angle);
-printf("%f\n", angle);
-
+	
+	
 	if (angle > 5.0f)
 	{
-		m_Controller.m_stickDown = true;
+		m_controller.m_stickDown = true;
 	}
 	else
 	{
-		m_Controller.m_stickDown = false;
-	}*/
+		m_controller.m_stickDown = false;
+	}
+	*/
 
-
-	//const float value = oka::MyMath::ToRadian(0.8f);
-	//glm::tquat<float> quat;
+	const float value = glm::degrees(1.0f);
+	glm::tquat<float> quat;
 
 	//Roll
 	/*if (_pressedKey & XINPUT_GAMEPAD_RIGHT_SHOULDER)
@@ -274,24 +269,28 @@ printf("%f\n", angle);
 	}*/
 
 	//Pitch
-	/*if (m_Controller.m_stickUp)
+	/*
+	if (m_controller.m_stickUp)
 	{
 		quat = oka::MyMath::Rotate(-value, glm::vec3(1, 0, 0));
 
 		m_transform.m_rotate *= quat;
 	}
-	else if (m_Controller.m_stickDown)
+	else if (m_controller.m_stickDown)
 	{
 		quat = oka::MyMath::Rotate(value, glm::vec3(1, 0, 0));
 
 		m_transform.m_rotate *= quat;
-	}*/
+	}
+	*/
+
+	//printf("x:%f y:%f z:%f w:%f\n", m_transform.m_rotate.x, m_transform.m_rotate.y, m_transform.m_rotate.z, m_transform.m_rotate.w);
 
 
-
-	if (nullptr != oka::CharacterManager::GetInstance()->m_player)
+	
+	if (nullptr != oka::CharacterManager::GetInstance()->GetPlayer())
 	{
-		const glm::vec3 pos = oka::CharacterManager::GetInstance()->m_player->m_transform.m_position;
+		const glm::vec3 pos = oka::CharacterManager::GetInstance()->GetPlayer()->m_transform.m_position;
 
 		if (IsFrontPlayer(pos))
 		{
@@ -307,6 +306,7 @@ printf("%f\n", angle);
 	{
 		Patrol();
 	}
+	
 }
 
 //-------------------------------------
@@ -320,12 +320,12 @@ void Enemy::Patrol()
 		glm::vec3 accel = m_aimPos - m_transform.m_position;
 		accel = glm::normalize(accel);
 
-		m_accel = accel*0.02f;
+		m_accel = accel*0.01f;
 		
 		glm::vec3 start = m_transform.m_myToVec;
 		glm::vec3 dest = accel;
 
-		glm::tquat<float>quat = RotationBetweenVectors(start, dest);
+		glm::tquat<float>quat = oka::MyMath::RotationBetweenVectors(start, dest);
 		m_transform.m_rotate = quat * m_transform.m_rotate;
 	}
 }
@@ -335,11 +335,11 @@ void Enemy::Patrol()
 
 void Enemy::Chase()
 {
-	const glm::vec3 aimPos = oka::CharacterManager::GetInstance()->m_player->m_transform.m_position;
+	const glm::vec3 aimPos = oka::CharacterManager::GetInstance()->GetPlayer()->m_transform.m_position;
 	glm::vec3 v = aimPos - m_transform.m_position;
 
 	float length = glm::length(v);
-	const float distance = 30.0f;
+	const float distance = 100.0f;
 
 	v = glm::normalize(v);
 
@@ -350,14 +350,14 @@ void Enemy::Chase()
 	}
 	else
 	{
-		v *= 0.05f;
+		v *= 0.005f;
 		m_accel = v;	
 	}
 
 	glm::vec3 start = m_transform.m_myToVec;
 	glm::vec3 dest = v;
 
-	glm::tquat<float>quat = RotationBetweenVectors(start, dest);
+	glm::tquat<float>quat = oka::MyMath::RotationBetweenVectors(start, dest);
 	m_transform.m_rotate = quat * m_transform.m_rotate;
 }
 
@@ -366,21 +366,14 @@ void Enemy::Chase()
 
 void Enemy::Fall()
 {
-	const glm::tquat<float> quat = oka::MyMath::Rotate(oka::MyMath::ToRadian(3.0f), glm::vec3(0, 0, -1));
+	const glm::tquat<float> quat = oka::MyMath::Rotate(glm::radians(3.0f), glm::vec3(0, 0, -1));
 	m_transform.m_rotate *= quat;
 
-	//m_accel = glm::vec3(0.0f, 0.0f, 0.0f);
-
-	m_transform.m_position.y -= 0.5f;
+	m_transform.m_position.y -= 0.3f;
 
 	if (0 == (m_flame % 5))
 	{
-		EffectInfo info;
-		info.basePos = m_transform.m_position;
-		info.particleNum = 1;
-		info.color = glm::vec3(50.0f / 255.0f, 50.0f / 255.0f, 50.0f / 255.0f);
-
-		SmokeSP smoke = Smoke::Create(info);
+		SmokeSP smoke = Smoke::Create(m_transform.m_position, 1, glm::vec3(50.0f / 255.0f, 50.0f / 255.0f, 50.0f / 255.0f));
 		oka::GameManager::GetInstance()->Add("Smoke", smoke);
 	}
 

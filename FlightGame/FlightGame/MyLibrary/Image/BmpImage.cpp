@@ -117,17 +117,6 @@ namespace oka
 			pixels3f[i].b = tmp;
 		}
 
-		//ピクセル単位で上下反転
-		/*for (int i = 0; i < bih.biWidth; i++)
-		{
-			for (int n = 0; n < bih.biHeight / 2; n++)
-			{
-				RGB temp = pixels3f[bih.biWidth * n + i];
-				pixels3f[bih.biWidth * n + i] = pixels3f[bih.biWidth*(bih.biHeight - n - 1) + i];
-				pixels3f[bih.biWidth*(bih.biHeight - n - 1) + i] = temp;
-			}
-		}*/
-
 		int imageSize4f = bih.biWidth * bih.biHeight * sizeof(RGBA);
 		RGBA *pixels4f = (RGBA*)malloc(imageSize4f);
 
